@@ -1,0 +1,12 @@
+.Button {
+    border: 2px solid #757eff;
+    padding: 0;
+}
+
+.Button:hover {
+    border: 2px solid #9b6cff;
+}
+
+.Button:active {
+    border: 2px solid #f527ff;
+}

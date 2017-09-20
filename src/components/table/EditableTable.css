@@ -1,0 +1,57 @@
+.EditableTable {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.EditableTable .content {
+    width: 100%;
+    height: calc(100% - 42px);
+    position: absolute;
+}
+
+.EditableTable .controls {
+    width: 100%;
+    height: 30px;
+    background-color: #e4dfe8;
+    z-index: 200;
+    top: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    overflow: inherit;
+    box-shadow: 0 1px 2px #999;
+}
+.EditableTable .controls:hover {
+    box-shadow: 0 1px 4px #333;
+}
+
+.controls>button {
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    float: right;
+    border-radius: 50%;
+    margin-right: 16px;
+}
+
+.controls>button:hover {
+    border: none;
+    box-shadow: 1px 1px 16px #000;
+}
+.controls>button.edit,
+.controls>button.remove,
+.controls>button.add {
+    background-color: #FF9800;
+}
+.controls>button.cancel {
+    background-color: #cb3549;
+}
+.controls>button.cancel {
+    background-color: #cb3549;
+}
+.controls>button.done {
+    background-color: #019c00;
+}

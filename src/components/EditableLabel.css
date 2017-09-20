@@ -1,0 +1,20 @@
+.EditableLabel {
+    width: 100%;
+}
+.EditableLabel.notValid {
+    background-color: #cb816a !important;
+}
+
+input:not([type='checkbox']).EditableLabel,
+select.EditableLabel {
+    background-color: #cddfe8;
+}
+input:not([type='checkbox']).EditableLabel:hover,
+select.EditableLabel:hover {
+    box-shadow: 0 0 4px #000;
+}
+
+input:not([type='checkbox']).EditableLabel:focus,
+select.EditableLabel:focus {
+    box-shadow: 0 0 10px #51013d;
+}
