@@ -15,14 +15,22 @@ export const Cell = (cellInfo, onChange, keyName) => (
     <EditableLabel key={cellInfo.original[keyName]} value={cellInfo.value}
                    valueSet={cellInfo.column.allowedValues}
                    inputType={cellInfo.column.inputType}
+                   isEditable={cellInfo.column.isEditable}
                    isEditMode={cellInfo.original.isEditing}
                    onChange={(value) => onChange && onChange(cellInfo.original[keyName], {[cellInfo.column.id]: value})}
-                   error={ cellInfo.original.errors
+                   error={ Array.isArray(cellInfo.original.errors)
                        ? cellInfo.original.errors.find(error => error.field === cellInfo.column.id)
                        : null
                    }
+                   isDeleted={cellInfo.original.isDeleted}
     />
 );
+
+export const IconCell = (iconName) => {
+    return (
+        <i className="material-icons rowIcon">{iconName}</i>
+    )
+};
 
 const Table = ({data, columns, defaultSorted, sorted}) => {
     return (

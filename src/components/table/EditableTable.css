@@ -19,11 +19,19 @@
     top: 8px;
     padding-top: 6px;
     padding-bottom: 6px;
-    overflow: inherit;
+    overflow: visible;
     box-shadow: 0 1px 2px #999;
 }
 .EditableTable .controls:hover {
     box-shadow: 0 1px 4px #333;
+}
+
+.controls .tableName {
+    margin-left: 50px;
+    line-height: 30px;
+    font-size: 110%;
+    font-weight: 600;
+    color: #003f16;
 }
 
 .controls>button {
@@ -49,9 +57,9 @@
 .controls>button.cancel {
     background-color: #cb3549;
 }
-.controls>button.cancel {
-    background-color: #cb3549;
-}
 .controls>button.done {
     background-color: #019c00;
+}
+.controls>button.refresh {
+    background-color: #54669c;
 }

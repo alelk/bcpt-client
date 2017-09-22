@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import Table, {Cell} from './Table'
+import Table, {Cell, IconCell} from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -13,6 +13,7 @@ import 'moment/locale/ru';
 class PersonsTable extends React.Component {
 
     columns = [
+        { Header: "", accessor: "localId", Cell: () => IconCell("person"), width: 30, filterable: false },
         { Header: "ID", accessor: "externalId", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
         { Header: "Фамилия", accessor: "lastName", Cell: (ci) => Cell(ci, this.props.onChange, "localId") },
         { Header: "Имя", accessor: "firstName", Cell: (ci) => Cell(ci, this.props.onChange, "localId") },
@@ -35,17 +36,17 @@ class PersonsTable extends React.Component {
             Header: "Последнее изменение",
             id: "updateTimestamp",
             accessor: d => moment(d.updateTimestamp).format('YYYY/MM/DD HH:mm'),
-            width: 130
+            minWidth: 130
         }
     ];
 
     render() {
         const {persons, isEditMode} = this.props;
-        const data = Object.keys(persons).map(k => Object.assign({}, persons[k], {localId: k})).filter(item => !item.isDeleted);
+        const data = Object.keys(persons).map(k => Object.assign({}, persons[k], {localId: k}));
         return (
             <Table
-                defaultSorted={[{id:"localId", desc:true}]}
-                sorted={isEditMode ? [{id:"localId", desc:true}] : undefined}
+                defaultSorted={[{id:"localId", desc:false}]}
+                sorted={isEditMode ? [{id:"localId", desc:false}] : undefined}
                 data={data}
                 filterable={true}
                 columns={isEditMode ? [{
@@ -65,7 +66,9 @@ PersonsTable.propTypes = {
         lastName : PropTypes.string,
         middleName : PropTypes.string,
         groupType : PropTypes.string,
-        rhFactor : PropTypes.string
+        rhFactor : PropTypes.string,
+        updateTimestamp : PropTypes.string,
+        errors : PropTypes.object | PropTypes.array
     })).isRequired,
     isEditMode : PropTypes.bool,
     onChange : PropTypes.func

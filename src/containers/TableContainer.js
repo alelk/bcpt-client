@@ -5,6 +5,7 @@
  */
 import EditableTable from '../components/table/EditableTable'
 import PersonsContainer from './PersonsContainer'
+import BloodDonationsContainer from './BloodDonationsContainer'
 import {fetchTableData, addNew, edit, saveChanges, enableEditMode, deleteChecked} from '../actions/actions'
 
 import React from 'react'
@@ -53,8 +54,11 @@ class TableContainer extends React.Component {
                                onCancel={this.dismissChanges}
                                onEdit={this.onEnableEditMode}
                                onRemove={this.onDeleteCheckedItems}
+                               onRefresh={this.dismissChanges}
+                               tableName={this.props.tableDisplayName}
                 >
                     <Route path='*/table/persons' component={PersonsContainer}/>
+                    <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
                 </EditableTable>
             </div>
         )
@@ -63,6 +67,7 @@ class TableContainer extends React.Component {
 
 TableContainer.propTypes = {
     tableName : PropTypes.string,
+    tableDisplayName : PropTypes.string,
     tableData : PropTypes.object,
     addNew : PropTypes.func,
     enableEditMode : PropTypes.func,
@@ -75,6 +80,7 @@ const mapStateToProps = (state, ownProps) => {
     const {tableName} = ownProps.match.params;
     return {
         tableName,
+        tableDisplayName : state.tables[tableName].displayName,
         tableData: state.tables[tableName]
     }
 };

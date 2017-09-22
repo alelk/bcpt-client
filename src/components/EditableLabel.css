@@ -5,6 +5,11 @@
     background-color: #cb816a !important;
 }
 
+.EditableLabel.deleted {
+    color: #5d3544;
+    opacity: 0.5;
+}
+
 input:not([type='checkbox']).EditableLabel,
 select.EditableLabel {
     background-color: #cddfe8;
