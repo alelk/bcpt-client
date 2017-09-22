@@ -1,0 +1,54 @@
+.Drawer {
+    position: fixed;
+    height: 100%;
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 200;
+}
+.Drawer, .Drawer * {
+    transition: 0.4s ease-in-out;
+}
+.Drawer .header {
+    margin-top: 50px;
+}
+
+.Drawer .navItem {
+    background-color: rgba(224, 232, 255, 0.11);
+    color: white;
+    margin: 10px 6px 10px 6px;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.Drawer .navItem:hover {
+    box-shadow: 0 0 4px #fff;
+}
+
+.Drawer .navItem a {
+    color: white;
+    text-decoration: none;
+}
+
+.Drawer.closed {
+    width: 0;
+}
+.Drawer.closed .header,
+.Drawer.closed .content {
+    display: none;
+}
+.Drawer .menu {
+    position: fixed;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2000;
+    top: 8px;
+    left: 8px;
+}
+
+.Drawer .menu:hover {
+    color: #0db80b;
+}
+
+.Drawer.opened .menu {
+    color: #fff;
+}

@@ -1,3 +1,8 @@
 .ReactTable {
     height: calc(100% - 2px);
 }
+
+.ReactTable .rowIcon {
+    font-size: inherit;
+    color: #699784;
+}

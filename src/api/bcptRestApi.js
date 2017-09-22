@@ -10,13 +10,17 @@ import { normalize, schema } from 'normalizr'
 
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
+const bloodDonationSchema = new schema.Entity('bloodDonations', {}, { idAttribute : value => value.externalId });
+const bloodDonationsSchema = new schema.Array(bloodDonationSchema);
 
 const SchemaTable = {
     persons : personsSchema,
+    bloodDonations : bloodDonationsSchema
 };
 
 const SchemaTableEntity = {
-    persons : personSchema
+    persons : personSchema,
+    bloodDonations : bloodDonationSchema
 };
 
 export const getTable = function (tableName) {
@@ -36,7 +40,7 @@ export const putTableEntity = function (tableName, externalId, data) {
 };
 
 export const deleteTableEntity = function (tableName, externalId) {
-    return deleteObject(BcptConfig.get("rest-api-uri") + tableName + "/" + (externalId || ''), undefined)
+    return deleteObject(BcptConfig.get("rest-api-uri") + tableName + "/", {externalId})
 };
 
 const putObject = function (uri, json, schema) {
@@ -65,12 +69,21 @@ const postObject = function (uri, json, schema) {
     }, schema)
 };
 
-const getObject = function(uri, schema) {
-    return fetchBcptApi(uri, undefined, schema);
+const deleteObject = function(uri, json) {
+    return fetchBcptApi(uri, {
+        method:'delete',
+        mode: 'cors',
+        headers: {
+            'Access-Control-Allow-Origin':'*',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(json)
+    }, undefined);
 };
 
-const deleteObject = function(uri) {
-    return fetchBcptApi(uri, {method:'delete'}, undefined);
+const getObject = function(uri, schema) {
+    return fetchBcptApi(uri, undefined, schema);
 };
 
 const fetchBcptApi = function (uri, requestBody, schema) {
