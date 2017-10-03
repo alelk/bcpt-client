@@ -6,6 +6,9 @@
 import EditableTable from '../components/table/EditableTable'
 import PersonsContainer from './PersonsContainer'
 import BloodDonationsContainer from './BloodDonationsContainer'
+import BloodInvoicesContainer from './BloodInvoicesContainer'
+import BloodPoolsContainer from './BloodPoolsContainer'
+import ProductBatchesContainer from './ProductBatchesContainer'
 import {fetchTableData, addNew, edit, saveChanges, enableEditMode, deleteChecked} from '../actions/actions'
 
 import React from 'react'
@@ -59,6 +62,9 @@ class TableContainer extends React.Component {
                 >
                     <Route path='*/table/persons' component={PersonsContainer}/>
                     <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
+                    <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
+                    <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
+                    <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                 </EditableTable>
             </div>
         )

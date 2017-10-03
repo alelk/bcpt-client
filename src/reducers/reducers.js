@@ -20,8 +20,11 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 
 const tables = (state = {
-    persons: {displayName:"Доноры", data: {}, isFetching:false, isFetched:false, isEdited : false},
-    bloodDonations: {displayName:"Пакеты с плазмой", data: {}, isFetching:false, isFetched:false, isEdited : false},
+    persons: {displayName:"Доноры", data: {}},
+    bloodDonations: {displayName:"Пакеты с плазмой", data: {}},
+    bloodInvoices: {displayName:"Накладные", data: {}},
+    bloodPools: {displayName:"Пулы", data: {}},
+    productBatches: {displayName:"Загрузки", data: {}},
 }, action) => {
     const {type, response, tableName, error} = action;
     if (ACTION_TABLE_DATA_REQUEST === type) {
@@ -30,7 +33,7 @@ const tables = (state = {
     } else if (ACTION_TABLE_DATA_SUCCESS === type) {
         const table = Object.assign({},
             state[tableName],
-            {data: response.entities[tableName], isFetched:true, isFetching:false, isEditing:false, isEdited:false}
+            {data: response.entities[tableName] || {}, isFetched:true, isFetching:false, isEditing:false, isEdited:false}
         );
         return Object.assign({}, state, {[tableName] : table});
     } else if (ACTION_TABLE_DATA_FAILURE === type) {
