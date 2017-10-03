@@ -1,7 +1,7 @@
 /**
- * Blood Donations Table
+ * Blood Pools Table
  *
- * Created by Alex Elkin on 21.09.2017.
+ * Created by Alex Elkin on 02.10.2017.
  */
 
 import Table, {Cell, IconCell, filterById} from './Table'
@@ -9,38 +9,33 @@ import Table, {Cell, IconCell, filterById} from './Table'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class BloodDonationsTable extends React.Component {
+class BloodPoolsTable extends React.Component {
 
     columns = [
-        {Header: "", accessor: "localId", Cell: () => IconCell("invert_colors"), width: 30, filterable: false },
+        {Header: "", accessor: "localId", Cell: () => IconCell("poll"), width: 30, filterable: false },
         {
             Header: "ID",
             accessor: "externalId",
             Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
             filterMethod: filterById
         }, {
-            Header: "ID донора",
-            accessor: "donorExternalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onDonorClick),
+            Header: "Номер пула",
+            accessor: "poolNumber",
+            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
             filterMethod: filterById
-        },
-        {
-            Header: "ID накладной",
-            accessor: "bloodInvoiceExternalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodInvoiceClick),
-            filterMethod: filterById
-        },
-        {Header: "Объём", accessor: "amount", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
-        {
-            Header: "Дата изготовления",
-            accessor: "donationDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
         }, {
-            Header: "Начало карантина",
-            accessor: "quarantineDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
+            Header: "Номера накладных",
+            accessor: "bloodInvoiceIds",
+            valueSplitRegex: /\s*[;,]\s*/,
+            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodInvoicesClick),
+            filterMethod: filterById
+        },
+        {Header: "Суммарная ёмкость", accessor: "totalAmount", Cell: (ci) => Cell(ci, undefined, "localId"), isEditable:false},
+        {
+            Header: "Номер загрузки",
+            accessor: "productBatchExternalId",
+            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onProductBatchClick),
+            filterMethod: filterById
         }, {
             Header: "Последнее изменение",
             accessor: "updateTimestamp",
@@ -52,8 +47,8 @@ class BloodDonationsTable extends React.Component {
     ];
 
     render() {
-        const {bloodDonations, isEditMode, isFetching, filters} = this.props;
-        const data = Object.keys(bloodDonations).map(k => Object.assign({}, bloodDonations[k], {localId: k}));
+        const {bloodPools, isEditMode, isFetching, filters} = this.props;
+        const data = Object.keys(bloodPools).map(k => Object.assign({}, bloodPools[k], {localId: k}));
         return (
             <Table
                 defaultSorted={[{id: "localId", desc: false}]}
@@ -73,21 +68,20 @@ class BloodDonationsTable extends React.Component {
         )
     }
 }
-BloodDonationsTable.propTypes = {
-    bloodDonations : PropTypes.objectOf(PropTypes.shape({
+BloodPoolsTable.propTypes = {
+    bloodPools : PropTypes.objectOf(PropTypes.shape({
         externalId : PropTypes.string,
-        amount : PropTypes.number,
-        donationDate : PropTypes.string,
-        quarantineDate : PropTypes.string,
+        poolNumber : PropTypes.string,
+        bloodInvoiceIds : PropTypes.arrayOf(PropTypes.string),
         updateTimestamp : PropTypes.string,
         errors : PropTypes.oneOfType([PropTypes.object, PropTypes.array])
     })).isRequired,
     isFetching : PropTypes.bool,
     isEditMode : PropTypes.bool,
     onChange : PropTypes.func,
-    onDonorClick : PropTypes.func,
-    onBloodInvoiceClick : PropTypes.func,
+    onBloodInvoicesClick : PropTypes.func,
+    onProductBatchClick : PropTypes.func,
     filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
-export default BloodDonationsTable;
+export default BloodPoolsTable;

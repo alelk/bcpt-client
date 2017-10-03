@@ -12,15 +12,27 @@ const personSchema = new schema.Entity('persons', {}, { idAttribute : value => v
 const personsSchema = new schema.Array(personSchema);
 const bloodDonationSchema = new schema.Entity('bloodDonations', {}, { idAttribute : value => value.externalId });
 const bloodDonationsSchema = new schema.Array(bloodDonationSchema);
+const bloodInvoiceSchema = new schema.Entity('bloodInvoices', {}, { idAttribute : value => value.externalId });
+const bloodInvoicesSchema = new schema.Array(bloodInvoiceSchema);
+const bloodPoolSchema = new schema.Entity('bloodPools', {}, { idAttribute : value => value.externalId });
+const bloodPoolsSchema = new schema.Array(bloodPoolSchema);
+const productBatchSchema = new schema.Entity('productBatches', {}, { idAttribute : value => value.externalId });
+const productBatchesSchema = new schema.Array(productBatchSchema);
 
 const SchemaTable = {
     persons : personsSchema,
-    bloodDonations : bloodDonationsSchema
+    bloodDonations : bloodDonationsSchema,
+    bloodInvoices: bloodInvoicesSchema,
+    bloodPools : bloodPoolsSchema,
+    productBatches : productBatchesSchema
 };
 
 const SchemaTableEntity = {
     persons : personSchema,
-    bloodDonations : bloodDonationSchema
+    bloodDonations : bloodDonationSchema,
+    bloodInvoices: bloodInvoiceSchema,
+    bloodPools : bloodPoolSchema,
+    productBatches : productBatchSchema
 };
 
 export const getTable = function (tableName) {

@@ -59,7 +59,7 @@ export default store => nextProcedure => action => {
                     nextProcedure(savedChanges(tableName, key, response));
                     return Promise.resolve(response)
                 });
-                return promise.catch(errors => {throw {localId:key, errors}});
+                return promise.catch(errors => Promise.reject({localId:key, errors}));
             })).then(
                 results => nextProcedure(actionWith({type: successType, tableName})),
                 error => nextProcedure(actionWith({type: failureType, tableName, error}))
