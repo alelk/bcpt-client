@@ -15,6 +15,7 @@ import {
     ACTION_TABLE_ENABLE_EDIT_MODE,
     ACTION_TABLE_DELETE_CHECKED_ITEMS
 } from '../actions/actions'
+import {urlQueryAsFilters} from '../components/table/Table'
 
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
@@ -98,6 +99,15 @@ const tables = (state = {
     return state;
 };
 
+const tableFilters = (state = {}, action) => {
+    const {type, payload} = action;
+    if ('@@router/LOCATION_CHANGE' === type && /\/table\/(\w+)\/?/.test(payload.pathname)) {
+        const tableName = /\/table\/(\w+)\/?/g.exec(payload.pathname)[1];
+        return Object.assign({}, state, {[tableName] : urlQueryAsFilters(payload.search)});
+    }
+    return state;
+};
+
 const errors = (state = {}, action) => {
     const {type, error, tableName} = action;
     if (ACTION_TABLE_DATA_FAILURE === type)
@@ -108,6 +118,7 @@ const errors = (state = {}, action) => {
 const rootReducer = combineReducers({
     tables,
     errors,
+    tableFilters,
     routing: routerReducer
 });
 

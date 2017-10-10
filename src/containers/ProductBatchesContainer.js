@@ -6,7 +6,6 @@
 
 import ProductBatchesTable from '../components/table/ProductBatchTable'
 import {fetchTableData, edit} from '../actions/actions'
-import {urlQueryAsFilters} from '../components/table/Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -21,13 +20,13 @@ class ProductBatchesContainer extends React.Component {
     }
 
     render() {
-        const {productBatches, isEditMode, edit, isFetching, location, pushUrl} = this.props;
+        const {productBatches, isEditMode, edit, isFetching, filters, pushUrl} = this.props;
         return (
             <ProductBatchesTable productBatches={productBatches}
                                  isEditMode={isEditMode}
                                  isFetching={isFetching}
                                  onChange={(localId, changes) => edit("productBatches", localId, changes)}
-                                 filters={urlQueryAsFilters(location.search)}
+                                 filters={filters}
                                  onBloodPoolsClick={externalIds =>
                                      pushUrl("/table/bloodPools/?" + externalIds.map(id => "externalId=" + id).join("&"))
                                  }
@@ -38,6 +37,7 @@ class ProductBatchesContainer extends React.Component {
 
 ProductBatchesContainer.propTypes = {
     productBatches : PropTypes.object,
+    filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
     fetchTableData : PropTypes.func,
     isEditMode : PropTypes.bool,
     isFetching : PropTypes.bool,
@@ -47,6 +47,7 @@ ProductBatchesContainer.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
     productBatches: state.tables["productBatches"].data,
+    filters: state.tableFilters["productBatches"],
     isEditMode: state.tables["productBatches"].isEditing,
     isFetching: state.tables["productBatches"].isFetching,
 });

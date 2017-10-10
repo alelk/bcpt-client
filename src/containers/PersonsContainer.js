@@ -5,7 +5,6 @@
  */
 import PersonsTable from '../components/table/PersonsTable'
 import {fetchTableData, edit} from '../actions/actions'
-import {urlQueryAsFilters} from '../components/table/Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -19,13 +18,13 @@ class PersonsContainer extends React.Component {
     }
 
     render() {
-        const {persons, isEditMode, edit, isFetching, location} = this.props;
+        const {persons, isEditMode, edit, isFetching, filters} = this.props;
         return (
             <PersonsTable persons={persons}
                           isEditMode={isEditMode}
                           isFetching={isFetching}
                           onChange={(localId, changes) => edit("persons", localId, changes)}
-                          filters={urlQueryAsFilters(location.search)}
+                          filters={filters}
             />
         )
     }
@@ -33,6 +32,7 @@ class PersonsContainer extends React.Component {
 
 PersonsContainer.propTypes = {
     persons : PropTypes.object,
+    filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
     fetchTableData : PropTypes.func,
     isEditMode : PropTypes.bool,
     isFetching : PropTypes.bool,
@@ -41,6 +41,7 @@ PersonsContainer.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
     persons: state.tables["persons"].data,
+    filters: state.tableFilters["persons"],
     isEditMode: state.tables["persons"].isEditing,
     isFetching: state.tables["persons"].isFetching
 });

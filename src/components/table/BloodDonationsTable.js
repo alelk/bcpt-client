@@ -5,6 +5,7 @@
  */
 
 import Table, {Cell, IconCell, filterById} from './Table'
+import EditableLabel from '../editable/EditableLabel'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -14,7 +15,7 @@ class BloodDonationsTable extends React.Component {
     columns = [
         {Header: "", accessor: "localId", Cell: () => IconCell("invert_colors"), width: 30, filterable: false },
         {
-            Header: "ID",
+            Header: "Штрих-код",
             accessor: "externalId",
             Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
             filterMethod: filterById
@@ -23,15 +24,23 @@ class BloodDonationsTable extends React.Component {
             accessor: "donorExternalId",
             Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onDonorClick),
             filterMethod: filterById
-        },
-        {
-            Header: "ID накладной",
+        }, {
+            Header: "Номер накладной",
             accessor: "bloodInvoiceExternalId",
             Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodInvoiceClick),
             filterMethod: filterById
-        },
-        {Header: "Объём", accessor: "amount", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
-        {
+        }, {
+            Header: "Тип донации",
+            accessor: "donationType",
+            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
+            allowedValues: ["", "plasma-fresh-frozen"],
+            Filter: ({ filter, onChange }) => <EditableLabel valueSet={["", "plasma-fresh-frozen"]} isEditMode={true} onChange={onChange}/>,
+            width: 100
+        }, {
+            Header: "Объём, мл",
+            accessor: "amount",
+            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
+        }, {
             Header: "Дата изготовления",
             accessor: "donationDate",
             inputType: 'date',

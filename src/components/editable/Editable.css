@@ -1,0 +1,25 @@
+.Editable {
+    width: 100%;
+}
+
+.Editable.notValid {
+    background-color: #cb816a !important;
+}
+
+.Editable.clickable:hover{
+    background-color: #b0aacb;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.Editable.editMode {
+    background-color: #cddfe8;
+}
+
+.Editable.editMode {
+    box-shadow: 0 0 4px #000;
+}
+
+.Editable.editMode:focus {
+    box-shadow: 0 0 10px #51013d;
+}

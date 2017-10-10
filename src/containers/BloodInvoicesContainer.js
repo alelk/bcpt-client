@@ -6,7 +6,6 @@
 
 import BloodInvoicesTable from '../components/table/BloodInvoicesTable'
 import {fetchTableData, edit} from '../actions/actions'
-import {urlQueryAsFilters} from '../components/table/Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -21,17 +20,17 @@ class BloodInvoicesContainer extends React.Component {
     }
 
     render() {
-        const {bloodInvoices, isEditMode, edit, isFetching, location, pushUrl} = this.props;
+        const {bloodInvoices, isEditMode, edit, isFetching, filters, pushUrl} = this.props;
         return (
             <BloodInvoicesTable bloodInvoices={bloodInvoices}
                                 isEditMode={isEditMode}
                                 isFetching={isFetching}
                                 onChange={(localId, changes) => edit("bloodInvoices", localId, changes)}
-                                onBloodDonationsClick={ externalIds =>
-                                    pushUrl("/table/bloodDonations/?" + externalIds.map(id => "externalId=" + id).join("&"))
+                                onBloodDonationsClick={ (ids, bloodInvoiceId) =>
+                                    pushUrl("/table/bloodDonations/?bloodInvoiceExternalId=" + bloodInvoiceId)
                                 }
                                 onBloodPoolClick={id => pushUrl("/table/bloodPools/?externalId=" + id)}
-                                filters={urlQueryAsFilters(location.search)}
+                                filters={filters}
             />
         )
     }
@@ -39,6 +38,7 @@ class BloodInvoicesContainer extends React.Component {
 
 BloodInvoicesContainer.propTypes = {
     bloodInvoices : PropTypes.object,
+    filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
     fetchTableData : PropTypes.func,
     pushUrl : PropTypes.func,
     isEditMode : PropTypes.bool,
@@ -48,6 +48,7 @@ BloodInvoicesContainer.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
     bloodInvoices: state.tables["bloodInvoices"].data,
+    filters: state.tableFilters["bloodInvoices"],
     isEditMode: state.tables["bloodInvoices"].isEditing,
     isFetching: state.tables["bloodInvoices"].isFetching
 });
