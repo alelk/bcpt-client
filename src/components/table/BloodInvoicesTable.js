@@ -14,12 +14,12 @@ class BloodInvoicesTable extends React.Component {
     columns = [
         {Header: "", accessor: "localId", Cell: () => IconCell("format_list_bulleted"), width: 30, filterable: false },
         {
-            Header: "ID",
+            Header: "Номер накладной",
             accessor: "externalId",
             Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
             filterMethod: filterById
         },{
-            Header: "Номера контейнеров",
+            Header: "Штрих-коды контейнеров",
             accessor: "bloodDonationExternalIds",
             valueSplitRegex: /\s*[;,]\s*/,
             Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodDonationsClick),

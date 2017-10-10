@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 14.09.2017.
  */
-import EditableLabel from '../EditableLabel'
+import EditableLabel from '../editable/EditableLabel'
 import "./Table.css"
 
 import React from 'react'
@@ -19,7 +19,7 @@ export const Cell = (cellInfo, onChange, keyName, onClick) => (
                    inputType={cellInfo.column.inputType}
                    isEditable={cellInfo.column.isEditable}
                    isEditMode={cellInfo.original.isEditing}
-                   onClick={onClick && (() => onClick(cellInfo.value))}
+                   onClick={onClick && (() => onClick(cellInfo.value, cellInfo.original[keyName]))}
                    onChange={(value) => onChange && onChange(cellInfo.original[keyName], {[cellInfo.column.id]: value})}
                    error={ Array.isArray(cellInfo.original.errors)
                        ? cellInfo.original.errors.find(error => error.field === cellInfo.column.id)
@@ -41,6 +41,7 @@ export const IconCell = (iconName) => {
 };
 
 export const urlQueryAsFilters = (queryStr) => {
+    if (queryStr == null) return null;
     const parsed = queryString.parse(queryStr);
     return Object.keys(parsed).map((key) => ({id:key, value:parsed[key]}))
         .map(filter => Array.isArray(filter.value) ? Object.assign({}, filter, {value: filter.value.join(",")}) : filter);
@@ -55,7 +56,7 @@ const Table = ({data, columns, defaultSorted, sorted, isFetching, filters}) => {
             loading = {isFetching}
             data={data}
             filterable={true}
-            filtered={(filters == null) || (filters.length === 0) ? undefined : filters}
+            filtered={filters != null && filters.length > 0 ? filters : undefined}
             columns={columns}
             defaultPageSize={15}
             pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
@@ -69,6 +70,14 @@ const Table = ({data, columns, defaultSorted, sorted, isFetching, filters}) => {
             rowsText="строк"
             showPaginationTop
             showPaginationBottom={false}
+            getTdProps={(state, rowInfo, column, instance) => {
+                return {
+                    onClick: (e, handleOriginal) => {
+                        console.log("row: ", rowInfo, " column: ", column, " instance: ", instance);
+                        handleOriginal && handleOriginal();
+                    }
+                }
+            }}
         />
     )
 };

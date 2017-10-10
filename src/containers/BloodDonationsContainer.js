@@ -6,7 +6,6 @@
 
 import BloodDonationsTable from '../components/table/BloodDonationsTable'
 import {fetchTableData, edit} from '../actions/actions'
-import {urlQueryAsFilters} from '../components/table/Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -21,7 +20,7 @@ class BloodDonationsContainer extends React.Component {
     }
 
     render() {
-        const {bloodDonations, isEditMode, edit, isFetching, location, pushUrl} = this.props;
+        const {bloodDonations, isEditMode, edit, isFetching, filters, pushUrl} = this.props;
         return (
             <BloodDonationsTable bloodDonations={bloodDonations}
                                  isEditMode={isEditMode}
@@ -29,7 +28,7 @@ class BloodDonationsContainer extends React.Component {
                                  onChange={(localId, changes) => edit("bloodDonations", localId, changes)}
                                  onDonorClick={(donorId) => pushUrl("/table/persons?externalId=" + donorId)}
                                  onBloodInvoiceClick={(bloodInvoiceId) => pushUrl("/table/bloodInvoices?externalId=" + bloodInvoiceId)}
-                                 filters={urlQueryAsFilters(location.search)}
+                                 filters={filters}
             />
         )
     }
@@ -37,6 +36,7 @@ class BloodDonationsContainer extends React.Component {
 
 BloodDonationsContainer.propTypes = {
     bloodDonations : PropTypes.object,
+    filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
     fetchTableData : PropTypes.func,
     pushUrl : PropTypes.func,
     isEditMode : PropTypes.bool,
@@ -46,6 +46,7 @@ BloodDonationsContainer.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
     bloodDonations: state.tables["bloodDonations"].data,
+    filters: state.tableFilters["bloodDonations"],
     isEditMode: state.tables["bloodDonations"].isEditing,
     isFetching: state.tables["bloodDonations"].isFetching
 });
