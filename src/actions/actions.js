@@ -10,16 +10,20 @@ export const ACTION_TABLE_DATA_REQUEST = 'ACTION_TABLE_DATA_REQUEST';
 export const ACTION_TABLE_DATA_SUCCESS = 'ACTION_TABLE_DATA_SUCCESS';
 export const ACTION_TABLE_DATA_FAILURE = 'ACTION_TABLE_DATA_FAILURE';
 
-const fetchTableDataWithApi = (tableName) => ({
+const fetchTableDataWithApi = (tableName, pageNumber, itemsPerPage, sorted, filtered) => ({
     [CALL_BCPT_REST_API] : {
         types : [ACTION_TABLE_DATA_REQUEST, ACTION_TABLE_DATA_SUCCESS, ACTION_TABLE_DATA_FAILURE],
         method : 'fetchTableData',
-        tableName
+        tableName,
+        pageNumber,
+        itemsPerPage,
+        sorted,
+        filtered
     }
 });
 
-export const fetchTableData = (tableName) => (dispatch) => {
-    return dispatch(fetchTableDataWithApi(tableName));
+export const fetchTableData = (tableName, pageNumber, itemsPerPage, sorted, filtered) => (dispatch) => {
+    return dispatch(fetchTableDataWithApi(tableName, pageNumber || 1, itemsPerPage || 15, sorted, filtered));
 };
 
 export const ACTION_TABLE_EDIT = 'ACTION_TABLE_EDIT';

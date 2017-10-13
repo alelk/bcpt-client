@@ -47,48 +47,78 @@ export const urlQueryAsFilters = (queryStr) => {
         .map(filter => Array.isArray(filter.value) ? Object.assign({}, filter, {value: filter.value.join(",")}) : filter);
 };
 
-const Table = ({data, columns, defaultSorted, sorted, isFetching, filters}) => {
-    return (
-        <ReactTable
-            defaultFilterMethod={(filter, row) => String(row[filter.id]).toLowerCase().startsWith(filter.value.toLowerCase())}
-            defaultSorted = {defaultSorted || []}
-            sorted = {sorted}
-            loading = {isFetching}
-            data={data}
-            filterable={true}
-            filtered={filters != null && filters.length > 0 ? filters : undefined}
-            columns={columns}
-            defaultPageSize={15}
-            pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
-            minRows={15}
-            previousText="Предыдущая"
-            nextText='Следующая'
-            loadingText='Загрузка...'
-            noDataText='Нет данных'
-            pageText='Стр.'
-            ofText='из'
-            rowsText="строк"
-            showPaginationTop
-            showPaginationBottom={false}
-            getTdProps={(state, rowInfo, column, instance) => {
-                return {
-                    onClick: (e, handleOriginal) => {
-                        console.log("row: ", rowInfo, " column: ", column, " instance: ", instance);
-                        handleOriginal && handleOriginal();
-                    }
-                }
-            }}
-        />
-    )
-};
+class Table extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onFetchData = this.onFetchData.bind(this);
+    }
+
+    /**
+     * Should be override child component
+     * @returns {Array}
+     */
+    columns() {
+        return []
+    }
+
+    _columns() {
+        if (this.columnsData == null) {
+            this.columnsData = [
+                {accessor: "isChecked", inputType:'checkbox', width: 30},
+                ...this.columns()
+            ]
+        }
+        return this.columnsData;
+    }
+
+    onFetchData(state) {
+        this.props.onFetchData(
+            state.page + 1,
+            state.pageSize,
+            state.sorted,
+            state.filtered
+        );
+    }
+
+    render() {
+        const {data, pagesCount, isFetching} = this.props;
+        return (
+            <ReactTable
+                data={data}
+                manual
+                onFetchData={this.onFetchData}
+                loading = {isFetching}
+                columns={this._columns()}
+                pages={pagesCount}
+                defaultPageSize={15}
+                pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
+                minRows={15}
+                previousText="Предыдущая"
+                nextText='Следующая'
+                loadingText='Загрузка...'
+                noDataText='Нет данных'
+                pageText='Стр.'
+                ofText='из'
+                rowsText="строк"
+                showPaginationTop
+                showPaginationBottom={false}
+            />
+        )
+    }
+}
+
 Table.propTypes = {
     data: PropTypes.array.isRequired,
+    pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
-    columns: PropTypes.array.isRequired,
+    onFetchData: PropTypes.func,
+
     isEditMode : PropTypes.bool,
     defaultSorted : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, desc:PropTypes.bool})),
     sorted : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, desc:PropTypes.bool})),
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
+    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string})),
+
 };
 
 export default Table;

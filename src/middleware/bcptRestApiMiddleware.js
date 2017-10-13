@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import {getTable, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
+import {getTable, getTablePage, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
 import {savedChanges} from '../actions/actions'
 
 export const CALL_BCPT_REST_API = 'CALL_BCPT_REST_API';
@@ -24,16 +24,15 @@ export default store => nextProcedure => action => {
         throw new Error('Expected action types to be strings.');
 
     const actionWith = data => {
-        const nextAction = Object.assign({}, action, data);
-        delete nextAction[CALL_BCPT_REST_API];
-        return nextAction;
+        return Object.assign({}, callApi, data);
     };
 
     const [requestType, successType, failureType] = types;
-    nextProcedure(actionWith({type: requestType, tableName}));
+    nextProcedure(actionWith({type: requestType}));
 
     if (/fetchTableData/.test(method)) {
-        getTable(tableName).then(
+        const {pageNumber, itemsPerPage, sorted, filtered} = callApi;
+        getTablePage(tableName, pageNumber, itemsPerPage, sorted, filtered).then(
             response => nextProcedure(actionWith({type: successType, tableName, response})),
             error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
         )

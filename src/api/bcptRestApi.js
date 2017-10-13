@@ -10,6 +10,8 @@ import { normalize, schema } from 'normalizr'
 
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
+const personPageSchema = new schema.Entity('pages', {items:personsSchema}, { idAttribute : value => value.pageNumber });
+
 const bloodDonationSchema = new schema.Entity('bloodDonations', {}, { idAttribute : value => value.externalId });
 const bloodDonationsSchema = new schema.Array(bloodDonationSchema);
 const bloodInvoiceSchema = new schema.Entity('bloodInvoices', {}, { idAttribute : value => value.externalId });
@@ -18,6 +20,10 @@ const bloodPoolSchema = new schema.Entity('bloodPools', {}, { idAttribute : valu
 const bloodPoolsSchema = new schema.Array(bloodPoolSchema);
 const productBatchSchema = new schema.Entity('productBatches', {}, { idAttribute : value => value.externalId });
 const productBatchesSchema = new schema.Array(productBatchSchema);
+
+const SchemaPage = {
+    persons : personPageSchema
+};
 
 const SchemaTable = {
     persons : personsSchema,
@@ -33,6 +39,19 @@ const SchemaTableEntity = {
     bloodInvoices: bloodInvoiceSchema,
     bloodPools : bloodPoolSchema,
     productBatches : productBatchSchema
+};
+
+const sortedAsParams = (sorted) => {
+    return Array.isArray(sorted) ? sorted.map(s => "sortBy=" + s.id + ":" + (s.desc ? 'desc' : 'asc')).join("&") : '';
+};
+
+export const getTablePage = function (tableName, pageNumber, itemsPerPage, sorted, filtered) {
+    console.log("sorted: ", sortedAsParams(sorted));
+    return getObject(
+        BcptConfig.get("rest-api-uri") + tableName + "/page/" + pageNumber + "?itemsPerPage=" + itemsPerPage +
+        "&" + sortedAsParams(sorted),
+        SchemaPage[tableName]
+    )
 };
 
 export const getTable = function (tableName) {
