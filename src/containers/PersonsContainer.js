@@ -12,26 +12,38 @@ import {connect} from 'react-redux'
 
 class PersonsContainer extends React.Component {
 
-    componentWillMount() {
-        if (Object.keys(this.props.persons).length <= 0)
-            this.props.fetchTableData("persons");
+    constructor(props) {
+        super(props);
+        this.onFetchData = this.onFetchData.bind(this);
+    }
+
+    onFetchData(pageNumber, itemsPerPage, sorted, filtered) {
+        this.props.fetchTableData("persons", pageNumber, itemsPerPage, sorted, filtered)
     }
 
     render() {
-        const {persons, isEditMode, edit, isFetching, filters} = this.props;
+        const {table, pages, items, isEditMode, edit, filters} = this.props;
+        const page = table && pages && pages[table.pageNumber];
+
+        console.log("page:", page);
+
         return (
-            <PersonsTable persons={persons}
+            <PersonsTable data={page && page.items && page.items.map(item => items[item])}
+                          pagesCount={page && page.pagesCount}
                           isEditMode={isEditMode}
-                          isFetching={isFetching}
+                          isFetching={page && page.isFetching}
                           onChange={(localId, changes) => edit("persons", localId, changes)}
                           filters={filters}
+                          onFetchData={this.onFetchData}
             />
         )
     }
 }
 
 PersonsContainer.propTypes = {
-    persons : PropTypes.object,
+    table : PropTypes.object,
+    pages : PropTypes.object,
+    items : PropTypes.object,
     filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
     fetchTableData : PropTypes.func,
     isEditMode : PropTypes.bool,
@@ -40,10 +52,10 @@ PersonsContainer.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-    persons: state.tables["persons"].data,
-    filters: state.tableFilters["persons"],
-    isEditMode: state.tables["persons"].isEditing,
-    isFetching: state.tables["persons"].isFetching
+    table: state.tables["persons"],
+    pages: state.tablePages["persons"],
+    items: state.tableItems["persons"],
+    isEditMode: state.tables["persons"].isEditing
 });
 
 export default connect(mapStateToProps, {fetchTableData, edit})(PersonsContainer);

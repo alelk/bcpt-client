@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import 'moment/locale/ru';
 
-class PersonsTable extends React.Component {
+class PersonsTable extends Table {
 
     constructor(props) {
         super(props);
@@ -22,8 +22,8 @@ class PersonsTable extends React.Component {
         this.props.onChange && this.props.onChange(row.externalId, {[column.id] : value});
     }
 
-    componentWillMount() {
-        this.columns = [
+    columns() {
+        return [
             {Header: "", accessor: "localId", Cell: () => IconCell("person"), width: 30, filterable: false},
             {
                 Header: "ID",
@@ -59,30 +59,9 @@ class PersonsTable extends React.Component {
             }
         ];
     }
-
-    render() {
-        const {persons, isEditMode, isFetching, filters} = this.props;
-        const data = Object.keys(persons).map(k => Object.assign({}, persons[k], {localId: k}));
-        return (
-            <Table
-                defaultSorted={[{id:"localId", desc:false}]}
-                sorted={isEditMode ? [{id:"localId", desc:false}] : undefined}
-                data={data}
-                filterable={true}
-                filters={filters}
-                isFetching={isFetching}
-                columns={isEditMode ? [{
-                    Header: "", accessor: "isChecked",
-                        Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                        inputType:'checkbox', width: 30}
-                        ,...this.columns] : this.columns
-                }
-            />
-        )
-    }
 }
 PersonsTable.propTypes = {
-    persons : PropTypes.objectOf(PropTypes.shape({
+    data : PropTypes.arrayOf(PropTypes.shape({
         externalId : PropTypes.string,
         firstName : PropTypes.string,
         lastName : PropTypes.string,
@@ -92,9 +71,10 @@ PersonsTable.propTypes = {
         updateTimestamp : PropTypes.string,
         errors : PropTypes.object | PropTypes.array
     })).isRequired,
-    isEditMode : PropTypes.bool,
+    pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
     onChange : PropTypes.func,
+    onFetchData: PropTypes.func,
     filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
