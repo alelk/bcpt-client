@@ -21,7 +21,7 @@ class Editable extends React.Component {
         if (this.props.isEditMode)
             Rx.Observable.create(o => {
                 this.observer = o;
-            }).sampleTime(1000).subscribe(value => this.props.onChange && this.props.onChange(value))
+            }).sampleTime(1000).subscribe(value => this.props.onChange && this.props.onChange(value));
         this.init();
     }
 

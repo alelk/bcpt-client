@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import {getTable, getTablePage, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
+import {getTable, getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
 import {savedChanges} from '../actions/actions'
 
 export const CALL_BCPT_REST_API = 'CALL_BCPT_REST_API';
@@ -36,22 +36,31 @@ export default store => nextProcedure => action => {
             response => nextProcedure(actionWith({type: successType, tableName, response})),
             error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
         )
-    } else if (/saveChanges/.test(method)) {
-        const entities = store.getState().tables[tableName];
-        if (!entities)
-            nextProcedure(actionWith({type: failureType, error: "Unable to save table '" + tableName + "': no entities found!"}));
-        else if (!entities.isEdited)
+    }  else if (/fetchTableRow/.test(method)) {
+        const{localId} = callApi;
+        getTableEntity(tableName, localId).then(
+            response => nextProcedure(actionWith({type: successType, tableName, response})),
+            error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
+        )
+    }
+
+    else if (/saveChanges/.test(method)) {
+        const items = store.getState().tableItems[tableName];
+        const table = store.getState().tables[tableName];
+        if (!items || !table)
+            nextProcedure(actionWith({type: failureType, error: "Unable to save table '" + tableName + "': no table or table items found!"}));
+        else if (!table.isEdited)
             nextProcedure(actionWith({type: successType, message: "No changes found in the '" + tableName + "' table"}));
         else {
-            Promise.all(Object.keys(entities.data).map(key => {
-                const e = entities.data[key];
+            Promise.all(Object.keys(items).map(key => {
+                const item = items[key];
                 let promise;
-                if (e.isCreated)
-                    promise = postTableEntity(tableName, e);
-                else if (e.isDeleted)
+                if (item.isCreated)
+                    promise = postTableEntity(tableName, item);
+                else if (item.isDeleted)
                     promise = deleteTableEntity(tableName, key).then(response => Promise.resolve({entities:{}}));
-                else if (e.isEdited)
-                    promise = putTableEntity(tableName, key, e);
+                else if (item.isEdited)
+                    promise = putTableEntity(tableName, key, item);
                 else
                     return undefined;
                 promise.then(response => {

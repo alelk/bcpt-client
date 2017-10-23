@@ -5,7 +5,7 @@
  */
 
 import ProductBatchesTable from '../components/table/ProductBatchTable'
-import {fetchTableData, edit} from '../actions/actions'
+import {fetchTableData, tableRowChange} from '../actions/actions'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -52,4 +52,4 @@ const mapStateToProps = (state, ownProps) => ({
     isFetching: state.tables["productBatches"].isFetching,
 });
 
-export default connect(mapStateToProps, {fetchTableData, edit, pushUrl : push})(ProductBatchesContainer);
+export default connect(mapStateToProps, {fetchTableData, tableRowChange, pushUrl : push})(ProductBatchesContainer);

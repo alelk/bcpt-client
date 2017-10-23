@@ -5,7 +5,7 @@
  */
 
 import BloodInvoicesTable from '../components/table/BloodInvoicesTable'
-import {fetchTableData, edit} from '../actions/actions'
+import {fetchTableData, tableRowChange} from '../actions/actions'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -53,4 +53,4 @@ const mapStateToProps = (state, ownProps) => ({
     isFetching: state.tables["bloodInvoices"].isFetching
 });
 
-export default connect(mapStateToProps, {fetchTableData, edit, pushUrl : push})(BloodInvoicesContainer);
+export default connect(mapStateToProps, {fetchTableData, tableRowChange, pushUrl : push})(BloodInvoicesContainer);

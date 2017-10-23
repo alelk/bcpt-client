@@ -7,13 +7,19 @@ import {
     ACTION_TABLE_DATA_REQUEST,
     ACTION_TABLE_DATA_SUCCESS,
     ACTION_TABLE_DATA_FAILURE,
-    ACTION_TABLE_EDIT,
+    ACTION_TABLE_MODIFY_INFO,
+    ACTION_TABLE_CHECK_ROW,
+    ACTION_TABLE_UNCHECK_ROWS,
+    ACTION_TABLE_DELETE_ROW,
+    ACTION_TABLE_EDIT_ROW,
+    ACTION_TABLE_RESET_CHANGES,
+    ACTION_TABLE_ROW_CHANGE,
+    ACTION_TABLE_INVALIDATE_PAGES,
     ACTION_TABLE_ADD_NEW_ITEM,
     ACTION_TABLE_SAVED_CHANGES,
     ACTION_TABLE_SAVE_CHANGES_SUCCESS,
     ACTION_TABLE_SAVE_CHANGES_FAILURE,
     ACTION_TABLE_ENABLE_EDIT_MODE,
-    ACTION_TABLE_DELETE_CHECKED_ITEMS
 } from '../actions/actions'
 import {urlQueryAsFilters} from '../components/table/Table'
 
@@ -114,17 +120,30 @@ const tables = (state = {
     bloodPools: {displayName:"Пулы"},
     productBatches: {displayName:"Загрузки"},
 }, action) => {
-    const {type, tableName} = action;
+    const {type, tableName, localId, error, changes} = action;
     if (ACTION_TABLE_DATA_REQUEST === type) {
-        const {pageNumber, itemsPerPage, sorted, filtered} = action;
-        return tableWith(state, tableName, {isFetching: true, isFetched:false, error:undefined, pageNumber, itemsPerPage, sorted, filtered});
+        return tableWith(state, tableName, {isFetching: true, isFetched:false, error:undefined});
     } else if (ACTION_TABLE_DATA_SUCCESS === type) {
         const {pageNumber, response} = action;
         const page = pageFromResponse(pageNumber, response);
-        return tableWith(state, tableName, {isFetched:true, isFetching:false, pagesCount: (page && page.pagesCount) || undefined});
+        const pagesCount = (page && page.pagesCount) || undefined;
+        return tableWith(state, tableName, {isFetched:true, isFetching:false}, pagesCount && {pagesCount});
     } else if (ACTION_TABLE_DATA_FAILURE === type) {
-        const {error} = action;
         return tableWith(state, tableName, {isFetched:false, isFetching:false, error});
+    } else if (ACTION_TABLE_INVALIDATE_PAGES === type) {
+        return tableWith(state, tableName, {isFetched:false, isFetching:false});
+    } else if (ACTION_TABLE_MODIFY_INFO === type) {
+        return tableWith(state, tableName, changes);
+    } else if (ACTION_TABLE_DELETE_ROW === type && localId) {
+        return tableWith(state, tableName, {isEdited:true, isEditing:true});
+    } else if (ACTION_TABLE_EDIT_ROW === type && localId) {
+        return tableWith(state, tableName, {isEditing:true});
+    } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
+        return tableWith(state, tableName, {isEdited:true});
+    } else if (ACTION_TABLE_RESET_CHANGES === type || ACTION_TABLE_SAVE_CHANGES_SUCCESS === type) {
+        return tableWith(state, tableName, {isEdited:false, isEditing:false, isFetched:false, isFetching:false, checkedItems:undefined});
+    } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
+        return tableWith(state, tableName, {isEditing:true, checkedItems:undefined});
     }
     return state;
 };
@@ -136,32 +155,142 @@ const pageFromResponse = (pageNumber, response) => {
 const pageWith = (tablePages, tableName, pageNumber, changes) => {
     const pages = objectWith(tablePages[tableName]);
     pages[pageNumber] = objectWith(pages[pageNumber], changes);
+    let result = objectWith(tablePages, {[tableName]:pages});
+    const created = pages[pageNumber].created;
+    created && created.forEach(localId => result = pageItemsAddCreated(result, tableName, pageNumber, localId));
+    return result;
+};
+
+const pageItemsAddCreated = (tablePages, tableName, pageNumber, localId) => {
+    const pages = objectWith(tablePages[tableName]);
+    const page = pages && objectWith(pages[pageNumber]);
+    page.created = [localId, ...page.created || []];
+    if (!Array.isArray(page.items) || !page.items.find(item => item === localId))
+        page.items = [localId, ...page.items || []];
+    pages[pageNumber] = page;
     return objectWith(tablePages, {[tableName]:pages});
 };
 
+const pageItemsRemoveCreated = (tablePages, tableName, pageNumber, localId) => {
+    const pageWithCreatedItem = tablePages[tableName] && Object.keys(tablePages[tableName])
+            .map(pageNumber => ({pageNumber, page:tablePages[tableName][pageNumber]}))
+            .find(({page}) => page.created && (page.created.findIndex(item => item === localId) > -1));
+    if (!pageWithCreatedItem) return tablePages;
+    const page = objectWith(pageWithCreatedItem.page);
+        page.created = page.created && page.created.filter(id => id !== localId);
+        page.items = page.items && page.items.filter(id => id !== localId);
+    const pages = objectWith(tablePages[tableName], {[pageWithCreatedItem.pageNumber] : page});
+    return objectWith(tablePages, {[tableName]: pages});
+};
+
+const pagesInvalidate = (tablePages, tableName) => {
+    const pages = objectWith(tablePages[tableName]);
+    Object.keys(pages).forEach(pageNumber => {
+        pages[pageNumber] = objectWith(pages[pageNumber], {isFetching: false, isFetched: false, items:[]});
+    });
+    return objectWith(tablePages, {[tableName] : pages});
+};
+
+export const isPageFetched = (tablePages, tableName, pageNumber) => {
+    const page = tablePages && tablePages[tableName] && tablePages[tableName][pageNumber];
+    return page && page.isFetched;
+};
+
 const tablePages = (state = {}, action) => {
-    const {type, tableName, pageNumber, response, error} = action;
+    const {type, tableName, pageNumber, response, error, localId} = action;
     if (ACTION_TABLE_DATA_REQUEST === type)
         return pageWith(state, tableName, pageNumber, {isFetching: true, isFetched: false});
     else if (ACTION_TABLE_DATA_SUCCESS === type)
         return pageWith(state, tableName, pageNumber, Object.assign(
             {isFetching: false, isFetched: true},
-            pageFromResponse(pageNumber, response)
+            pageFromResponse(pageNumber, response) || state[tableName] && state[tableName][pageNumber]
         ));
     else if (ACTION_TABLE_DATA_FAILURE === type)
         return pageWith(state, tableName, pageNumber,{isFetching: false, isFetched: true, error});
+    else if (ACTION_TABLE_RESET_CHANGES === type)
+        return objectWith(state, {[tableName]:{}});
+    else  if (ACTION_TABLE_INVALIDATE_PAGES === type)
+        return pagesInvalidate(state, tableName);
+    else if (ACTION_TABLE_ADD_NEW_ITEM === type)
+        return pageItemsAddCreated(state, tableName, pageNumber, localId);
+    else if (ACTION_TABLE_SAVED_CHANGES === type)
+        return pageItemsRemoveCreated(state, tableName, pageNumber, localId);
     return state;
 };
 
-const tableItemsWith = (tableItems, tableName, newItems) => {
-    const items = Object.assign({}, tableItems[tableName], newItems);
+const itemHasChanges = (items, localId) => {
+    return items && localId ? items[localId] && (items[localId].isEditing || items[localId].isDeleted) : false;
+};
+
+const mergeItems = (items, newItems, overrideChanges = false) => {
+    const result = objectWith(items);
+    newItems && Object.keys(newItems)
+        .filter(localId => overrideChanges || !itemHasChanges(items, localId))
+        .map(localId => ({localId, item:newItems[localId]}))
+        .forEach(({localId, item})=> result[localId] = item);
+    return result;
+};
+
+const tableItemsMerge = (tableItems, tableName, newItems, overrideChanges = false) => {
+    const items = mergeItems(tableItems[tableName], newItems, overrideChanges);
     return Object.assign({}, tableItems, {[tableName] : items});
 };
 
+const tableItemsWith = (tableItems, tableName, newItems) => {
+    const items = objectWith(tableItems[tableName], newItems);
+    return Object.assign({}, tableItems, {[tableName] : items});
+};
+
+const tableItemWith = (tableItems, tableName, itemLocalId, itemChanges) => {
+    const item = Object.assign({}, tableItems[tableName] && tableItems[tableName][itemLocalId], itemChanges);
+    return tableItemsWith(tableItems, tableName, {[itemLocalId] : item});
+};
+
+const tableItemsDeleteItem = (items, tableName, localId) => {
+    const tableItems = tableItemsWith(items, tableName);
+    delete tableItems[tableName][localId];
+    return tableItems;
+};
+
+/**
+ * Find local ids of checked items
+ *
+ * @param tableItems all items for the all tables
+ * @param tableName table name
+ * @returns {*|Array} local ids of checked items
+ */
+export const tableItemsChecked = (tableItems, tableName) => {
+    const items = tableItems[tableName];
+    return items && Object.keys(items)
+            .map(localId => ({localId, item:items[localId]}))
+            .filter(({localId, item}) => item.isChecked)
+            .map(({localId, item}) => localId);
+};
+
 const tableItems = (state = {}, action) => {
-    const {type, tableName, response} = action;
-    if (ACTION_TABLE_DATA_SUCCESS === type && response && response && response.entities && response.entities[tableName]) {
-        return tableItemsWith(state, tableName, response.entities[tableName]);
+    const {type, tableName, localId, changes, response, error} = action;
+    if (ACTION_TABLE_DATA_SUCCESS === type && response && response.entities && response.entities[tableName]) {
+        return tableItemsMerge(state, tableName, response.entities[tableName]);
+    } else if (ACTION_TABLE_CHECK_ROW === type) {
+        return tableItemWith(state, tableName, localId, changes);
+    } else if (ACTION_TABLE_DELETE_ROW === type && localId) {
+        return tableItemWith(state, tableName, localId, {isDeleted:true});
+    } else if (ACTION_TABLE_EDIT_ROW === type && localId) {
+        return tableItemWith(state, tableName, localId, {isEditing:true, isDeleted:false});
+    } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
+        return tableItemWith(state, tableName, localId, objectWith({isEdited:true}, changes));
+    } else if (ACTION_TABLE_RESET_CHANGES === type) {
+        return objectWith(state, {[tableName]:{}})
+    } else if (ACTION_TABLE_SAVED_CHANGES === type) {
+        const newItems = tableItemsDeleteItem(state, tableName, localId);
+        return (response && response.entities && response.entities[tableName] &&
+            tableItemsWith(newItems, tableName, response.entities[tableName])
+            ) || newItems;
+    } else if (ACTION_TABLE_SAVE_CHANGES_FAILURE === type) {
+        const {errors, localId} = error;
+        return tableItemWith(state, tableName, localId, {errors})
+    } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
+        return tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true});
     }
     return state;
 };

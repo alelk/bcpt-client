@@ -16,7 +16,6 @@
     height: 30px;
     background-color: #e4dfe8;
     z-index: 200;
-    top: 8px;
     padding-top: 6px;
     padding-bottom: 6px;
     overflow: visible;
@@ -34,7 +33,27 @@
     color: #003f16;
 }
 
-.controls>button {
+.controls .itemsSelected {
+    margin-left: 40px;
+    line-height: 30px;
+    font-size: 110%;
+    font-weight: 200;
+    color: #373f3f;
+}
+
+.controls .itemsSelected button {
+    color: #FF9800;
+    background-color: transparent;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+.controls .itemsSelected button:hover {
+    text-shadow: 0 0 4px #666;
+}
+
+.controls > button {
     border: none;
     color: white;
     width: 30px;
