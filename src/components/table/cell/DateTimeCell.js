@@ -4,27 +4,32 @@
  * Created by Alex Elkin on 09.10.2017.
  */
 
+import DateTimeInput from '../input/DateTimeInput'
+import DateTimeLabel from '../label/DateTimeLabel'
+
 import React from 'react'
 import PropTypes from 'prop-types';
-import DateTimeEditable from '../../editable/DateTimeEditable'
 import {onCellChange} from './util'
 
-const DateTimeCell = (props) => {
-    const {value, column, original, row} = props;
+const DateTimeCell = ({value, column, original, row}) => {
     return (
-        <DateTimeEditable inputType={column.inputType}
-                       value={value}
-                       onChange={(value) => onCellChange(value, column, row)}
-                       isEditMode={original.isEditing && column.isEditable}
-        />
+        <div key={original.localId} className={`Cell${(original.isDeleted && ' deleted') || ''}`}>
+            {
+                original.isEditing && column.isEditable
+                    ? <DateTimeInput inputType={column.inputType} value={value}
+                             onChange={(value) => onCellChange(value, column, row)}/>
+                    : <DateTimeLabel value={value} inputType={column.inputType}/>
+            }
+        </div>
     )
-
 };
 
 
 DateTimeCell.propTypes = {
     original : PropTypes.shape({
-        isEditing: PropTypes.bool
+        localId: PropTypes.string,
+        isEditing: PropTypes.bool,
+        isDeleted: PropTypes.bool
     }),
     column : PropTypes.shape({
         inputType : PropTypes.oneOf(["datetime-local", "date", "time"]),

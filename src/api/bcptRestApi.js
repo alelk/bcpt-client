@@ -7,6 +7,7 @@
 import BcptConfig from '../util/BcptConfig'
 
 import { normalize, schema } from 'normalizr'
+import urlencode from 'urlencode'
 
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
@@ -41,25 +42,30 @@ const SchemaTableEntity = {
     productBatches : productBatchSchema
 };
 
-const sortedAsParams = (sorted) => {
+export const sortedAsParams = (sorted) => {
     return Array.isArray(sorted) ? sorted.map(s => "sortBy=" + s.id + ":" + (s.desc ? 'desc' : 'asc')).join("&") : '';
 };
 
+export const filteredAsParams = (filtered) => {
+    return Array.isArray(filtered) ? filtered.map(f => "filter=" + f.id + ":" + urlencode(f.value)).join("&") : '';
+};
+
 export const getTablePage = function (tableName, pageNumber, itemsPerPage, sorted, filtered) {
-    console.log("sorted: ", sortedAsParams(sorted));
+    const url = BcptConfig.get("rest-api-uri") + tableName + "/page/" + pageNumber + "?itemsPerPage=" + itemsPerPage +
+        "&" + sortedAsParams(sorted) + "&" + filteredAsParams(filtered);
+    console.log("Get table page: " + url);
     return getObject(
-        BcptConfig.get("rest-api-uri") + tableName + "/page/" + pageNumber + "?itemsPerPage=" + itemsPerPage +
-        "&" + sortedAsParams(sorted),
+        url,
         SchemaPage[tableName]
     )
 };
 
-export const getTable = function (tableName) {
-    return getObject(BcptConfig.get("rest-api-uri") + tableName + "/", SchemaTable[tableName])
-};
-
 export const getTableEntity = function (tableName, externalId) {
     return getObject(BcptConfig.get("rest-api-uri") + tableName + "/" + externalId, SchemaTableEntity[tableName])
+};
+
+export const getTable = function (tableName) {
+    return getObject(BcptConfig.get("rest-api-uri") + tableName + "/", SchemaTable[tableName])
 };
 
 export const postTableEntity = function (tableName, data) {

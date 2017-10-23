@@ -1,0 +1,4 @@
+input[type='checkbox'].Input:focus {
+    box-shadow: none;
+    text-shadow: 0 0 4px #333;
+}

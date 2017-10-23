@@ -3,79 +3,131 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import Table, {Cell, IconCell, filterById} from './Table'
-import EditableLabel from '../editable/EditableLabel'
+import TextCell from './cell/TextCell'
+import IconCell from './cell/IconCell'
+import DateTimeCell from './cell/DateTimeCell'
+import DropDownCell from './cell/DropDownCell'
+import TextFilter from './filter/TextFilter'
+import DropDownFilter from './filter/DropDownFilter'
+import Table from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import moment from 'moment'
 import 'moment/locale/ru';
 
 class PersonsTable extends Table {
 
-    constructor(props) {
-        super(props);
-        this.onValueChange = this.onValueChange.bind(this);
-    }
-
-    onValueChange(value, row, column) {
-        this.props.onChange && this.props.onChange(row.externalId, {[column.id] : value});
-    }
-
     columns() {
         return [
-            {Header: "", accessor: "localId", Cell: () => IconCell("person"), width: 30, filterable: false},
             {
+                Header: "",
+                accessor: "localId",
+                iconName: "person",
+                Cell: IconCell,
+                width: 30,
+                filterable: false
+            }, {
                 Header: "ID",
                 accessor: "externalId",
-                Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                filterMethod: filterById
-            },
-            {Header: "Фамилия", accessor: "lastName", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
-            {Header: "Имя", accessor: "firstName", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
-            {Header: "Отчество", accessor: "middleName", Cell: (ci) => Cell(ci, this.props.onChange, "localId")},
-            {
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Фамилия",
+                accessor: "lastName",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+            }, {
+                Header: "Имя",
+                accessor: "firstName",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Отчество",
+                accessor: "middleName",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
                 Header: "Группа крови",
                 accessor: "bloodType",
-                Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                allowedValues: ["", "0(I)", "A(II)", "B(III)", "AB(IV)"],
-                Filter: ({filter, onChange}) => <EditableLabel valueSet={["", "0(I)", "A(II)", "B(III)", "AB(IV)"]}
-                                                               isEditMode={true} onChange={onChange}/>,
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: true,
+                allowedValues: [
+                    {value:"", displayValue: ""},
+                    {value:"0", displayValue: "0(I)"},
+                    {value:"a", displayValue: "A(II)"},
+                    {value:"b", displayValue: "B(III)"},
+                    {value:"ab", displayValue: "AB(IV)"}
+                ],
+                filterable: true,
+                Filter: DropDownFilter,
                 width: 100
             }, {
                 Header: "Rh",
                 accessor: "rhFactor",
-                Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                allowedValues: ["", "Rh+", "Rh-"],
-                Filter: ({filter, onChange}) => <EditableLabel valueSet={["", "Rh+", "Rh-"]} isEditMode={true}
-                                                               onChange={onChange}/>,
+                Cell: DropDownCell,
+                isEditable: true,
+                onChange: this.onValueChange,
+                allowedValues: [
+                    {value:"", displayValue: ""},
+                    {value:"pos", displayValue: "Rh+"},
+                    {value:"neg", displayValue: "Rh-"}
+                ],
+                filterable: true,
+                Filter: DropDownFilter,
                 width: 100
             },
             {
                 Header: "Последнее изменение",
-                id: "updateTimestamp",
-                accessor: d => moment(d.updateTimestamp).format('YYYY/MM/DD HH:mm'),
-                minWidth: 130
+                accessor: "updateTimestamp",
+                inputType: "datetime-local",
+                Cell:DateTimeCell,
+                minWidth: 90
             }
         ];
     }
 }
+const dataItem = PropTypes.shape({
+    isChecked : PropTypes.bool,
+    localId : PropTypes.string,
+    externalId : PropTypes.string,
+    firstName : PropTypes.string,
+    lastName : PropTypes.string,
+    middleName : PropTypes.string,
+    groupType : PropTypes.string,
+    rhFactor : PropTypes.string,
+    updateTimestamp : PropTypes.string,
+    errors : PropTypes.object | PropTypes.array
+});
 PersonsTable.propTypes = {
-    data : PropTypes.arrayOf(PropTypes.shape({
-        externalId : PropTypes.string,
-        firstName : PropTypes.string,
-        lastName : PropTypes.string,
-        middleName : PropTypes.string,
-        groupType : PropTypes.string,
-        rhFactor : PropTypes.string,
-        updateTimestamp : PropTypes.string,
-        errors : PropTypes.object | PropTypes.array
-    })).isRequired,
+    name : PropTypes.string,
+    data : PropTypes.arrayOf(dataItem),
+    checkedItems : PropTypes.arrayOf(dataItem),
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
+    isEditing : PropTypes.bool,
     onChange : PropTypes.func,
+    onCheckRow : PropTypes.func,
+    onDeleteRow : PropTypes.func,
+    onEditRow : PropTypes.func,
     onFetchData: PropTypes.func,
+    onResetChanges : PropTypes.func,
+    onRefreshData : PropTypes.func,
+    onSaveChanges : PropTypes.func,
+    onAddNewItem : PropTypes.func,
+
     filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
-
 export default PersonsTable;

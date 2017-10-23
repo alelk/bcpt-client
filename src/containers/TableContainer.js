@@ -9,7 +9,7 @@ import BloodDonationsContainer from './BloodDonationsContainer'
 import BloodInvoicesContainer from './BloodInvoicesContainer'
 import BloodPoolsContainer from './BloodPoolsContainer'
 import ProductBatchesContainer from './ProductBatchesContainer'
-import {fetchTableData, addNew, edit, saveChanges, enableEditMode, deleteChecked} from '../actions/actions'
+import {fetchTableData, tableRowCreate, tableRowChange, saveChanges, enableEditMode} from '../actions/actions'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -51,21 +51,11 @@ class TableContainer extends React.Component {
         const {isEditing} = this.props.tableData;
         return (
             <div>
-                <EditableTable onAdd={this.onAddRow}
-                               onDone={this.onSaveChanges}
-                               isEditMode={isEditing}
-                               onCancel={this.dismissChanges}
-                               onEdit={this.onEnableEditMode}
-                               onRemove={this.onDeleteCheckedItems}
-                               onRefresh={this.dismissChanges}
-                               tableName={this.props.tableDisplayName}
-                >
                     <Route path='*/table/persons' component={PersonsContainer}/>
                     <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
                     <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
-                </EditableTable>
             </div>
         )
     }
@@ -91,4 +81,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default connect(mapStateToProps, {addNew, edit, saveChanges, fetchTableData, enableEditMode, deleteChecked})(TableContainer);
+export default connect(mapStateToProps, {tableRowCreate, tableRowChange, saveChanges, fetchTableData, enableEditMode})(TableContainer);

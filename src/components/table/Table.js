@@ -3,6 +3,8 @@
  *
  * Created by Alex Elkin on 14.09.2017.
  */
+import EditableTable from './EditableTable'
+import CheckboxCell from './cell/CheckboxCell'
 import EditableLabel from '../editable/EditableLabel'
 import "./Table.css"
 
@@ -52,6 +54,11 @@ class Table extends React.Component {
     constructor(props) {
         super(props);
         this.onFetchData = this.onFetchData.bind(this);
+        this.onValueChange = this.onValueChange.bind(this);
+        this.onCheckRow = this.onCheckRow.bind(this);
+        this.onUncheckRows = this.onUncheckRows.bind(this);
+        this.onDeleteRows = this.onDeleteRows.bind(this);
+        this.onEditRows = this.onEditRows.bind(this);
     }
 
     /**
@@ -65,7 +72,12 @@ class Table extends React.Component {
     _columns() {
         if (this.columnsData == null) {
             this.columnsData = [
-                {accessor: "isChecked", inputType:'checkbox', width: 30},
+                {
+                    accessor: "isChecked",
+                    Cell: CheckboxCell,
+                    onChange: this.onCheckRow,
+                    width: 30
+                },
                 ...this.columns()
             ]
         }
@@ -81,38 +93,91 @@ class Table extends React.Component {
         );
     }
 
+    onCheckRow(value, row) {
+        this.props.onCheckRow && this.props.onCheckRow(row.localId, {isChecked: value});
+    }
+
+    onUncheckRows() {
+        const {checkedItems, onCheckRow} = this.props;
+        checkedItems && onCheckRow && checkedItems.map(ci => onCheckRow(ci.localId, {isChecked:false}))
+    }
+
+    onDeleteRows() {
+        const {checkedItems, onDeleteRow} = this.props;
+        checkedItems && onDeleteRow && checkedItems.map(ci => onDeleteRow(ci.localId));
+        this.onUncheckRows();
+    }
+
+    onEditRows() {
+        const {checkedItems, onEditRow} = this.props;
+        checkedItems && onEditRow && checkedItems.map(ci => onEditRow(ci.localId));
+        this.onUncheckRows();
+    }
+
+    onValueChange(value, row, column) {
+        this.props.onChange && this.props.onChange(row.localId, {[column.id]: value});
+    }
+
     render() {
-        const {data, pagesCount, isFetching} = this.props;
+        const {
+            name, data, pagesCount, checkedItems, isFetching, isEditing, onResetChanges, onSaveChanges, onRefreshData, onAddNewItem
+        } = this.props;
         return (
-            <ReactTable
-                data={data}
-                manual
-                onFetchData={this.onFetchData}
-                loading = {isFetching}
-                columns={this._columns()}
-                pages={pagesCount}
-                defaultPageSize={15}
-                pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
-                minRows={15}
-                previousText="Предыдущая"
-                nextText='Следующая'
-                loadingText='Загрузка...'
-                noDataText='Нет данных'
-                pageText='Стр.'
-                ofText='из'
-                rowsText="строк"
-                showPaginationTop
-                showPaginationBottom={false}
-            />
+            <EditableTable tableName={name}
+                           checkedItems={checkedItems && checkedItems.map(ci => ci.localId)}
+                           onUncheckItems={this.onUncheckRows}
+                           onRemove={this.onDeleteRows}
+                           onEdit={this.onEditRows}
+                           isEditMode={isEditing}
+                           onCancel={onResetChanges}
+                           onDone={onSaveChanges}
+                           onRefresh={onRefreshData}
+                           onAdd={onAddNewItem}>
+                <ReactTable
+                    data={data || []}
+                    manual
+                    onFetchData={this.onFetchData}
+                    loading={isFetching}
+                    columns={this._columns()}
+                    pages={pagesCount}
+                    defaultPageSize={15}
+                    pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
+                    minRows={15}
+                    previousText="Предыдущая"
+                    nextText='Следующая'
+                    loadingText='Загрузка...'
+                    noDataText='Нет данных'
+                    pageText='Стр.'
+                    ofText='из'
+                    rowsText="строк"
+                    showPaginationTop
+                    showPaginationBottom={false}
+                />
+            </EditableTable>
         )
     }
 }
-
+const dataItem = PropTypes.shape({
+    localId : PropTypes.string,
+    externalId : PropTypes.string,
+});
 Table.propTypes = {
-    data: PropTypes.array.isRequired,
+    name : PropTypes.string,
+    data: PropTypes.arrayOf(dataItem),
+    checkedItems : PropTypes.arrayOf(dataItem),
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
+    isEditing : PropTypes.bool,
     onFetchData: PropTypes.func,
+    onChange : PropTypes.func,
+    onCheckRow : PropTypes.func,
+    onDeleteRow : PropTypes.func,
+    onEditRow : PropTypes.func,
+    onResetChanges : PropTypes.func,
+    onRefreshData : PropTypes.func,
+    onSaveChanges : PropTypes.func,
+    onAddNewItem : PropTypes.func,
+
 
     isEditMode : PropTypes.bool,
     defaultSorted : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, desc:PropTypes.bool})),
