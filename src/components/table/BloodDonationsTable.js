@@ -4,99 +4,127 @@
  * Created by Alex Elkin on 21.09.2017.
  */
 
-import Table, {Cell, IconCell, filterById} from './Table'
-import EditableLabel from '../editable/EditableLabel'
+import TextCell from './cell/TextCell'
+import IconCell from './cell/IconCell'
+import DateTimeCell from './cell/DateTimeCell'
+import DropDownCell from './cell/DropDownCell'
+import TextFilter from './filter/TextFilter'
+import DropDownFilter from './filter/DropDownFilter'
+import Table from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class BloodDonationsTable extends React.Component {
+class BloodDonationsTable extends Table {
 
-    columns = [
-        {Header: "", accessor: "localId", Cell: () => IconCell("invert_colors"), width: 30, filterable: false },
-        {
-            Header: "Штрих-код",
-            accessor: "externalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-            filterMethod: filterById
-        }, {
-            Header: "ID донора",
-            accessor: "donorExternalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onDonorClick),
-            filterMethod: filterById
-        }, {
-            Header: "Номер накладной",
-            accessor: "bloodInvoiceExternalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodInvoiceClick),
-            filterMethod: filterById
-        }, {
-            Header: "Тип донации",
-            accessor: "donationType",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-            allowedValues: ["", "plasma-fresh-frozen"],
-            Filter: ({ filter, onChange }) => <EditableLabel valueSet={["", "plasma-fresh-frozen"]} isEditMode={true} onChange={onChange}/>,
-            width: 100
-        }, {
-            Header: "Объём, мл",
-            accessor: "amount",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        }, {
-            Header: "Дата изготовления",
-            accessor: "donationDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        }, {
-            Header: "Начало карантина",
-            accessor: "quarantineDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        }, {
-            Header: "Последнее изменение",
-            accessor: "updateTimestamp",
-            inputType: 'datetime',
-            minWidth: 130,
-            isEditable: false,
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        }
-    ];
-
-    render() {
-        const {bloodDonations, isEditMode, isFetching, filters} = this.props;
-        const data = Object.keys(bloodDonations).map(k => Object.assign({}, bloodDonations[k], {localId: k}));
-        return (
-            <Table
-                defaultSorted={[{id: "localId", desc: false}]}
-                sorted={isEditMode ? [{id: "localId", desc: false}] : undefined}
-                data={data}
-                filterable={true}
-                isFetching={isFetching}
-                filters={filters}
-                columns={isEditMode ? [{
-                        Header: "", accessor: "isChecked",
-                        Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                        inputType: 'checkbox', width: 30
-                    }
-                        , ...this.columns] : this.columns
-                }
-            />
-        )
+    columns() {
+        return [
+            {
+                Header: "",
+                accessor: "localId",
+                iconName: "invert_colors",
+                Cell: IconCell,
+                width: 30,
+                filterable: false
+            }, {
+                Header: "Штрих-код",
+                accessor: "externalId",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "ID донора",
+                accessor: "donor",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Номер накладной",
+                accessor: "bloodInvoice",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Тип донации",
+                accessor: "donationType",
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: true,
+                allowedValues: [
+                    {value: "", displayValue: ""},
+                    {value: "plasma-fresh-frozen", displayValue: "Плазма свежезамороженная"}
+                ],
+                filterable: true,
+                Filter: DropDownFilter,
+                width: 300
+            }, {
+                Header: "Объем, мл.",
+                accessor: "amount",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Дата донации",
+                accessor: "donationDate",
+                inputType: "date",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }, {
+                Header: "Начало карантина",
+                accessor: "quarantineDate",
+                inputType: "date",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }, {
+                Header: "Последнее изменение",
+                accessor: "updateTimestamp",
+                inputType: "datetime-local",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }
+        ];
     }
 }
+const dataItem = PropTypes.shape({
+    isChecked : PropTypes.bool,
+    localId : PropTypes.string,
+    externalId : PropTypes.string,
+    donor : PropTypes.string,
+    bloodInvoice : PropTypes.string,
+    donationType : PropTypes.string,
+    amount : PropTypes.number,
+    donationDate : PropTypes.string,
+    quarantineDate : PropTypes.string,
+    updateTimestamp : PropTypes.string,
+    errors : PropTypes.object | PropTypes.array
+});
 BloodDonationsTable.propTypes = {
-    bloodDonations : PropTypes.objectOf(PropTypes.shape({
-        externalId : PropTypes.string,
-        amount : PropTypes.number,
-        donationDate : PropTypes.string,
-        quarantineDate : PropTypes.string,
-        updateTimestamp : PropTypes.string,
-        errors : PropTypes.oneOfType([PropTypes.object, PropTypes.array])
-    })).isRequired,
+    name : PropTypes.string,
+    data : PropTypes.arrayOf(dataItem),
+    checkedItems : PropTypes.arrayOf(dataItem),
+    pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
-    isEditMode : PropTypes.bool,
+    isEditing : PropTypes.bool,
     onChange : PropTypes.func,
-    onDonorClick : PropTypes.func,
-    onBloodInvoiceClick : PropTypes.func,
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
+    onCheckRow : PropTypes.func,
+    onDeleteRow : PropTypes.func,
+    onEditRow : PropTypes.func,
+    onFetchData: PropTypes.func,
+    onResetChanges : PropTypes.func,
+    onRefreshData : PropTypes.func,
+    onSaveChanges : PropTypes.func,
+    onAddNewItem : PropTypes.func,
+    isSimpleTable : PropTypes.bool,
+    defaultPageSize: PropTypes.number,
+    filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
 export default BloodDonationsTable;

@@ -13,13 +13,72 @@ import PropTypes from 'prop-types'
 
 class BloodPoolsTable extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.onValueChange = this.onValueChange.bind(this);
-    }
-
-    onValueChange(value, row, column) {
-        this.props.onChange && this.props.onChange(row.externalId, {[column.id] : value});
+    columns() {
+        return [
+            {
+                Header: "",
+                accessor: "localId",
+                iconName: "invert_colors",
+                Cell: IconCell,
+                width: 30,
+                filterable: false
+            }, {
+                Header: "ID пула",
+                accessor: "externalId",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Номер пула",
+                accessor: "poolNumber",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Тип донации",
+                accessor: "donationType",
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: true,
+                allowedValues: [
+                    {value: "", displayValue: ""},
+                    {value: "plasma-fresh-frozen", displayValue: "Плазма свежезамороженная"}
+                ],
+                filterable: true,
+                Filter: DropDownFilter,
+                width: 300
+            }, {
+                Header: "Объем, мл.",
+                accessor: "amount",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Дата донации",
+                accessor: "donationDate",
+                inputType: "date",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }, {
+                Header: "Начало карантина",
+                accessor: "quarantineDate",
+                inputType: "date",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }, {
+                Header: "Последнее изменение",
+                accessor: "updateTimestamp",
+                inputType: "datetime-local",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }
+        ];
     }
 
     componentWillMount() {

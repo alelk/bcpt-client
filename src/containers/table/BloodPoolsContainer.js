@@ -4,8 +4,8 @@
  * Created by Alex Elkin on 02.10.2017.
  */
 
-import BloodPoolsTable from '../components/table/BloodPoolsTable'
-import {fetchTableData, tableRowChange} from '../actions/actions'
+import BloodPoolsTable from '../../components/table/BloodPoolsTable'
+import {fetchTableData, tableRowChange} from '../../actions/actions'
 
 import React from 'react'
 import PropTypes from 'prop-types'

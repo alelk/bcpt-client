@@ -12,18 +12,25 @@ import urlencode from 'urlencode'
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
 const personPageSchema = new schema.Entity('pages', {items:personsSchema}, { idAttribute : value => value.pageNumber });
-
 const bloodDonationSchema = new schema.Entity('bloodDonations', {}, { idAttribute : value => value.externalId });
 const bloodDonationsSchema = new schema.Array(bloodDonationSchema);
+const bloodDonationPageSchema = new schema.Entity('pages', {items:bloodDonationsSchema}, { idAttribute : value => value.pageNumber });
 const bloodInvoiceSchema = new schema.Entity('bloodInvoices', {}, { idAttribute : value => value.externalId });
 const bloodInvoicesSchema = new schema.Array(bloodInvoiceSchema);
+const bloodInvoicePageSchema = new schema.Entity('pages', {items:bloodInvoicesSchema}, { idAttribute : value => value.pageNumber });
 const bloodPoolSchema = new schema.Entity('bloodPools', {}, { idAttribute : value => value.externalId });
 const bloodPoolsSchema = new schema.Array(bloodPoolSchema);
+const bloodPoolPageSchema = new schema.Entity('pages', {items:bloodPoolsSchema}, { idAttribute : value => value.pageNumber });
 const productBatchSchema = new schema.Entity('productBatches', {}, { idAttribute : value => value.externalId });
 const productBatchesSchema = new schema.Array(productBatchSchema);
+const productBatchPageSchema = new schema.Entity('pages', {items:productBatchesSchema}, { idAttribute : value => value.pageNumber });
 
 const SchemaPage = {
-    persons : personPageSchema
+    persons : personPageSchema,
+    bloodDonations : bloodDonationPageSchema,
+    bloodInvoices : bloodInvoicePageSchema,
+    bloodPools : bloodPoolPageSchema,
+    productBatches : productBatchPageSchema
 };
 
 const SchemaTable = {
@@ -47,7 +54,7 @@ export const sortedAsParams = (sorted) => {
 };
 
 export const filteredAsParams = (filtered) => {
-    return Array.isArray(filtered) ? filtered.map(f => "filter=" + f.id + ":" + urlencode(f.value)).join("&") : '';
+    return Array.isArray(filtered) ? filtered.map(f => "filter=" + (f.id || f.key) + ":" + urlencode(f.value)).join("&") : '';
 };
 
 export const getTablePage = function (tableName, pageNumber, itemsPerPage, sorted, filtered) {

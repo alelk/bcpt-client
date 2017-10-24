@@ -7,11 +7,12 @@ import './Cell.css'
 
 import React from 'react'
 import PropTypes from 'prop-types';
+import FontIcon from 'material-ui/FontIcon'
 
 const IconCell = ({original, column}) => {
     return (
         <div key={original.localId} className={`Cell${(original.isDeleted && ' deleted') || ''}`}>
-            <i className="material-icons rowIcon">{column.iconName}</i>
+            <FontIcon className="material-icons rowIcon">{column.iconName}</FontIcon>
         </div>
     )
 };

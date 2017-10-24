@@ -139,7 +139,7 @@ const tables = (state = {
     } else if (ACTION_TABLE_EDIT_ROW === type && localId) {
         return tableWith(state, tableName, {isEditing:true});
     } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
-        return tableWith(state, tableName, {isEdited:true});
+        return tableWith(state, tableName, {isEdited:true, isEditing:true});
     } else if (ACTION_TABLE_RESET_CHANGES === type || ACTION_TABLE_SAVE_CHANGES_SUCCESS === type) {
         return tableWith(state, tableName, {isEdited:false, isEditing:false, isFetched:false, isFetching:false, checkedItems:undefined});
     } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
@@ -278,7 +278,7 @@ const tableItems = (state = {}, action) => {
     } else if (ACTION_TABLE_EDIT_ROW === type && localId) {
         return tableItemWith(state, tableName, localId, {isEditing:true, isDeleted:false});
     } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
-        return tableItemWith(state, tableName, localId, objectWith({isEdited:true}, changes));
+        return tableItemWith(state, tableName, localId, objectWith({isEdited:true, isEditing:true}, changes));
     } else if (ACTION_TABLE_RESET_CHANGES === type) {
         return objectWith(state, {[tableName]:{}})
     } else if (ACTION_TABLE_SAVED_CHANGES === type) {
