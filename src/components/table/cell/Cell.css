@@ -1,3 +1,7 @@
+.Cell {
+    width: 100%;
+}
+
 .Cell.deleted {
     opacity: 0.2;
 }

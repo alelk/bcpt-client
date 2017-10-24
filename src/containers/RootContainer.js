@@ -3,8 +3,9 @@
  *
  * Created by Alex Elkin on 12.09.2017.
  */
-import PersonsContainer from './PersonsContainer'
-import TableContainer from './TableContainer'
+import PersonsContainer from './table/PersonsContainer'
+import BloodDonationsContainer from './table/BloodDonationsContainer'
+import BloodInvoicesContainer from './table/BloodInvoicesContainer'
 import DrawerContainer from './DrawerContainer'
 
 import React from 'react'
@@ -24,8 +25,11 @@ const Root = ({store, history}) => (
                     <Link to='/table/bloodPools'><i className="material-icons">poll</i>Пулы</Link>
                     <Link to='/table/productBatches'><i className="material-icons">call_merge</i>Загрузки</Link>
                 </DrawerContainer>
-                <Route path='/table/:tableName' component={TableContainer}/>
-                <Route exact path='/abv' component={PersonsContainer}/>
+                <div>
+                    <Route path='*/table/persons' component={PersonsContainer}/>
+                    <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
+                    <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
+                </div>
             </div>
         </ConnectedRouter>
     </Provider>

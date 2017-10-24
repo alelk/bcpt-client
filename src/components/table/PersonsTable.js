@@ -13,7 +13,6 @@ import Table from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import 'moment/locale/ru';
 
 class PersonsTable extends Table {
 
@@ -88,8 +87,7 @@ class PersonsTable extends Table {
                 filterable: true,
                 Filter: DropDownFilter,
                 width: 100
-            },
-            {
+            }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",

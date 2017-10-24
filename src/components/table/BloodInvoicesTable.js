@@ -4,85 +4,110 @@
  * Created by Alex Elkin on 25.09.2017.
  */
 
-import Table, {Cell, IconCell, filterById} from './Table'
+import TextCell from './cell/TextCell'
+import ArrayCell from './cell/ArrayCell'
+import IconCell from './cell/IconCell'
+import DateTimeCell from './cell/DateTimeCell'
+import TextFilter from './filter/TextFilter'
+import Table from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class BloodInvoicesTable extends React.Component {
+class BloodInvoicesTable extends Table {
 
-    columns = [
-        {Header: "", accessor: "localId", Cell: () => IconCell("format_list_bulleted"), width: 30, filterable: false },
-        {
-            Header: "Номер накладной",
-            accessor: "externalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-            filterMethod: filterById
-        },{
-            Header: "Штрих-коды контейнеров",
-            accessor: "bloodDonationExternalIds",
-            valueSplitRegex: /\s*[;,]\s*/,
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodDonationsClick),
-            filterMethod: filterById
-        }, {
-            Header: "Суммарная ёмкость",
-            accessor: "totalAmount",
-            Cell: (ci) => Cell(ci, undefined, "localId"),
-            isEditable:false
-        }, {
-            Header: "ID пула",
-            accessor: "bloodPoolExternalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodPoolClick)
-        }, {
-            Header: "Дата накладной",
-            accessor: "deliveryDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-            filterMethod: filterById
-        }, {
-            Header: "Последнее изменение",
-            accessor: "updateTimestamp",
-            inputType: 'datetime',
-            minWidth: 130,
-            isEditable: false,
-            Cell: (ci) => Cell(ci, undefined, "localId")
-        }
-    ];
+    constructor(props) {
+        super(props);
+        this.onBloodDonationsClick=this.onBloodDonationsClick.bind(this);
+    }
 
-    render() {
-        const {bloodInvoices, isEditMode, isFetching, filters} = this.props;
-        const data = Object.keys(bloodInvoices).map(k => Object.assign({}, bloodInvoices[k], {localId: k}));
-        return (
-            <Table
-                defaultSorted={[{id: "localId", desc: false}]}
-                sorted={isEditMode ? [{id: "localId", desc: false}] : undefined}
-                data={data}
-                isFetching={isFetching}
-                filterable={true}
-                filters={filters}
-                columns={isEditMode ? [{
-                        Header: "", accessor: "isChecked",
-                        Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                        inputType: 'checkbox', width: 30
-                    }
-                        , ...this.columns] : this.columns
-                }
-            />
-        )
+    onBloodDonationsClick(value, row, column, original) {
+        const {onBloodDonationsClick} = this.props;
+        onBloodDonationsClick && onBloodDonationsClick(value, original, row.localId);
+    }
+
+    columns() {
+        return [
+            {
+                Header: "",
+                accessor: "localId",
+                iconName: "format_list_bulleted",
+                Cell: IconCell,
+                width: 30,
+                filterable: false
+            }, {
+                Header: "Номер накладной",
+                accessor: "externalId",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Штрих-коды контейнеров",
+                accessor: "bloodDonations",
+                iconName: "invert_colors",
+                onClick: this.onBloodDonationsClick,
+                onChange: this.onValueChange,
+                Cell: ArrayCell,
+                sortable: false,
+                isEditable: true,
+                filterable: false,
+                Filter: TextFilter
+            }, {
+                Header: "Суммарный объем, мл.",
+                accessor: "totalAmount",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                sortable: false,
+                filterable: false,
+                maxWidth: 190
+            }, {
+                Header: "Дата накладной",
+                isEditable: true,
+                accessor: "deliveryDate",
+                inputType: "date",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }, {
+                Header: "Последнее изменение",
+                accessor: "updateTimestamp",
+                inputType: "datetime-local",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }
+        ];
     }
 }
+const dataItem = PropTypes.shape({
+    isChecked : PropTypes.bool,
+    localId : PropTypes.string,
+    externalId : PropTypes.string,
+    bloodDonations : PropTypes.arrayOf(PropTypes.string),
+    totalAmount : PropTypes.number,
+    deliveryDate : PropTypes.string,
+    updateTimestamp : PropTypes.string,
+    errors : PropTypes.object | PropTypes.array
+});
 BloodInvoicesTable.propTypes = {
-    bloodInvoices : PropTypes.objectOf(PropTypes.shape({
-        externalId : PropTypes.string,
-        deliveryDate : PropTypes.string,
-        bloodDonationExternalIds : PropTypes.arrayOf(PropTypes.string),
-        errors : PropTypes.oneOfType([PropTypes.object, PropTypes.array])
-    })).isRequired,
+    name : PropTypes.string,
+    data : PropTypes.arrayOf(dataItem),
+    checkedItems : PropTypes.arrayOf(dataItem),
+    pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
-    isEditMode : PropTypes.bool,
+    isEditing : PropTypes.bool,
     onChange : PropTypes.func,
-    onBloodDonationsClick : PropTypes.func,
-    onBloodPoolClick : PropTypes.func,
+    onCheckRow : PropTypes.func,
+    onDeleteRow : PropTypes.func,
+    onEditRow : PropTypes.func,
+    onFetchData: PropTypes.func,
+    onResetChanges : PropTypes.func,
+    onRefreshData : PropTypes.func,
+    onSaveChanges : PropTypes.func,
+    onAddNewItem : PropTypes.func,
+    onBloodDonationsClick: PropTypes.func,
+    subComponent : PropTypes.func,
+
     filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 

@@ -71,15 +71,17 @@ class Table extends React.Component {
 
     _columns() {
         if (this.columnsData == null) {
-            this.columnsData = [
-                {
-                    accessor: "isChecked",
-                    Cell: CheckboxCell,
-                    onChange: this.onCheckRow,
-                    width: 30
-                },
-                ...this.columns()
-            ]
+            this.columnsData = this.props.isSimpleTable
+                ? this.columns().map(c => Object.assign({}, c, {filterable:false, Filter:undefined}))
+                : [
+                    {
+                        accessor: "isChecked",
+                        Cell: CheckboxCell,
+                        onChange: this.onCheckRow,
+                        width: 30
+                    },
+                    ...this.columns()
+                ]
         }
         return this.columnsData;
     }
@@ -118,11 +120,43 @@ class Table extends React.Component {
         this.props.onChange && this.props.onChange(row.localId, {[column.id]: value});
     }
 
+    renderReactTable() {
+        const {data, pagesCount, isFetching, subComponent, filtered, isSimpleTable, defaultPageSize} = this.props;
+        return (
+            <ReactTable
+                style={isSimpleTable && {padding:'20px', backgroundColor:"#ecf6f0"}}
+                data={data || []}
+                manual
+                onFetchData={this.onFetchData}
+                loading={isFetching}
+                columns={this._columns()}
+                pages={pagesCount}
+                defaultPageSize={defaultPageSize || 15}
+                pageSizeOptions={[defaultPageSize || 15, 20, 25, 30, 40, 50, 100, 500]}
+                minRows={!isSimpleTable ? 15 : 0}
+                previousText="Предыдущая"
+                nextText='Следующая'
+                loadingText='Загрузка...'
+                noDataText='Нет данных'
+                pageText='Стр.'
+                ofText='из'
+                rowsText="строк"
+                showPaginationTop
+                showPaginationBottom={false}
+                SubComponent={subComponent && (({original}) => subComponent(original))}
+                filtered={filtered}
+                defaultFiltered={filtered}
+            />
+        );
+    }
+
     render() {
         const {
-            name, data, pagesCount, checkedItems, isFetching, isEditing, onResetChanges, onSaveChanges, onRefreshData, onAddNewItem
+            name, checkedItems, isEditing, onResetChanges,
+            onSaveChanges, onRefreshData, onAddNewItem, isSimpleTable
         } = this.props;
         return (
+            isSimpleTable ? this.renderReactTable() :
             <EditableTable tableName={name}
                            checkedItems={checkedItems && checkedItems.map(ci => ci.localId)}
                            onUncheckItems={this.onUncheckRows}
@@ -133,26 +167,7 @@ class Table extends React.Component {
                            onDone={onSaveChanges}
                            onRefresh={onRefreshData}
                            onAdd={onAddNewItem}>
-                <ReactTable
-                    data={data || []}
-                    manual
-                    onFetchData={this.onFetchData}
-                    loading={isFetching}
-                    columns={this._columns()}
-                    pages={pagesCount}
-                    defaultPageSize={15}
-                    pageSizeOptions={[15, 20, 25, 30, 40, 50, 100, 500]}
-                    minRows={15}
-                    previousText="Предыдущая"
-                    nextText='Следующая'
-                    loadingText='Загрузка...'
-                    noDataText='Нет данных'
-                    pageText='Стр.'
-                    ofText='из'
-                    rowsText="строк"
-                    showPaginationTop
-                    showPaginationBottom={false}
-                />
+                {this.renderReactTable()}
             </EditableTable>
         )
     }
@@ -177,12 +192,14 @@ Table.propTypes = {
     onRefreshData : PropTypes.func,
     onSaveChanges : PropTypes.func,
     onAddNewItem : PropTypes.func,
-
+    isSimpleTable : PropTypes.bool,
+    subComponent : PropTypes.func,
+    defaultPageSize: PropTypes.number,
+    filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string})),
 
     isEditMode : PropTypes.bool,
     defaultSorted : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, desc:PropTypes.bool})),
     sorted : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, desc:PropTypes.bool})),
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string})),
 
 };
 
