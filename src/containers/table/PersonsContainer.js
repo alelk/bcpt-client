@@ -8,11 +8,25 @@ import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './Tabl
 
 import React from 'react'
 import {connect} from 'react-redux'
+import BloodDonationsContainer from './BloodDonationsContainer'
+import './PersonsContainer.css'
+
+const PersonSubTable = (row) => {
+    return (
+        <div className="personBloodDonations">
+            <label>Контейнеры с плазмой для донора {row.externalId}</label>
+            <BloodDonationsContainer
+                isSimpleTable={true}
+                filtered={[{key: "donor", value: row.externalId}]}
+            />
+        </div>
+    )
+};
 
 class PersonsContainer extends TableContainerAdapter {
     render() {
         return (
-            <PersonsTable {...this.tableProps()}/>
+            <PersonsTable {...this.tableProps()} subComponent={PersonSubTable}/>
         )
     }
 }

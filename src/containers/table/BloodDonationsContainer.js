@@ -6,15 +6,35 @@
 
 import BloodDonationsTable from '../../components/table/BloodDonationsTable'
 import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
+import PersonsContainer from './PersonsContainer'
+import BloodInvoicesContainer from './BloodInvoicesContainer'
+import './BloodDonationsContainer.css'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
+const BloodDonationSubTable = (row) => {
+    return (
+        <div className="bloodDonationSubTable">
+            <label>Донор контейнера с плазмой {row.externalId}</label>
+            <PersonsContainer
+                isSimpleTable={true}
+                filtered={[{key: "externalId", value: row.donor}]}
+            />
+            <label>Накладная контейнера с плазмой {row.externalId}</label>
+            <BloodInvoicesContainer
+                isSimpleTable={true}
+                filtered={[{key: "externalId", value: row.bloodInvoice}]}
+            />
+        </div>
+    )
+};
+
 class BloodDonationsContainer extends TableContainerAdapter {
     render() {
         return (
-            <BloodDonationsTable {...this.tableProps()}/>
+            <BloodDonationsTable {...this.tableProps()} subComponent={BloodDonationSubTable}/>
         )
     }
 }

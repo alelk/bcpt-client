@@ -27,6 +27,10 @@ class TableContainerAdapter extends React.Component {
         this.onTableRowCreate = this.onTableRowCreate.bind(this);
     }
 
+    componentWillMount() {
+        this.tableInstanceId = Math.random().toString(36).slice(-4);
+    }
+
     onFetchData(pageNumber, itemsPerPage, sorted, filtered) {
         this.props.fetchTableData(this.props.tableName, pageNumber, itemsPerPage, sorted, filtered);
     }

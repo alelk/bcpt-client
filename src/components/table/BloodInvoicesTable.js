@@ -106,9 +106,9 @@ BloodInvoicesTable.propTypes = {
     onSaveChanges : PropTypes.func,
     onAddNewItem : PropTypes.func,
     onBloodDonationsClick: PropTypes.func,
+    isSimpleTable : PropTypes.bool,
     subComponent : PropTypes.func,
-
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
+    filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
 export default BloodInvoicesTable;

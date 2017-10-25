@@ -125,7 +125,7 @@ PersonsTable.propTypes = {
     onRefreshData : PropTypes.func,
     onSaveChanges : PropTypes.func,
     onAddNewItem : PropTypes.func,
-
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
+    isSimpleTable : PropTypes.bool,
+    filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 export default PersonsTable;
