@@ -19,94 +19,17 @@ import {
     ACTION_TABLE_SAVED_CHANGES,
     ACTION_TABLE_SAVE_CHANGES_SUCCESS,
     ACTION_TABLE_SAVE_CHANGES_FAILURE,
-    ACTION_TABLE_ENABLE_EDIT_MODE,
+    ACTION_TABLE_CLEAN_UP_SUBTABLE
 } from '../actions/actions'
+
+import {extractTableName, isSubtable} from '../util/util'
+
 import {urlQueryAsFilters} from '../components/table/Table'
 
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 
 const objectWith = (object, changes) => Object.assign({}, object, changes);
-
-/*
- const tables = (state = {
- persons: {displayName:"Доноры", data: {}},
- bloodDonations: {displayName:"Пакеты с плазмой", data: {}},
- bloodInvoices: {displayName:"Накладные", data: {}},
- bloodPools: {displayName:"Пулы", data: {}},
- productBatches: {displayName:"Загрузки", data: {}},
- }, action) => {
- const {type, response, tableName, error} = action;
- if (ACTION_TABLE_DATA_REQUEST === type) {
- const table = Object.assign({}, state[tableName], {isFetching: true, isFetched:false});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_DATA_SUCCESS === type) {
- const table = Object.assign({},
- state[tableName],
- {data: response.entities[tableName] || {}, isFetched:true, isFetching:false, isEditing:false, isEdited:false}
- );
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_DATA_FAILURE === type) {
- const table = Object.assign({}, state[tableName], {isFetched:false, isFetching:false});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
- const table = Object.assign({}, state[tableName], {isEditing: true});
- const data = Object.assign({}, table.data, {[Math.random().toString(36)]:{isEditing:true, isCreated:true}});
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_DELETE_CHECKED_ITEMS === type) {
- const table = Object.assign({}, state[tableName], {isEditing: true});
- const data = Object.assign({}, table.data);
- Object.keys(data)
- .filter(key => data[key].isChecked)
- .map(key => ({key, entity: Object.assign({}, data[key], {isChecked: false, isDeleted: true})}))
- .forEach(({key, entity}) => {
- if (entity.isCreated) delete data[key];
- else Object.assign(data, {[key]: entity})
- });
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName]: table});
- } else if (ACTION_TABLE_EDIT === type) {
- const {localId, changes} = action;
- const table = Object.assign({}, state[tableName], {isEdited: true});
- const entity = Object.assign({}, table.data[localId], changes, {isEdited:true});
- const data = Object.assign({}, table.data, {[localId]:entity});
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_SAVED_CHANGES === type) {
- const {localId, response} = action;
- const table = Object.assign({}, state[tableName]);
- const data = Object.assign({}, table.data);
- delete data[localId];
- Object.assign(data, response.entities[tableName]);
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_SAVE_CHANGES_SUCCESS === type) {
- const table = Object.assign({}, state[tableName], {isEditing:false, isEdited:false});
- const data = Object.assign({}, table.data);
- Object.keys(data)
- .map(key => ({key, entity: Object.assign({}, data[key], {isEditing:false})}))
- .forEach(({key, entity}) => Object.assign(data, {[key] : entity}));
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_SAVE_CHANGES_FAILURE === type && error !== undefined) {
- const {localId, errors} = error;
- const table = Object.assign({}, state[tableName]);
- const entity = Object.assign({}, table.data[localId], {errors});
- const data = Object.assign({}, table.data, {[localId]:entity});
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- } else if (ACTION_TABLE_ENABLE_EDIT_MODE === type) {
- const table = Object.assign({}, state[tableName], {isEditing:true});
- const data = Object.assign({}, table.data);
- Object.keys(data)
- .map(key => ({key, entity: Object.assign({}, data[key], {isEditing:true})}))
- .forEach(({key, entity}) => Object.assign(data, {[key] : entity}));
- Object.assign(table, {data});
- return Object.assign({}, state, {[tableName] : table});
- }
- return state;
- }; */
 
 const tableWith = (tables, tableName, changes) => {
     const table = objectWith(tables[tableName], changes);
@@ -144,6 +67,10 @@ const tables = (state = {
         return tableWith(state, tableName, {isEdited:false, isEditing:false, isFetched:false, isFetching:false, checkedItems:undefined});
     } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
         return tableWith(state, tableName, {isEditing:true, checkedItems:undefined});
+    } else if (ACTION_TABLE_CLEAN_UP_SUBTABLE && isSubtable(tableName)) {
+        const tables = objectWith(state);
+        delete tables[tableName];
+        return tables;
     }
     return state;
 };
@@ -215,6 +142,11 @@ const tablePages = (state = {}, action) => {
         return pageItemsAddCreated(state, tableName, pageNumber, localId);
     else if (ACTION_TABLE_SAVED_CHANGES === type)
         return pageItemsRemoveCreated(state, tableName, pageNumber, localId);
+    else if (ACTION_TABLE_CLEAN_UP_SUBTABLE && isSubtable(tableName)) {
+        const pages = objectWith(state);
+        delete pages[tableName];
+        return pages;
+    }
     return state;
 };
 
@@ -269,8 +201,10 @@ export const tableItemsChecked = (tableItems, tableName) => {
 
 const tableItems = (state = {}, action) => {
     const {type, tableName, localId, changes, response, error} = action;
-    if (ACTION_TABLE_DATA_SUCCESS === type && response && response.entities && response.entities[tableName]) {
-        return tableItemsMerge(state, tableName, response.entities[tableName]);
+    if (ACTION_TABLE_DATA_SUCCESS === type) {
+        const tableRealName = extractTableName(tableName);
+        if (!response || !response.entities || !response.entities[tableRealName]) return state;
+        return tableItemsMerge(state, tableName, response.entities[tableRealName]);
     } else if (ACTION_TABLE_CHECK_ROW === type) {
         return tableItemWith(state, tableName, localId, changes);
     } else if (ACTION_TABLE_DELETE_ROW === type && localId) {
@@ -291,6 +225,10 @@ const tableItems = (state = {}, action) => {
         return tableItemWith(state, tableName, localId, {errors})
     } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
         return tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true});
+    } else if (ACTION_TABLE_CLEAN_UP_SUBTABLE && isSubtable(tableName)) {
+        const items = objectWith(state);
+        delete items[tableName];
+        return items;
     }
     return state;
 };

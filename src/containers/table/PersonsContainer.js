@@ -17,6 +17,7 @@ const PersonSubTable = (row) => {
             <label>Контейнеры с плазмой для донора {row.externalId}</label>
             <BloodDonationsContainer
                 isSimpleTable={true}
+                tableInstanceId={"person-" + row.externalId}
                 filtered={[{key: "donor", value: row.externalId}]}
             />
         </div>

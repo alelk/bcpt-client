@@ -20,11 +20,13 @@ const BloodDonationSubTable = (row) => {
             <label>Донор контейнера с плазмой {row.externalId}</label>
             <PersonsContainer
                 isSimpleTable={true}
+                tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.donor}]}
             />
             <label>Накладная контейнера с плазмой {row.externalId}</label>
             <BloodInvoicesContainer
                 isSimpleTable={true}
+                tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.bloodInvoice}]}
             />
         </div>
