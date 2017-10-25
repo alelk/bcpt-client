@@ -5,8 +5,9 @@
  */
 import {
     fetchTableData, tableRowChange, checkTableRow, deleteTableRow, editTableRow,
-    resetTableChanges, saveChanges, tableRowCreate
+    resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable
 } from '../../actions/actions'
+import {extractTableName} from '../../util/util'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -27,8 +28,9 @@ class TableContainerAdapter extends React.Component {
         this.onTableRowCreate = this.onTableRowCreate.bind(this);
     }
 
-    componentWillMount() {
-        this.tableInstanceId = Math.random().toString(36).slice(-4);
+    componentWillUnmount() {
+        const {tableName, isSimpleTable, cleanUpSubtable} = this.props;
+        if (isSimpleTable) cleanUpSubtable(tableName);
     }
 
     onFetchData(pageNumber, itemsPerPage, sorted, filtered) {
@@ -103,10 +105,12 @@ class TableContainerAdapter extends React.Component {
 }
 
 TableContainerAdapter.propTypes = {
+    tableName : PropTypes.string,
     table : PropTypes.object,
     pages : PropTypes.object,
     items : PropTypes.object,
     isSimpleTable: PropTypes.bool,
+    tableInstanceId: PropTypes.string,
     defaultPageSize: PropTypes.number,
     filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string})),
     fetchTableData : PropTypes.func,
@@ -116,24 +120,26 @@ TableContainerAdapter.propTypes = {
     editTableRow : PropTypes.func,
     resetTableChanges: PropTypes.func,
     tableRowCreate: PropTypes.func,
+    cleanUpSubtable: PropTypes.func,
     saveChanges: PropTypes.func,
 };
 
 export const mapStateToProps = (tableName) => (state, ownProps) => {
+    const tableId = ownProps.isSimpleTable ? tableName + '~' + ownProps.tableInstanceId : tableName;
     return {
-        tableName,
+        tableName: tableId,
         isSimpleTable: ownProps.isSimpleTable,
         filtered: ownProps.filtered,
         defaultPageSize : ownProps.defaultPageSize,
-        table: state.tables[tableName],
-        pages: state.tablePages[tableName],
-        items: state.tableItems[tableName]
+        table: state.tables[tableId],
+        pages: state.tablePages[tableId],
+        items: state.tableItems[tableId]
     }
 };
 
 export const mapDispatchToProps = {
     fetchTableData, tableRowChange, checkTableRow, deleteTableRow,
-    editTableRow, resetTableChanges, saveChanges, tableRowCreate
+    editTableRow, resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable
 };
 
 export default TableContainerAdapter;

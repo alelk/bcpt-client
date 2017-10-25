@@ -164,15 +164,10 @@ export const tableRowCreate = (tableName) => (dispatch, getState) => {
     })
 };
 
+export const ACTION_TABLE_CLEAN_UP_SUBTABLE = 'ACTION_TABLE_CLEAN_UP_SUBTABLE';
 
-
-
-
-
-export const ACTION_TABLE_ENABLE_EDIT_MODE = 'ACTION_TABLE_ENABLE_EDIT_MODE';
-
-export const enableEditMode = (tableName) => ({
-    type : ACTION_TABLE_ENABLE_EDIT_MODE,
+export const cleanUpSubtable = (tableName) => ({
+    type: ACTION_TABLE_CLEAN_UP_SUBTABLE,
     tableName
 });
 

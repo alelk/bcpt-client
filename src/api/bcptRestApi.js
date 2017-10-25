@@ -8,6 +8,7 @@ import BcptConfig from '../util/BcptConfig'
 
 import { normalize, schema } from 'normalizr'
 import urlencode from 'urlencode'
+import {extractTableName} from '../util/util'
 
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
@@ -57,7 +58,8 @@ export const filteredAsParams = (filtered) => {
     return Array.isArray(filtered) ? filtered.map(f => "filter=" + (f.id || f.key) + ":" + urlencode(f.value)).join("&") : '';
 };
 
-export const getTablePage = function (tableName, pageNumber, itemsPerPage, sorted, filtered) {
+export const getTablePage = function (tableId, pageNumber, itemsPerPage, sorted, filtered) {
+    const tableName = extractTableName(tableId);
     const url = BcptConfig.get("rest-api-uri") + tableName + "/page/" + pageNumber + "?itemsPerPage=" + itemsPerPage +
         "&" + sortedAsParams(sorted) + "&" + filteredAsParams(filtered);
     console.log("Get table page: " + url);
@@ -67,23 +69,28 @@ export const getTablePage = function (tableName, pageNumber, itemsPerPage, sorte
     )
 };
 
-export const getTableEntity = function (tableName, externalId) {
+export const getTableEntity = function (tableId, externalId) {
+    const tableName = extractTableName(tableId);
     return getObject(BcptConfig.get("rest-api-uri") + tableName + "/" + externalId, SchemaTableEntity[tableName])
 };
 
-export const getTable = function (tableName) {
+export const getTable = function (tableId) {
+    const tableName = extractTableName(tableId);
     return getObject(BcptConfig.get("rest-api-uri") + tableName + "/", SchemaTable[tableName])
 };
 
-export const postTableEntity = function (tableName, data) {
+export const postTableEntity = function (tableId, data) {
+    const tableName = extractTableName(tableId);
     return postObject(BcptConfig.get("rest-api-uri") + tableName + "/", data, SchemaTableEntity[tableName])
 };
 
-export const putTableEntity = function (tableName, externalId, data) {
+export const putTableEntity = function (tableId, externalId, data) {
+    const tableName = extractTableName(tableId);
     return putObject(BcptConfig.get("rest-api-uri") + tableName + "/" + (externalId || ''), data, SchemaTableEntity[tableName])
 };
 
-export const deleteTableEntity = function (tableName, externalId) {
+export const deleteTableEntity = function (tableId, externalId) {
+    const tableName = extractTableName(tableId);
     return deleteObject(BcptConfig.get("rest-api-uri") + tableName + "/", {externalId})
 };
 

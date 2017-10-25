@@ -18,6 +18,7 @@ const BloodInvoiceSubTable = (row) => {
             <label style={{margin: '20px', fontSize: '18px'}}>Контейнеры с плазмой для накладной {row.externalId}</label>
             <BloodDonationsContainer
                 isSimpleTable={true}
+                tableInstanceId={"bloodInvoice-" + row.externalId}
                 filtered={[{key: "bloodInvoice", value: row.externalId}]}
                 defaultPageSize={Array.isArray(row.bloodDonations) && row.bloodDonations.length || undefined}
             />
