@@ -7,13 +7,14 @@
 import BloodInvoicesTable from '../../components/table/BloodInvoicesTable'
 import BloodDonationsContainer from './BloodDonationsContainer'
 import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
+import './BloodInvoicesContainer.css'
 
 import React from 'react'
 import {connect} from 'react-redux'
 
-const BloodDonationsSubTable = (row) => {
+const BloodInvoiceSubTable = (row) => {
     return (
-        <div>
+        <div className="bloodInvoiceBloodDonations">
             <label style={{margin: '20px', fontSize: '18px'}}>Контейнеры с плазмой для накладной {row.externalId}</label>
             <BloodDonationsContainer
                 isSimpleTable={true}
@@ -27,7 +28,7 @@ const BloodDonationsSubTable = (row) => {
 class BloodInvoicesContainer extends TableContainerAdapter {
     render() {
         return (
-            <BloodInvoicesTable {...this.tableProps()} subComponent={BloodDonationsSubTable}/>
+            <BloodInvoicesTable {...this.tableProps()} subComponent={BloodInvoiceSubTable}/>
         )
     }
 }

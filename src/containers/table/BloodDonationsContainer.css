@@ -1,0 +1,10 @@
+.bloodDonationSubTable {
+    background-color: #dfe7f9;
+}
+.bloodDonationSubTable > label {
+    margin-left: 20px;
+    margin-top: 30px;
+    font-size: 20px;
+    color: #003f16;
+    font-weight: 800;
+}

@@ -124,7 +124,7 @@ class Table extends React.Component {
         const {data, pagesCount, isFetching, subComponent, filtered, isSimpleTable, defaultPageSize} = this.props;
         return (
             <ReactTable
-                style={isSimpleTable && {padding:'20px', backgroundColor:"#ecf6f0"}}
+                style={isSimpleTable && {padding:'20px'}}
                 data={data || []}
                 manual
                 onFetchData={this.onFetchData}
