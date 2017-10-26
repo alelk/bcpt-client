@@ -36,6 +36,7 @@ class DateTimeInput extends Input{
                    defaultValue={moment(this.state.value).format(pattern)}
                    onChange={this.onChange}
                    title={error}
+                   style={{width:'100%'}}
             />
         );
     }
