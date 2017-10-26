@@ -44,7 +44,7 @@ class BloodInvoicesTable extends Table {
                 filterable: true,
                 Filter: TextFilter
             }, {
-                Header: "Штрих-коды контейнеров",
+                Header: "Контейнеры с плазмой",
                 accessor: "bloodDonations",
                 iconName: "invert_colors",
                 onClick: this.onBloodDonationsClick,
@@ -67,6 +67,7 @@ class BloodInvoicesTable extends Table {
                 isEditable: true,
                 accessor: "deliveryDate",
                 inputType: "date",
+                onChange: this.onValueChange,
                 Cell: DateTimeCell,
                 minWidth: 90
             }, {

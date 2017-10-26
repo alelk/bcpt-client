@@ -8,6 +8,7 @@ import BloodDonationsTable from '../../components/table/BloodDonationsTable'
 import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
 import PersonsContainer from './PersonsContainer'
 import BloodInvoicesContainer from './BloodInvoicesContainer'
+import BloodPoolsContainer from './BloodPoolsContainer'
 import './BloodDonationsContainer.css'
 
 import React from 'react'
@@ -28,6 +29,12 @@ const BloodDonationSubTable = (row) => {
                 isSimpleTable={true}
                 tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.bloodInvoice}]}
+            />
+            <label>Пул контейнера с плазмой {row.externalId}</label>
+            <BloodPoolsContainer
+                isSimpleTable={true}
+                tableInstanceId={"bloodDonation-" + row.externalId}
+                filtered={[{key: "externalId", value: row.bloodPool}]}
             />
         </div>
     )

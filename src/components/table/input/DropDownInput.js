@@ -24,7 +24,7 @@ class DropDownInput extends Input {
     render() {
         const {error, value, allowedValues} = this.props;
         return (
-            <select className={this.className} defaultValue={value} onChange={this.onChange} title={error}>
+            <select className={this.className} defaultValue={value} onChange={this.onChange} title={error} style={{width:'100%'}}>
                 { allowedValues &&
                     allowedValues.map(v => <option key={v.value} value={v.value}>{v.displayValue}</option>)
                 }

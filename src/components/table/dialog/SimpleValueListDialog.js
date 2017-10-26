@@ -34,7 +34,7 @@ class SimpleValueListDialog extends React.Component {
                     autoScrollBodyContent={true}
                     modal={false}>
                 <TextField hintText="Введите новое значение" floatingLabelText="Добавить значение" onChange={this.onTypeNewValue}/>
-                <FlatButton label="Добавить" onClick={() => onChange([this.state.newValue, ...valueList])}/>
+                <FlatButton label="Добавить" onClick={() => onChange([this.state.newValue, ...valueList || []])}/>
                 <div style={{display: 'flex', flexWrap: 'wrap'}}>
                     { Array.isArray(valueList) && valueList.map(v =>
                         <Chip
