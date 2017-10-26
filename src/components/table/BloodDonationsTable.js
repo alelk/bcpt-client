@@ -51,6 +51,15 @@ class BloodDonationsTable extends Table {
                 filterable: true,
                 Filter: TextFilter
             }, {
+                Header: "ID пула",
+                accessor: "bloodPool",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                width: 100
+            }, {
                 Header: "Тип донации",
                 accessor: "donationType",
                 onChange: this.onValueChange,
@@ -62,7 +71,7 @@ class BloodDonationsTable extends Table {
                 ],
                 filterable: true,
                 Filter: DropDownFilter,
-                width: 300
+                width: 150
             }, {
                 Header: "Объем, мл.",
                 accessor: "amount",
@@ -70,11 +79,14 @@ class BloodDonationsTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                width: 100
             }, {
                 Header: "Дата донации",
                 accessor: "donationDate",
+                onChange: this.onValueChange,
                 inputType: "date",
+                isEditable: true,
                 Cell: DateTimeCell,
                 minWidth: 90
             }, {
@@ -99,6 +111,7 @@ const dataItem = PropTypes.shape({
     externalId : PropTypes.string,
     donor : PropTypes.string,
     bloodInvoice : PropTypes.string,
+    bloodPool : PropTypes.string,
     donationType : PropTypes.string,
     amount : PropTypes.number,
     donationDate : PropTypes.string,

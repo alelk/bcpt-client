@@ -10,6 +10,7 @@ import DateTimeLabel from '../label/DateTimeLabel'
 import React from 'react'
 import PropTypes from 'prop-types';
 import {onCellChange} from './util'
+import './Cell.css'
 
 const DateTimeCell = ({value, column, original, row}) => {
     return (
