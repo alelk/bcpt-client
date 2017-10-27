@@ -7,6 +7,7 @@ import PersonsContainer from './table/PersonsContainer'
 import BloodDonationsContainer from './table/BloodDonationsContainer'
 import BloodInvoicesContainer from './table/BloodInvoicesContainer'
 import BloodPoolsContainer from './table/BloodPoolsContainer'
+import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
 
 import React from 'react'
@@ -31,6 +32,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
                     <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
+                    <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                 </div>
             </div>
         </ConnectedRouter>

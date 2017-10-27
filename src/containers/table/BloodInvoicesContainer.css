@@ -1,10 +1,9 @@
 .bloodInvoiceBloodDonations {
-    background-color: #fbe4e5;
+    background-color: #e8eaf6;
 }
 .bloodInvoiceBloodDonations > label {
     margin-left: 20px;
     margin-top: 30px;
     font-size: 20px;
     color: #003f16;
-    font-weight: 800;
 }

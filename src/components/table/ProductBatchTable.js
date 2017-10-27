@@ -4,78 +4,104 @@
  * Created by Alex Elkin on 02.10.2017.
  */
 
-import Table, {Cell, IconCell, filterById} from './Table'
+import TextCell from './cell/TextCell'
+import ArrayCell from './cell/ArrayCell'
+import IconCell from './cell/IconCell'
+import DateTimeCell from './cell/DateTimeCell'
+import TextFilter from './filter/TextFilter'
+import Table from './Table'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class ProductBatchTable extends React.Component {
+class BloodPoolsTable extends Table {
 
-    columns = [
-        {Header: "", accessor: "localId", Cell: () => IconCell("call_merge"), width: 30, filterable: false },
-        {
-            Header: "ID",
-            accessor: "externalId",
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-            filterMethod: filterById
-        }, {
-            Header: "Номера пулов",
-            accessor: "bloodPoolIds",
-            valueSplitRegex: /\s*[;,]\s*/,
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId", this.props.onBloodPoolsClick),
-            filterMethod: filterById
-        }, {
-            Header: "Дата загрузки",
-            accessor: "batchDate",
-            inputType: 'date',
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        },
-        {Header: "Суммарная ёмкость", accessor: "totalAmount", Cell: (ci) => Cell(ci, undefined, "localId"), isEditable:false},
-        {
-            Header: "Последнее изменение",
-            accessor: "updateTimestamp",
-            inputType: 'datetime',
-            minWidth: 130,
-            isEditable: false,
-            Cell: (ci) => Cell(ci, this.props.onChange, "localId")
-        }
-    ];
+    constructor(props) {
+        super(props);
+    }
 
-    render() {
-        const {productBatches, isEditMode, isFetching, filters} = this.props;
-        const data = Object.keys(productBatches).map(k => Object.assign({}, productBatches[k], {localId: k}));
-        return (
-            <Table
-                defaultSorted={[{id: "localId", desc: false}]}
-                sorted={isEditMode ? [{id: "localId", desc: false}] : undefined}
-                data={data}
-                filterable={true}
-                isFetching={isFetching}
-                filters={filters}
-                columns={isEditMode ? [{
-                        Header: "", accessor: "isChecked",
-                        Cell: (ci) => Cell(ci, this.props.onChange, "localId"),
-                        inputType: 'checkbox', width: 30
-                    }
-                        , ...this.columns] : this.columns
-                }
-            />
-        )
+    columns() {
+        return [
+            {
+                Header: "",
+                accessor: "localId",
+                iconName: "call_merge",
+                Cell: IconCell,
+                width: 30,
+                filterable: false
+            }, {
+                Header: "Номер загрузки",
+                accessor: "externalId",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Номера пулов",
+                accessor: "bloodPools",
+                iconName: "poll",
+                onChange: this.onValueChange,
+                Cell: ArrayCell,
+                sortable: false,
+                isEditable: true,
+                filterable: false,
+                Filter: TextFilter
+            }, {
+                Header: "Суммарный объем, мл.",
+                accessor: "totalAmount",
+                Cell: TextCell,
+                sortable: false,
+                filterable: false,
+                maxWidth: 190
+            }, {
+                Header: "Дата загрузки",
+                isEditable: true,
+                accessor: "batchDate",
+                inputType: "date",
+                sortable: true,
+                onChange: this.onValueChange,
+                Cell: DateTimeCell,
+                minWidth: 90
+            },  {
+                Header: "Последнее изменение",
+                accessor: "updateTimestamp",
+                inputType: "datetime-local",
+                Cell: DateTimeCell,
+                minWidth: 90
+            }
+        ];
     }
 }
-ProductBatchTable.propTypes = {
-    productBatches : PropTypes.objectOf(PropTypes.shape({
-        externalId : PropTypes.string,
-        bloodPoolIds : PropTypes.arrayOf(PropTypes.string),
-        batchDate : PropTypes.string,
-        updateTimestamp : PropTypes.string,
-        errors : PropTypes.oneOfType([PropTypes.object, PropTypes.array])
-    })).isRequired,
-    isEditMode : PropTypes.bool,
+const dataItem = PropTypes.shape({
+    isChecked : PropTypes.bool,
+    localId : PropTypes.string,
+    externalId : PropTypes.string,
+    bloodPools : PropTypes.arrayOf(PropTypes.string),
+    totalAmount : PropTypes.number,
+    batchDate : PropTypes.string,
+    updateTimestamp : PropTypes.string,
+    errors : PropTypes.object | PropTypes.array
+});
+BloodPoolsTable.propTypes = {
+    name : PropTypes.string,
+    data : PropTypes.arrayOf(dataItem),
+    checkedItems : PropTypes.arrayOf(dataItem),
+    pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
+    isEditing : PropTypes.bool,
     onChange : PropTypes.func,
-    onBloodPoolsClick : PropTypes.func,
-    filters : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
+    onCheckRow : PropTypes.func,
+    onDeleteRow : PropTypes.func,
+    onEditRow : PropTypes.func,
+    onFetchData: PropTypes.func,
+    onResetChanges : PropTypes.func,
+    onRefreshData : PropTypes.func,
+    onSaveChanges : PropTypes.func,
+    onAddNewItem : PropTypes.func,
+    isSimpleTable : PropTypes.bool,
+    subComponent : PropTypes.func,
+    filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
-export default ProductBatchTable;
+export default BloodPoolsTable;

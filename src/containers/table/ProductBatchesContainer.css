@@ -1,7 +1,7 @@
-.bloodDonationSubTable {
-    background-color: #e3f2fd;
+.ProductBatchSubTable {
+    background-color: #f3e5f5;
 }
-.bloodDonationSubTable > label {
+.ProductBatchSubTable > label {
     margin-left: 20px;
     margin-top: 30px;
     font-size: 20px;

@@ -14,7 +14,7 @@ import './PersonsContainer.css'
 const PersonSubTable = (row) => {
     return (
         <div className="personBloodDonations">
-            <label>Контейнеры с плазмой для донора {row.externalId}</label>
+            <label>Контейнеры с плазмой для донора <b>{row.externalId}</b></label>
             <BloodDonationsContainer
                 isSimpleTable={true}
                 tableInstanceId={"person-" + row.externalId}

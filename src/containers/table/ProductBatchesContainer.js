@@ -4,52 +4,35 @@
  * Created by Alex Elkin on 02.10.2017.
  */
 
-import ProductBatchesTable from '../../components/table/ProductBatchTable'
-import {fetchTableData, tableRowChange} from '../../actions/actions'
+import ProductBatchTable from '../../components/table/ProductBatchTable'
+import BloodPoolsContainer from './BloodPoolsContainer'
+import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
+import './ProductBatchesContainer.css'
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import { push } from 'react-router-redux'
 
-class ProductBatchesContainer extends React.Component {
-
-    componentWillMount() {
-        if (Object.keys(this.props.productBatches).length <= 0)
-            this.props.fetchTableData("productBatches");
-    }
-
-    render() {
-        const {productBatches, isEditMode, edit, isFetching, filters, pushUrl} = this.props;
-        return (
-            <ProductBatchesTable productBatches={productBatches}
-                                 isEditMode={isEditMode}
-                                 isFetching={isFetching}
-                                 onChange={(localId, changes) => edit("productBatches", localId, changes)}
-                                 filters={filters}
-                                 onBloodPoolsClick={externalIds =>
-                                     pushUrl("/table/bloodPools/?" + externalIds.map(id => "externalId=" + id).join("&"))
-                                 }
+const ProductBatchSubTable = (row) => {
+    const bloodPoolsCount = Array.isArray(row.bloodPools) && row.bloodPools.length || undefined;
+    return (
+        <div className="ProductBatchSubTable">
+            <label style={{margin: '20px', fontSize: '18px'}}>Пулы для загрузки № <b>{row.externalId}</b> (количество пулов: {bloodPoolsCount || 0})</label>
+            <BloodPoolsContainer
+                isSimpleTable={true}
+                tableInstanceId={"productBatch-" + row.externalId}
+                filtered={[{key: "productBatch", value: row.externalId}]}
+                defaultPageSize={bloodPoolsCount}
             />
+        </div>
+    )
+};
+
+class ProductBatchesContainer extends TableContainerAdapter {
+    render() {
+        return (
+            <ProductBatchTable {...this.tableProps()} subComponent={ProductBatchSubTable}/>
         )
     }
 }
 
-ProductBatchesContainer.propTypes = {
-    productBatches : PropTypes.object,
-    filters : PropTypes.arrayOf(PropTypes.shape({id : PropTypes.string, value : PropTypes.string})),
-    fetchTableData : PropTypes.func,
-    isEditMode : PropTypes.bool,
-    isFetching : PropTypes.bool,
-    edit : PropTypes.func,
-    pushUrl : PropTypes.func
-};
-
-const mapStateToProps = (state, ownProps) => ({
-    productBatches: state.tables["productBatches"].data,
-    filters: state.tableFilters["productBatches"],
-    isEditMode: state.tables["productBatches"].isEditing,
-    isFetching: state.tables["productBatches"].isFetching,
-});
-
-export default connect(mapStateToProps, {fetchTableData, tableRowChange, pushUrl : push})(ProductBatchesContainer);
+export default connect(mapStateToProps("productBatches"), mapDispatchToProps)(ProductBatchesContainer);
