@@ -18,23 +18,26 @@ import {connect} from 'react-redux'
 const BloodDonationSubTable = (row) => {
     return (
         <div className="bloodDonationSubTable">
-            <label>Донор контейнера с плазмой {row.externalId}</label>
+            <label>Донор контейнера с плазмой <b>{row.externalId}</b></label>
             <PersonsContainer
                 isSimpleTable={true}
                 tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.donor}]}
+                defaultPageSize={1}
             />
-            <label>Накладная контейнера с плазмой {row.externalId}</label>
+            <label>Накладная контейнера с плазмой <b>{row.externalId}</b></label>
             <BloodInvoicesContainer
                 isSimpleTable={true}
                 tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.bloodInvoice}]}
+                defaultPageSize={1}
             />
-            <label>Пул контейнера с плазмой {row.externalId}</label>
+            <label>Пул контейнера с плазмой <b>{row.externalId}</b></label>
             <BloodPoolsContainer
                 isSimpleTable={true}
                 tableInstanceId={"bloodDonation-" + row.externalId}
                 filtered={[{key: "externalId", value: row.bloodPool}]}
+                defaultPageSize={1}
             />
         </div>
     )

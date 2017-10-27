@@ -15,7 +15,6 @@ class DateTimeInput extends Input{
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.value !== this.props.value) {
-            console.log("next value: " + nextProps.value);
             this.setState({
                 value: nextProps.value
             })
@@ -33,7 +32,7 @@ class DateTimeInput extends Input{
         return (
             <input className={this.className}
                    type={inputType || "date"}
-                   defaultValue={moment(this.state.value).format(pattern)}
+                   defaultValue={this.state.value && moment(this.state.value).format(pattern)}
                    onChange={this.onChange}
                    title={error}
                    style={{width:'100%'}}

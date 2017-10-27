@@ -120,6 +120,10 @@ class Table extends React.Component {
         this.props.onChange && this.props.onChange(row.localId, {[column.id]: value});
     }
 
+    controls() {}
+
+    extraContent() {}
+
     renderReactTable() {
         const {data, pagesCount, isFetching, subComponent, filtered, isSimpleTable, defaultPageSize} = this.props;
         return (
@@ -141,7 +145,7 @@ class Table extends React.Component {
                 pageText='Стр.'
                 ofText='из'
                 rowsText="строк"
-                showPaginationTop
+                showPaginationTop={!isSimpleTable || !defaultPageSize}
                 showPaginationBottom={false}
                 SubComponent={subComponent && (({original}) => subComponent(original))}
                 filtered={filtered}
@@ -166,8 +170,11 @@ class Table extends React.Component {
                            onCancel={onResetChanges}
                            onDone={onSaveChanges}
                            onRefresh={onRefreshData}
-                           onAdd={onAddNewItem}>
+                           onAdd={onAddNewItem}
+                           controls={this.controls()}
+            >
                 {this.renderReactTable()}
+                {this.extraContent()}
             </EditableTable>
         )
     }

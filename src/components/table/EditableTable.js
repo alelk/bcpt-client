@@ -9,7 +9,10 @@ import './EditableTable.css'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const EditableTable = ({children, onUncheckItems, isEditMode, checkedItems, onAdd, onEdit, onDone, onCancel, onRemove, onRefresh, tableName}) => {
+const EditableTable = ({
+    children, onUncheckItems, isEditMode, checkedItems, onAdd, onEdit, onDone, onCancel, onRemove, onRefresh,
+    tableName, controls
+}) => {
     const checkedItemsCount = Array.isArray(checkedItems) && checkedItems.length || 0;
     return (
         <div className="EditableTable">
@@ -22,15 +25,28 @@ const EditableTable = ({children, onUncheckItems, isEditMode, checkedItems, onAd
                 </label>
                 }
                 {isEditMode &&
-                <Button iconName='clear' className="cancel" onClick={onCancel} title="Отменить изменения"/>}
-                {isEditMode && <Button iconName='done' className="done" onClick={onDone} title="Применить изменения"/>}
+                <Button iconName='clear' className="cancel" onClick={onCancel} title="Отменить изменения"/>
+                }
+                {isEditMode && <Button iconName='done' className="done" onClick={onDone} title="Применить изменения"/>
+                }
                 {!isEditMode &&
-                <Button iconName='sync' className="refresh" onClick={onRefresh} title="Обновить данные"/>}
+                <Button iconName='sync' className="refresh" onClick={onRefresh} title="Обновить данные"/>
+                }
                 {checkedItemsCount > 0 &&
-                <Button iconName='delete' className="remove" onClick={onRemove} title="Удалить выделенные строки"/>}
+                <Button iconName='delete' className="change" onClick={onRemove} title="Удалить выделенные строки"/>
+                }
                 {checkedItemsCount > 0 &&
-                <Button iconName='mode_edit' className="edit" onClick={onEdit} title="Редактировать выделенные строки"/>}
-                <Button iconName='add' className="add" onClick={onAdd} title="Добавить строку"/>
+                <Button iconName='mode_edit' className="change" onClick={onEdit} title="Редактировать выделенные строки"/>
+                }
+                <Button iconName='add' className="change" onClick={onAdd} title="Добавить строку"/>
+                {
+                    controls && controls.map((c) => {
+                        const {control, onCheckedItems, onEditMode} = c;
+                        if(!onCheckedItems && !onEditMode) return control;
+                        if (onCheckedItems && checkedItemsCount > 0) return control;
+                        if (onEditMode && isEditMode) return control;
+                    })
+                }
             </div>
             <div className="content">
                 {children}
@@ -48,7 +64,12 @@ EditableTable.propTypes = {
     onRemove : PropTypes.func,
     onCancel : PropTypes.func,
     onRefresh : PropTypes.func,
-    onUncheckItems : PropTypes.func
+    onUncheckItems : PropTypes.func,
+    controls : PropTypes.arrayOf(PropTypes.shape({
+        onCheckedItems : PropTypes.bool,
+        onEditMode : PropTypes.bool,
+        control : PropTypes.object
+    }))
 };
 
 export default EditableTable;

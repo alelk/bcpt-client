@@ -68,9 +68,7 @@
     border: none;
     box-shadow: 1px 1px 16px #000;
 }
-.controls>button.edit,
-.controls>button.remove,
-.controls>button.add {
+.controls>button.change {
     background-color: #FF9800;
 }
 .controls>button.cancel {

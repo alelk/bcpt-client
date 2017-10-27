@@ -10,12 +10,68 @@ import DateTimeCell from './cell/DateTimeCell'
 import DropDownCell from './cell/DropDownCell'
 import TextFilter from './filter/TextFilter'
 import DropDownFilter from './filter/DropDownFilter'
+import SumCheckedFooter from './footer/SumCheckedFooter'
 import Table from './Table'
+import Button from '../Button'
+import SimpleValueDialog from './dialog/SimpleValueDialog'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 
 class BloodDonationsTable extends Table {
+
+    constructor(props) {
+        super(props);
+        this.onAddToPoolOpen = this.onAddToPoolOpen.bind(this);
+        this.onAddToPoolClose = this.onAddToPoolClose.bind(this);
+        this.onAddToPoolSubmit = this.onAddToPoolSubmit.bind(this);
+        this.onAddToPoolValueChanged = this.onAddToPoolValueChanged.bind(this);
+        this.state = {
+            dialogAddToPool : false
+        }
+    }
+
+    controls() {
+        return [
+            {
+                control: <Button iconName="poll"
+                                 className="change"
+                                 title="Добавить в пул"
+                                 key="add_pool"
+                                 onClick={this.onAddToPoolOpen}/>,
+                onCheckedItems:true
+            }
+        ]
+    }
+
+    onAddToPoolOpen() {
+        this.setState({dialogAddToPool:true});
+    }
+
+    onAddToPoolClose() {
+        this.setState({dialogAddToPool:false});
+    }
+
+    onAddToPoolSubmit() {
+        const {checkedItems, onChange} = this.props;
+        checkedItems && onChange && checkedItems.forEach(item => onChange(item.localId, {bloodPool:this.state.bloodPool}));
+        this.setState({dialogAddToPool:false});
+    }
+
+    onAddToPoolValueChanged(e, value) {
+        this.setState({bloodPool : value})
+    }
+
+    extraContent() {
+        return (
+            <SimpleValueDialog title="Введите номер пула"
+                               inputType="string"
+                               open={this.state.dialogAddToPool}
+                               onClose={this.onAddToPoolClose}
+                               onChange={this.onAddToPoolValueChanged}
+                               onSubmit={this.onAddToPoolSubmit} />
+        )
+    }
 
     columns() {
         return [
@@ -77,6 +133,7 @@ class BloodDonationsTable extends Table {
                 accessor: "amount",
                 onChange: this.onValueChange,
                 Cell: TextCell,
+                Footer: SumCheckedFooter,
                 isEditable: true,
                 filterable: true,
                 Filter: TextFilter,

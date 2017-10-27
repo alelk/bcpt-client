@@ -13,14 +13,17 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 const BloodInvoiceSubTable = (row) => {
+    const bloodDonationsSize = Array.isArray(row.bloodDonations) && row.bloodDonations.length || undefined;
     return (
         <div className="bloodInvoiceBloodDonations">
-            <label style={{margin: '20px', fontSize: '18px'}}>Контейнеры с плазмой для накладной {row.externalId}</label>
+            <label style={{margin: '20px', fontSize: '18px'}}>
+                Контейнеры с плазмой для накладной <b>{row.externalId}</b> (количество контейнеров: {bloodDonationsSize})
+            </label>
             <BloodDonationsContainer
                 isSimpleTable={true}
                 tableInstanceId={"bloodInvoice-" + row.externalId}
                 filtered={[{key: "bloodInvoice", value: row.externalId}]}
-                defaultPageSize={Array.isArray(row.bloodDonations) && row.bloodDonations.length || undefined}
+                defaultPageSize={bloodDonationsSize}
             />
         </div>
     )
