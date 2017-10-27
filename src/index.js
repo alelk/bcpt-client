@@ -7,7 +7,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import createHistory from 'history/createBrowserHistory'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import '../node_modules/material-design-icons/iconfont/material-icons.css'
+import './material-icons/material-icons.css'
 
 const history = createHistory();
 const store = configureStore(history);
