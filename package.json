@@ -27,13 +27,15 @@
     "typeface-roboto": "0.0.41",
     "urlencode": "^1.1.0"
   },
-  "devDependencies": {
-    "react-scripts": "1.0.13"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "copy-material-design-icons": "cpx node_modules/material-design-icons/iconfont/*.{css,eot,svg,ttf,woff,woff2} src/material-icons",
+    "start": "npm run copy-material-design-icons && react-scripts start",
+    "build": "npm run copy-material-design-icons && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "cpx": "^1.5.0",
+    "react-scripts": "1.0.13"
   }
 }
