@@ -10,5 +10,5 @@ export const onCellChange = (value, column, row) => {
 
 export const getErrorIfExists = (original, column) => {
     const error = Array.isArray(original.errors) && original.errors.find(err => err && err.field === column.id);
-    return error && error.defaultMessage || undefined;
+    return error ? error.defaultMessage : undefined;
 };

@@ -13,7 +13,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 const ProductBatchSubTable = (row) => {
-    const bloodPoolsCount = Array.isArray(row.bloodPools) && row.bloodPools.length || undefined;
+    const bloodPoolsCount = Array.isArray(row.bloodPools) ? row.bloodPools.length : undefined;
     return (
         <div className="ProductBatchSubTable">
             <label style={{margin: '20px', fontSize: '18px'}}>Пулы для загрузки № <b>{row.externalId}</b> (количество пулов: {bloodPoolsCount || 0})</label>

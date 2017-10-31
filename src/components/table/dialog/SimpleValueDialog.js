@@ -7,14 +7,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 const SimpleValueDialog = ({open, onClose, onSubmit, onChange, title, inputType}) => (
     <Dialog open={open}
             modal={false}
             onRequestClose={onClose}
-            actions={[<FlatButton label="OK" primary={true} keyboardFocused={true} onClick={onSubmit}/>]}
+            actions={[<RaisedButton label="OK" primary={true} keyboardFocused={true} onClick={onSubmit}/>]}
             title={title}
     >
         <TextField id="value" onChange={onChange} type={inputType}/>

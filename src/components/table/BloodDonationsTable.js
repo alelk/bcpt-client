@@ -89,7 +89,8 @@ class BloodDonationsTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 140
             }, {
                 Header: "ID донора",
                 accessor: "donor",
@@ -97,7 +98,8 @@ class BloodDonationsTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 110
             }, {
                 Header: "Номер накладной",
                 accessor: "bloodInvoice",
@@ -105,7 +107,8 @@ class BloodDonationsTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 140
             }, {
                 Header: "ID пула",
                 accessor: "bloodPool",
@@ -114,7 +117,7 @@ class BloodDonationsTable extends Table {
                 isEditable: true,
                 filterable: true,
                 Filter: TextFilter,
-                width: 100
+                minWidth: 80
             }, {
                 Header: "Тип донации",
                 accessor: "donationType",
@@ -127,17 +130,49 @@ class BloodDonationsTable extends Table {
                 ],
                 filterable: true,
                 Filter: DropDownFilter,
-                width: 150
+                minWidth: 100
             }, {
+                Header: "Группа крови",
+                accessor: "bloodType",
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: false,
+                allowedValues: [
+                    {value:"", displayValue: ""},
+                    {value:"0", displayValue: "0(I)"},
+                    {value:"a", displayValue: "A(II)"},
+                    {value:"b", displayValue: "B(III)"},
+                    {value:"ab", displayValue: "AB(IV)"}
+                ],
+                filterable: true,
+                sortable: false,
+                Filter: DropDownFilter,
+                minWidth: 110
+            }, {
+                Header: "Rh",
+                accessor: "rhFactor",
+                Cell: DropDownCell,
+                isEditable: false,
+                onChange: this.onValueChange,
+                allowedValues: [
+                    {value:"", displayValue: ""},
+                    {value:"pos", displayValue: "Rh+"},
+                    {value:"neg", displayValue: "Rh-"}
+                ],
+                filterable: true,
+                sortable: false,
+                Filter: DropDownFilter,
+                minWidth: 50
+            },{
                 Header: "Объем, мл.",
                 accessor: "amount",
                 onChange: this.onValueChange,
                 Cell: TextCell,
-                Footer: SumCheckedFooter,
+                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 isEditable: true,
                 filterable: true,
                 Filter: TextFilter,
-                width: 100
+                minWidth: 100
             }, {
                 Header: "Дата донации",
                 accessor: "donationDate",
@@ -145,19 +180,19 @@ class BloodDonationsTable extends Table {
                 inputType: "date",
                 isEditable: true,
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 110
             }, {
                 Header: "Начало карантина",
                 accessor: "quarantineDate",
                 inputType: "date",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 110
             }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 110
             }
         ];
     }

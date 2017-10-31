@@ -7,12 +7,9 @@ import {
     fetchTableData, tableRowChange, checkTableRow, deleteTableRow, editTableRow,
     resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable
 } from '../../actions/actions'
-import {extractTableName} from '../../util/util'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Route } from 'react-router-dom'
-import {connect} from 'react-redux'
 
 class TableContainerAdapter extends React.Component {
 
@@ -61,8 +58,8 @@ class TableContainerAdapter extends React.Component {
         this.props.saveChanges(this.props.tableName);
     }
 
-    onTableRowCreate() {
-        this.props.tableRowCreate(this.props.tableName);
+    onTableRowCreate(initialState) {
+        this.props.tableRowCreate(this.props.tableName, initialState);
     }
 
     tableProps() {

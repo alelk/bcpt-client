@@ -14,7 +14,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 const BloodPoolSubTable = (row) => {
-    const bloodDonationsCount = Array.isArray(row.bloodDonations) && row.bloodDonations.length || undefined;
+    const bloodDonationsCount = Array.isArray(row.bloodDonations) ? row.bloodDonations.length : undefined;
     return (
         <div className="BloodPoolSubTable">
             <label style={{margin: '20px', fontSize: '18px'}}>

@@ -10,15 +10,12 @@ import IconCell from './cell/IconCell'
 import DateTimeCell from './cell/DateTimeCell'
 import TextFilter from './filter/TextFilter'
 import Table from './Table'
+import SumCheckedFooter from './footer/SumCheckedFooter'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class BloodPoolsTable extends Table {
-
-    constructor(props) {
-        super(props);
-    }
+class ProductBatchTable extends Table {
 
     columns() {
         return [
@@ -30,8 +27,16 @@ class BloodPoolsTable extends Table {
                 width: 30,
                 filterable: false
             }, {
-                Header: "Номер загрузки",
+                Header: "ID загрузки",
                 accessor: "externalId",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Номер загрузки",
+                accessor: "batchNumber",
                 onChange: this.onValueChange,
                 Cell: TextCell,
                 isEditable: true,
@@ -51,6 +56,7 @@ class BloodPoolsTable extends Table {
                 Header: "Суммарный объем, мл.",
                 accessor: "totalAmount",
                 Cell: TextCell,
+                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 sortable: false,
                 filterable: false,
                 maxWidth: 190
@@ -83,7 +89,7 @@ const dataItem = PropTypes.shape({
     updateTimestamp : PropTypes.string,
     errors : PropTypes.object | PropTypes.array
 });
-BloodPoolsTable.propTypes = {
+ProductBatchTable.propTypes = {
     name : PropTypes.string,
     data : PropTypes.arrayOf(dataItem),
     checkedItems : PropTypes.arrayOf(dataItem),
@@ -104,4 +110,4 @@ BloodPoolsTable.propTypes = {
     filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
-export default BloodPoolsTable;
+export default ProductBatchTable;
