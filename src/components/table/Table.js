@@ -57,8 +57,10 @@ class Table extends React.Component {
         this.onValueChange = this.onValueChange.bind(this);
         this.onCheckRow = this.onCheckRow.bind(this);
         this.onUncheckRows = this.onUncheckRows.bind(this);
+        this.onCheckAllRows = this.onCheckAllRows.bind(this);
         this.onDeleteRows = this.onDeleteRows.bind(this);
         this.onEditRows = this.onEditRows.bind(this);
+        this.onAddRow = this.onAddRow.bind(this);
     }
 
     /**
@@ -101,7 +103,12 @@ class Table extends React.Component {
 
     onUncheckRows() {
         const {checkedItems, onCheckRow} = this.props;
-        checkedItems && onCheckRow && checkedItems.map(ci => onCheckRow(ci.localId, {isChecked:false}))
+        checkedItems && onCheckRow && checkedItems.forEach(ci => onCheckRow(ci.localId, {isChecked:false}))
+    }
+
+    onCheckAllRows() {
+        const {data, onCheckRow} = this.props;
+        data && onCheckRow && data.forEach(row => onCheckRow(row.localId, {isChecked: true}));
     }
 
     onDeleteRows() {
@@ -114,6 +121,11 @@ class Table extends React.Component {
         const {checkedItems, onEditRow} = this.props;
         checkedItems && onEditRow && checkedItems.map(ci => onEditRow(ci.localId));
         this.onUncheckRows();
+    }
+
+    onAddRow() {
+        const {onAddNewItem} = this.props;
+        onAddNewItem && onAddNewItem();
     }
 
     onValueChange(value, row, column) {
@@ -157,20 +169,21 @@ class Table extends React.Component {
     render() {
         const {
             name, checkedItems, isEditing, onResetChanges,
-            onSaveChanges, onRefreshData, onAddNewItem, isSimpleTable
+            onSaveChanges, onRefreshData, isSimpleTable
         } = this.props;
         return (
             isSimpleTable ? this.renderReactTable() :
             <EditableTable tableName={name}
                            checkedItems={checkedItems && checkedItems.map(ci => ci.localId)}
                            onUncheckItems={this.onUncheckRows}
+                           onCheckAllItems={this.onCheckAllRows}
                            onRemove={this.onDeleteRows}
                            onEdit={this.onEditRows}
                            isEditMode={isEditing}
                            onCancel={onResetChanges}
                            onDone={onSaveChanges}
                            onRefresh={onRefreshData}
-                           onAdd={onAddNewItem}
+                           onAdd={this.onAddRow}
                            controls={this.controls()}
             >
                 {this.renderReactTable()}

@@ -10,10 +10,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const EditableTable = ({
-    children, onUncheckItems, isEditMode, checkedItems, onAdd, onEdit, onDone, onCancel, onRemove, onRefresh,
-    tableName, controls
+    children, onUncheckItems, onCheckAllItems, isEditMode, checkedItems, onAdd, onEdit, onDone, onCancel, onRemove,
+    onRefresh, tableName, controls
 }) => {
-    const checkedItemsCount = Array.isArray(checkedItems) && checkedItems.length || 0;
+    const checkedItemsCount = Array.isArray(checkedItems) ? checkedItems.length : 0;
     return (
         <div className="EditableTable">
             <div className="controls">
@@ -21,7 +21,8 @@ const EditableTable = ({
                 {checkedItemsCount > 0 &&
                 <label className="itemsSelected">
                     <span>{`${checkedItemsCount} строк выделено`}</span>
-                    <Button iconName='clear' className='clearSelection' onClick={onUncheckItems}/>
+                    <Button iconName='done_all' className='checkAll' onClick={onCheckAllItems} title="Выделить все на странице"/>
+                    <Button iconName='clear' className='clearSelection' onClick={onUncheckItems} title="Снять выделение"/>
                 </label>
                 }
                 {isEditMode &&
@@ -45,6 +46,7 @@ const EditableTable = ({
                         if(!onCheckedItems && !onEditMode) return control;
                         if (onCheckedItems && checkedItemsCount > 0) return control;
                         if (onEditMode && isEditMode) return control;
+                        return undefined;
                     })
                 }
             </div>
@@ -65,6 +67,7 @@ EditableTable.propTypes = {
     onCancel : PropTypes.func,
     onRefresh : PropTypes.func,
     onUncheckItems : PropTypes.func,
+    onCheckAllItems : PropTypes.func,
     controls : PropTypes.arrayOf(PropTypes.shape({
         onCheckedItems : PropTypes.bool,
         onEditMode : PropTypes.bool,

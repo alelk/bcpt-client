@@ -9,6 +9,7 @@ import './CheckBoxInput.css'
 
 import React from 'react'
 import PropTypes from 'prop-types';
+import Checkbox from 'material-ui/Checkbox'
 
 class CheckBoxInput extends Input {
 
@@ -20,13 +21,15 @@ class CheckBoxInput extends Input {
     componentWillMount() {}
 
     onChange(e) {
-        this.setState({value: e.target.value});
-        this.props.onChange && this.props.onChange(e.target.checked);
+        this.setState((oldState) => {
+            this.props.onChange && this.props.onChange(!oldState.value);
+            return {value : !oldState.value};
+        });
     }
 
     render() {
         return (
-            <input type="checkbox" className={this.className} value={this.state.value} checked={this.state.value} onChange={this.onChange} title={this.props.error}/>
+            <Checkbox checked={this.state.value} onCheck={this.onChange}/>
         );
     }
 }

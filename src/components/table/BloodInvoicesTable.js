@@ -10,6 +10,7 @@ import IconCell from './cell/IconCell'
 import DateTimeCell from './cell/DateTimeCell'
 import TextFilter from './filter/TextFilter'
 import Table from './Table'
+import SumCheckedFooter from './footer/SumCheckedFooter'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -59,6 +60,7 @@ class BloodInvoicesTable extends Table {
                 accessor: "totalAmount",
                 onChange: this.onValueChange,
                 Cell: TextCell,
+                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 sortable: false,
                 filterable: false,
                 maxWidth: 190

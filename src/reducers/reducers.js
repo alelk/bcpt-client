@@ -9,7 +9,6 @@ import {
     ACTION_TABLE_DATA_FAILURE,
     ACTION_TABLE_MODIFY_INFO,
     ACTION_TABLE_CHECK_ROW,
-    ACTION_TABLE_UNCHECK_ROWS,
     ACTION_TABLE_DELETE_ROW,
     ACTION_TABLE_EDIT_ROW,
     ACTION_TABLE_RESET_CHANGES,
@@ -130,7 +129,7 @@ const tablePages = (state = {}, action) => {
     else if (ACTION_TABLE_DATA_SUCCESS === type)
         return pageWith(state, tableName, pageNumber, Object.assign(
             {isFetching: false, isFetched: true},
-            pageFromResponse(pageNumber, response) || state[tableName] && state[tableName][pageNumber]
+            pageFromResponse(pageNumber, response) || (state[tableName] && state[tableName][pageNumber])
         ));
     else if (ACTION_TABLE_DATA_FAILURE === type)
         return pageWith(state, tableName, pageNumber,{isFetching: false, isFetched: true, error});
@@ -158,7 +157,7 @@ const mergeItems = (items, newItems, overrideChanges = false) => {
     const result = objectWith(items);
     newItems && Object.keys(newItems)
         .filter(localId => overrideChanges || !itemHasChanges(items, localId))
-        .map(localId => ({localId, item:newItems[localId]}))
+        .map(localId => ({localId, item:objectWith(newItems[localId], {isChecked:result[localId] && result[localId].isChecked})}))
         .forEach(({localId, item})=> result[localId] = item);
     return result;
 };

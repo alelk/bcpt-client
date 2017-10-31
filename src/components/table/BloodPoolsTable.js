@@ -10,6 +10,9 @@ import IconCell from './cell/IconCell'
 import DateTimeCell from './cell/DateTimeCell'
 import TextFilter from './filter/TextFilter'
 import Table from './Table'
+import Button from '../Button'
+import CreatePoolsDialog from './dialog/CreatePoolsDialog'
+import SumCheckedFooter from './footer/SumCheckedFooter'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -19,6 +22,58 @@ class BloodPoolsTable extends Table {
     constructor(props) {
         super(props);
         this.onBloodDonationsClick=this.onBloodDonationsClick.bind(this);
+        this.onCreatePoolsOpen = this.onCreatePoolsOpen.bind(this);
+        this.onCreatePoolsClose = this.onCreatePoolsClose.bind(this);
+        this.onCreatePoolsSubmit = this.onCreatePoolsSubmit.bind(this);
+        this.state = {
+            isCreatePoolsDialogOpened: false,
+            productBatchId : '',
+            poolStartNumber : 1,
+            poolsCount : 10
+        }
+    }
+
+    controls() {
+        return [
+            {
+                control: <Button iconName="control_point_duplicate"
+                                 className="change"
+                                 title="Создать пулы"
+                                 key="add_pulls"
+                                 onClick={this.onCreatePoolsOpen}/>
+            }
+        ]
+    }
+
+    onCreatePoolsOpen() {
+        this.setState({isCreatePoolsDialogOpened:true})
+    }
+
+    onCreatePoolsClose() {
+        this.setState({isCreatePoolsDialogOpened:false})
+    }
+
+    onCreatePoolsSubmit(productBatchId, poolStartNumber, poolsCount) {
+        const {onAddNewItem} = this.props;
+        [...new Array(poolsCount).keys()].map(i => ({
+            externalId: productBatchId + "-" + (poolStartNumber + i),
+            poolNumber : (poolStartNumber + i),
+            productBatch : productBatchId
+        })).forEach(pool =>
+            onAddNewItem && onAddNewItem(pool)
+        );
+        this.setState({productBatchId, poolStartNumber, poolsCount, isCreatePoolsDialogOpened:false})
+    }
+
+    extraContent() {
+        return (
+            <CreatePoolsDialog open={this.state.isCreatePoolsDialogOpened}
+                               productBatchId={this.state.productBatchId}
+                               poolStartNumber={this.state.poolStartNumber}
+                               poolsCount={this.state.poolsCount}
+                               onSubmit={this.onCreatePoolsSubmit}
+                               onCancel={this.onCreatePoolsClose}/>
+        )
     }
 
     onBloodDonationsClick(value, row, column, original) {
@@ -69,9 +124,10 @@ class BloodPoolsTable extends Table {
                 Cell: TextCell,
                 sortable: false,
                 filterable: false,
+                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 maxWidth: 190
             }, {
-                Header: "Номер загрузки",
+                Header: "ID загрузки",
                 accessor: "productBatch",
                 onChange: this.onValueChange,
                 Cell: TextCell,
@@ -95,7 +151,7 @@ const dataItem = PropTypes.shape({
     productBatch : PropTypes.string,
     bloodDonations : PropTypes.arrayOf(PropTypes.string),
     totalAmount : PropTypes.number,
-    poolNumber : PropTypes.string,
+    poolNumber : PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     updateTimestamp : PropTypes.string,
     errors : PropTypes.object | PropTypes.array
 });

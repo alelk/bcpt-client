@@ -13,7 +13,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 const BloodInvoiceSubTable = (row) => {
-    const bloodDonationsSize = Array.isArray(row.bloodDonations) && row.bloodDonations.length || undefined;
+    const bloodDonationsSize = Array.isArray(row.bloodDonations) ? row.bloodDonations.length : undefined;
     return (
         <div className="bloodInvoiceBloodDonations">
             <label style={{margin: '20px', fontSize: '18px'}}>

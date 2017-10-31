@@ -154,14 +154,16 @@ export const savedChanges = (tableName, localId, response) => ({
 
 export const ACTION_TABLE_ADD_NEW_ITEM = 'ACTION_TABLE_ADD_NEW_ITEM';
 
-export const tableRowCreate = (tableName) => (dispatch, getState) => {
+export const tableRowCreate = (tableName, initialData) => (dispatch, getState) => {
     const table = getState().tables[tableName];
-    return dispatch({
+    const localId = Math.random().toString(36);
+    dispatch({
         type: ACTION_TABLE_ADD_NEW_ITEM,
         tableName,
         pageNumber: table && table.pageNumber,
-        localId : Math.random().toString(36)
-    })
+        localId
+    });
+    initialData && dispatch(tableRowChange(tableName, localId, initialData));
 };
 
 export const ACTION_TABLE_CLEAN_UP_SUBTABLE = 'ACTION_TABLE_CLEAN_UP_SUBTABLE';

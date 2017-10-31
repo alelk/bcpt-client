@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import {getTable, getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
+import {getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
 import {savedChanges} from '../actions/actions'
 
 export const CALL_BCPT_REST_API = 'CALL_BCPT_REST_API';

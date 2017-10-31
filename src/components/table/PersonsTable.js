@@ -11,7 +11,6 @@ import TextFilter from './filter/TextFilter'
 import DropDownFilter from './filter/DropDownFilter'
 import Table from './Table'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 class PersonsTable extends Table {
