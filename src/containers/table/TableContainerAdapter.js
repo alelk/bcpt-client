@@ -5,7 +5,7 @@
  */
 import {
     fetchTableData, tableRowChange, checkTableRow, deleteTableRow, editTableRow,
-    resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable
+    resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable, changeDrawerState
 } from '../../actions/actions'
 
 import React from 'react'
@@ -23,6 +23,7 @@ class TableContainerAdapter extends React.Component {
         this.onResetTableChanges = this.onResetTableChanges.bind(this);
         this.onSaveChanges = this.onSaveChanges.bind(this);
         this.onTableRowCreate = this.onTableRowCreate.bind(this);
+        this.onRequestAppDrawer = this.onRequestAppDrawer.bind(this);
     }
 
     componentWillUnmount() {
@@ -62,6 +63,10 @@ class TableContainerAdapter extends React.Component {
         this.props.tableRowCreate(this.props.tableName, initialState);
     }
 
+    onRequestAppDrawer() {
+        this.props.changeDrawerState({isDrawerOpened:true});
+    }
+
     tableProps() {
         const {table, pages, items, isSimpleTable, filtered, defaultPageSize} = this.props;
         const page = table && pages && pages[table.pageNumber];
@@ -86,6 +91,7 @@ class TableContainerAdapter extends React.Component {
             onRefreshData : this.onResetTableChanges,
             onSaveChanges : this.onSaveChanges,
             onAddNewItem : this.onTableRowCreate,
+            onAppDrawerRequest : this.onRequestAppDrawer,
             isSimpleTable,
             filtered,
             defaultPageSize
@@ -119,6 +125,7 @@ TableContainerAdapter.propTypes = {
     tableRowCreate: PropTypes.func,
     cleanUpSubtable: PropTypes.func,
     saveChanges: PropTypes.func,
+    changeDrawerState: PropTypes.func,
 };
 
 export const mapStateToProps = (tableName) => (state, ownProps) => {
@@ -136,7 +143,7 @@ export const mapStateToProps = (tableName) => (state, ownProps) => {
 
 export const mapDispatchToProps = {
     fetchTableData, tableRowChange, checkTableRow, deleteTableRow,
-    editTableRow, resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable
+    editTableRow, resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable, changeDrawerState
 };
 
 export default TableContainerAdapter;

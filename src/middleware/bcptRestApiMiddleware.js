@@ -3,7 +3,7 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import {getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
+import {getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity, importDbfFile} from '../api/bcptRestApi'
 import {savedChanges} from '../actions/actions'
 
 export const CALL_BCPT_REST_API = 'CALL_BCPT_REST_API';
@@ -42,6 +42,12 @@ export default store => nextProcedure => action => {
             response => nextProcedure(actionWith({type: successType, tableName, response})),
             error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
         )
+    }
+
+    else if (/importDbfFile/.test(method)) {
+        const {file} = callApi;
+        console.log("Request to import file ", file);
+        importDbfFile(file).then(response => console.log("success ", response), err => console.log("error ", err))
     }
 
     else if (/saveChanges/.test(method)) {

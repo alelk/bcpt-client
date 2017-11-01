@@ -169,7 +169,7 @@ class Table extends React.Component {
     render() {
         const {
             name, checkedItems, isEditing, onResetChanges,
-            onSaveChanges, onRefreshData, isSimpleTable
+            onSaveChanges, onRefreshData, isSimpleTable, onAppDrawerRequest
         } = this.props;
         return (
             isSimpleTable ? this.renderReactTable() :
@@ -185,6 +185,7 @@ class Table extends React.Component {
                            onRefresh={onRefreshData}
                            onAdd={this.onAddRow}
                            controls={this.controls()}
+                           onAppDrawerRequest={onAppDrawerRequest}
             >
                 {this.renderReactTable()}
                 {this.extraContent()}
@@ -197,6 +198,7 @@ const dataItem = PropTypes.shape({
     externalId : PropTypes.string,
 });
 Table.propTypes = {
+    onAppDrawerRequest : PropTypes.func,
     name : PropTypes.string,
     data: PropTypes.arrayOf(dataItem),
     checkedItems : PropTypes.arrayOf(dataItem),
