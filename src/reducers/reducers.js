@@ -18,7 +18,8 @@ import {
     ACTION_TABLE_SAVED_CHANGES,
     ACTION_TABLE_SAVE_CHANGES_SUCCESS,
     ACTION_TABLE_SAVE_CHANGES_FAILURE,
-    ACTION_TABLE_CLEAN_UP_SUBTABLE
+    ACTION_TABLE_CLEAN_UP_SUBTABLE,
+    ACTION_CHANGE_DRAWER
 } from '../actions/actions'
 
 import {extractTableName, isSubtable} from '../util/util'
@@ -248,12 +249,20 @@ const errors = (state = {}, action) => {
     return state;
 };
 
+const drawer = (state = {}, action) => {
+    const {type, changes} = action;
+    if (ACTION_CHANGE_DRAWER === type)
+        return objectWith(state, changes);
+    return state;
+};
+
 const rootReducer = combineReducers({
     tables,
     tablePages,
     tableItems,
     errors,
     tableFilters,
+    drawer,
     routing: routerReducer
 });
 

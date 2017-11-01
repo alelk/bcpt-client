@@ -26,7 +26,7 @@
 }
 
 .controls .tableName {
-    margin-left: 50px;
+    margin-left: 20px;
     line-height: 30px;
     font-size: 110%;
     font-weight: 600;
@@ -62,6 +62,12 @@
     float: right;
     border-radius: 50%;
     margin-right: 16px;
+}
+
+.controls > .btnAppDrawer {
+    float: left;
+    color: black;
+    margin-left: 10px;
 }
 
 .controls>button:hover {

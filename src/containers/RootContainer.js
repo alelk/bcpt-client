@@ -9,23 +9,40 @@ import BloodInvoicesContainer from './table/BloodInvoicesContainer'
 import BloodPoolsContainer from './table/BloodPoolsContainer'
 import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
+import DataImporterContainer from './DataImporterContainer'
 
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
 import { Route, Link } from 'react-router-dom'
 import { ConnectedRouter} from 'react-router-redux'
+import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
+import FontIcon from 'material-ui/FontIcon';
+import Divider from 'material-ui/Divider';
+
+const renderMenuItem = (link, label, iconName) => (
+    <MenuItem>
+        <Link to={link}>
+            <FlatButton label={label} secondary style={{width: "100%", textAlign:"left", color: "#7e22c1"}}
+                        icon={<FontIcon className="material-icons">{iconName}</FontIcon>}
+            />
+        </Link>
+    </MenuItem>
+);
 
 const Root = ({store, history}) => (
     <Provider store={store}>
         <ConnectedRouter history={history}>
             <div>
                 <DrawerContainer>
-                    <Link to='/table/persons'><i className="material-icons">person</i>Доноры</Link>
-                    <Link to='/table/bloodDonations'><i className="material-icons">invert_colors</i>Пакеты с плазмой</Link>
-                    <Link to='/table/bloodInvoices'><i className="material-icons">format_list_bulleted</i>Накладные</Link>
-                    <Link to='/table/bloodPools'><i className="material-icons">poll</i>Пулы</Link>
-                    <Link to='/table/productBatches'><i className="material-icons">call_merge</i>Загрузки</Link>
+                    {renderMenuItem("/table/persons", "Доноры", "person")}
+                    {renderMenuItem("/table/bloodDonations", "Пакеты с плазмой", "invert_colors")}
+                    {renderMenuItem("/table/bloodInvoices", "Накладные", "format_list_bulleted")}
+                    {renderMenuItem("/table/bloodPools", "Пулы", "poll")}
+                    {renderMenuItem("/table/productBatches", "Загрузки", "call_merge")}
+                    <Divider />
+                    {renderMenuItem("/import", "Импорт данных", "file_upload")}
                 </DrawerContainer>
                 <div>
                     <Route path='*/table/persons' component={PersonsContainer}/>
@@ -33,6 +50,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
                     <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
+                    <Route path='*/import' component={DataImporterContainer}/>
                 </div>
             </div>
         </ConnectedRouter>

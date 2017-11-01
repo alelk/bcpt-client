@@ -11,12 +11,13 @@ import PropTypes from 'prop-types'
 
 const EditableTable = ({
     children, onUncheckItems, onCheckAllItems, isEditMode, checkedItems, onAdd, onEdit, onDone, onCancel, onRemove,
-    onRefresh, tableName, controls
+    onRefresh, tableName, controls, onAppDrawerRequest
 }) => {
     const checkedItemsCount = Array.isArray(checkedItems) ? checkedItems.length : 0;
     return (
         <div className="EditableTable">
             <div className="controls">
+                {onAppDrawerRequest && <Button className="btnAppDrawer" iconName="menu" onClick={onAppDrawerRequest} title="Открыть системное меню"/>}
                 <label className="tableName">{tableName}</label>
                 {checkedItemsCount > 0 &&
                 <label className="itemsSelected">
@@ -57,6 +58,7 @@ const EditableTable = ({
     )
 };
 EditableTable.propTypes = {
+    onAppDrawerRequest : PropTypes.func,
     checkedItems : PropTypes.arrayOf(PropTypes.string),
     tableName : PropTypes.string,
     isEditMode : PropTypes.bool,

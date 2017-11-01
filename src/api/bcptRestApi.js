@@ -94,6 +94,16 @@ export const deleteTableEntity = function (tableId, externalId) {
     return deleteObject(BcptConfig.get("rest-api-uri") + tableName + "/", {externalId})
 };
 
+export const importDbfFile = (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("name", file.name);
+    return fetchBcptApi(BcptConfig.get("rest-api-uri") + "importer/importDbf/", {
+        method: 'post',
+        body: data
+    })
+};
+
 const putObject = function (uri, json, schema) {
     return fetchBcptApi(uri, {
         method: 'put',

@@ -173,3 +173,12 @@ export const cleanUpSubtable = (tableName) => ({
     tableName
 });
 
+export const ACTION_CHANGE_DRAWER = 'ACTION_CHANGE_DRAWER';
+
+export const changeDrawerState = (changes) => ({
+    type: ACTION_CHANGE_DRAWER,
+    changes
+});
+
+
+
