@@ -3,8 +3,9 @@
  *
  * Created by Alex Elkin on 13.09.2017.
  */
-import {getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity, importDbfFile} from '../api/bcptRestApi'
+import {getTablePage, getTableEntity, postTableEntity, putTableEntity, deleteTableEntity} from '../api/bcptRestApi'
 import {savedChanges} from '../actions/actions'
+import {validateCallApiTypes, validateIsString} from './util'
 
 export const CALL_BCPT_REST_API = 'CALL_BCPT_REST_API';
 
@@ -16,12 +17,8 @@ export default store => nextProcedure => action => {
     }
 
     const {types, method, tableName} = callApi;
-    if (typeof method !== 'string')
-        throw new Error('Expected an method signature, but: ' + method);
-    if (!Array.isArray(types) || types.length !== 3)
-        throw new Error('Expected an array of three action types.');
-    if (!types.every(type => typeof type === 'string'))
-        throw new Error('Expected action types to be strings.');
+    validateIsString(method, "Expected a method signature");
+    validateCallApiTypes(types);
 
     const actionWith = data => {
         return Object.assign({}, callApi, data);
@@ -42,12 +39,6 @@ export default store => nextProcedure => action => {
             response => nextProcedure(actionWith({type: successType, tableName, response})),
             error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
         )
-    }
-
-    else if (/importDbfFile/.test(method)) {
-        const {file} = callApi;
-        console.log("Request to import file ", file);
-        importDbfFile(file).then(response => console.log("success ", response), err => console.log("error ", err))
     }
 
     else if (/saveChanges/.test(method)) {
@@ -80,7 +71,4 @@ export default store => nextProcedure => action => {
             )
         }
     }
-
-
-
 }

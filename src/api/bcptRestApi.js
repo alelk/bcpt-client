@@ -6,9 +6,10 @@
 
 import BcptConfig from '../util/BcptConfig'
 
-import { normalize, schema } from 'normalizr'
+import { schema } from 'normalizr'
 import urlencode from 'urlencode'
 import {extractTableName} from '../util/util'
+import {deleteObject, getObject, postObject, putObject} from './fetchFunctions'
 
 const personSchema = new schema.Entity('persons', {}, { idAttribute : value => value.externalId });
 const personsSchema = new schema.Array(personSchema);
@@ -92,66 +93,4 @@ export const putTableEntity = function (tableId, externalId, data) {
 export const deleteTableEntity = function (tableId, externalId) {
     const tableName = extractTableName(tableId);
     return deleteObject(BcptConfig.get("rest-api-uri") + tableName + "/", {externalId})
-};
-
-export const importDbfFile = (file) => {
-    const data = new FormData();
-    data.append("file", file);
-    data.append("name", file.name);
-    return fetchBcptApi(BcptConfig.get("rest-api-uri") + "importer/importDbf/", {
-        method: 'post',
-        body: data
-    })
-};
-
-const putObject = function (uri, json, schema) {
-    return fetchBcptApi(uri, {
-        method: 'put',
-        mode: 'cors',
-        headers: {
-            'Access-Control-Allow-Origin':'*',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(json)
-    }, schema)
-};
-
-const postObject = function (uri, json, schema) {
-    return fetchBcptApi(uri, {
-        method: 'post',
-        mode: 'cors',
-        headers: {
-            'Access-Control-Allow-Origin':'*',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(json)
-    }, schema)
-};
-
-const deleteObject = function(uri, json) {
-    return fetchBcptApi(uri, {
-        method:'delete',
-        mode: 'cors',
-        headers: {
-            'Access-Control-Allow-Origin':'*',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(json)
-    }, undefined);
-};
-
-const getObject = function(uri, schema) {
-    return fetchBcptApi(uri, undefined, schema);
-};
-
-const fetchBcptApi = function (uri, requestBody, schema) {
-    return fetch(uri, requestBody).then(response =>
-        response.json().then(json => {
-            if (!response.ok) return Promise.reject(json);
-            return schema !== undefined ? normalize(json, schema) : json;
-        })
-    );
 };

@@ -22,14 +22,16 @@ import {
     ACTION_CHANGE_DRAWER
 } from '../actions/actions'
 
+import {objectWith} from './util'
+
+import {uploads, uploadedFiles} from './uploaderReducers'
+
 import {extractTableName, isSubtable} from '../util/util'
 
 import {urlQueryAsFilters} from '../components/table/Table'
 
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-
-const objectWith = (object, changes) => Object.assign({}, object, changes);
 
 const tableWith = (tables, tableName, changes) => {
     const table = objectWith(tables[tableName], changes);
@@ -263,6 +265,8 @@ const rootReducer = combineReducers({
     errors,
     tableFilters,
     drawer,
+    uploads,
+    uploadedFiles,
     routing: routerReducer
 });
 

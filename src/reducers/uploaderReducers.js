@@ -1,0 +1,52 @@
+/**
+ * Uploader Reducers
+ *
+ * Created by Uploader Reducers on 02.11.2017.
+ */
+
+import {
+    ACTION_UPLOAD_FILE_REQUEST,
+    ACTION_UPLOAD_FILE_SUCCESS,
+    ACTION_UPLOAD_FILE_FAILURE
+} from '../actions/uploaderActions'
+import {objectWith} from './util'
+
+const categoryWith = (state, category, changes) => {
+    const upload = objectWith(state[category], changes);
+    return objectWith(state, {[category]:upload});
+};
+
+export const uploads = (state={
+    dbf: {displayName: "DBF", fileType:"text/plain", fileExtension:"txt"},
+    ant: {displayName: "ANT", fileType:"text/plain", fileExtension:"ant"},
+}, action) => {
+    const {type, category} = action;
+    if (ACTION_UPLOAD_FILE_REQUEST === type)
+        return categoryWith(state, category, {isFetching:true, isFetched:false});
+    else if (ACTION_UPLOAD_FILE_SUCCESS === type)
+        return categoryWith(state, category, {isFetching:false, isFetched:true});
+    else if (ACTION_UPLOAD_FILE_FAILURE === type)
+        return categoryWith(state, category, {isFetching:false, isFetched:false});
+    return state;
+};
+
+const uploadedFileWith = (state, category, fileName, changes) => {
+    return categoryWith(state, category, {[fileName] : changes});
+};
+
+const fileFromResponse = (fileName, response) => {
+    return response && response.entities && response.entities.files && response.entities.files[fileName];
+};
+
+export const uploadedFiles = (state = {}, action) => {
+    const {type, category, file, response, error} = action;
+    const fileName = file && file.name;
+    if (ACTION_UPLOAD_FILE_REQUEST === type)
+        return uploadedFileWith(state, category, fileName, {isFetching:true, isFetched:false, error:undefined});
+    else if (ACTION_UPLOAD_FILE_SUCCESS === type)
+        return uploadedFileWith(state, category, fileName,
+            Object.assign({isFetching:false, isFetched:true, error:undefined}, fileFromResponse(fileName, response)));
+    else if (ACTION_UPLOAD_FILE_FAILURE === type)
+        return uploadedFileWith(state, category, fileName, {isFetching:false, isFetched:false, error});
+    return state;
+};
