@@ -5,6 +5,7 @@
  */
 
 import bcptRestApiMiddleware from '../middleware/bcptRestApiMiddleware'
+import bcptUploaderMiddleware from '../middleware/bcptUploaderMiddleware'
 import rootReducer from '../reducers/reducers'
 
 import { createStore, applyMiddleware, compose } from 'redux'
@@ -20,6 +21,7 @@ const configureStore = (history, preloadedState) => {
             applyMiddleware(
                 thunk,
                 bcptRestApiMiddleware,
+                bcptUploaderMiddleware,
                 routerMiddleware(history),
                 createLogger()
             )

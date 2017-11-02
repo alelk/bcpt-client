@@ -1,5 +1,5 @@
 /**
- * Dbf File import Dialog
+ * Dbf File Open Dialog
  *
  * Created by Alex Elkin on 01.11.2017.
  */
@@ -10,7 +10,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 
-class DbfFileImportDialog extends React.Component {
+class FileOpenDialog extends React.Component {
 
     constructor(props) {
         super(props);
@@ -25,7 +25,7 @@ class DbfFileImportDialog extends React.Component {
     }
 
     onDialogOpen() {
-        this.setState({isDialogOpened: true})
+        this.setState({isDialogOpened: true, file:undefined, isValid:false, errorMessage: undefined})
     }
 
     onDialogClose() {
@@ -44,15 +44,17 @@ class DbfFileImportDialog extends React.Component {
         this.setState({
             file,
             isValid,
-            errorMessage: file ? isValid ? undefined : "Выбран неверный файл: ожидается файл формата txt (UTF-8)" : "Выберите файл"
+            errorMessage: file ? isValid ? undefined : "Выбран неверный файл" : "Выберите файл"
         })
     }
 
     validate(file) {
-        return file && /text\/plain/i.test(file.type);
+        const {fileType} = this.props;
+        return fileType ? file && fileType === file.type : file;
     }
 
     actions() {
+        const {submitLabel} = this.props;
         return [
             <FlatButton
                 label="Отмена"
@@ -60,7 +62,7 @@ class DbfFileImportDialog extends React.Component {
                 onClick={this.onDialogClose}
             />,
             <FlatButton
-                label="Импортировать"
+                label={submitLabel || "Открыть"}
                 disabled={!this.state.isValid}
                 primary={true}
                 keyboardFocused={true}
@@ -70,34 +72,37 @@ class DbfFileImportDialog extends React.Component {
     }
 
     render() {
-        const {buttonLabel} = this.props;
+        const {buttonLabel, title} = this.props;
+        const {isDialogOpened, errorMessage} = this.state;
         return (
             <div>
-                <RaisedButton label={buttonLabel || "Импорт DBF-файла"} onClick={this.onDialogOpen} />
+                <RaisedButton label={buttonLabel || "Выбрать файл"} onClick={this.onDialogOpen} />
                 <Dialog
-                    className="DbfFileImportDialog"
-                    title="Импорт данных DBF-файла"
+                    className="FileOpenDialog"
+                    title={title || buttonLabel || "Выбор файла"}
                     actions={this.actions()}
                     modal={false}
-                    open={this.state.isDialogOpened}
+                    open={isDialogOpened}
                     onRequestClose={this.onDialogClose}
                 >
-                    <input id="dataImporterFileInput"
-                           type="file"
+                    <input type="file"
                            onChange={this.onFileSelected}
                            style={{width:'100%'}}>
 
                     </input>
-                    {this.state.errorMessage && <label style={{color:'red'}}>{this.state.errorMessage}</label>}
+                    {errorMessage && <label style={{color:'red'}}>{errorMessage}</label>}
                 </Dialog>
             </div>
         );
     }
 }
 
-DbfFileImportDialog.propTypes = {
+FileOpenDialog.propTypes = {
     buttonLabel : PropTypes.string,
+    title : PropTypes.string,
+    submitLabel : PropTypes.string,
+    fileType : PropTypes.string,
     onSubmit : PropTypes.func
 };
 
-export default DbfFileImportDialog;
+export default FileOpenDialog;
