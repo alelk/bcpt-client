@@ -4,7 +4,7 @@
  * Created by Alex Elkin on 01.11.2017.
  */
 
-import FileUploader, {categoryType} from '../uploader/FileUploader'
+import FileUploader, {categoryType} from '../filemanager/FileManager'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -18,7 +18,9 @@ class DataImporter extends React.Component {
     }
 
     render() {
-        const {onDrawerChangeDrawerVisibilityRequest, categories, onUploadFile} = this.props;
+        const {
+            onDrawerChangeDrawerVisibilityRequest, categories, onUploadFile, onFetchUploadedFiles, onDownloadFile
+        } = this.props;
         console.log("categories: ", categories);
         return (
             <div className="DataImporter">
@@ -27,7 +29,9 @@ class DataImporter extends React.Component {
                 <FileUploader title="Файлы для импорта"
                               subtitle="Выберите файл или загрузите новый"
                               categories={categories}
-                              onUploadFile={onUploadFile}/>
+                              onUploadFile={onUploadFile}
+                              onDownloadFile={onDownloadFile}
+                              onFetchFiles={onFetchUploadedFiles}/>
             </div>
         )
     }
@@ -35,7 +39,9 @@ class DataImporter extends React.Component {
 DataImporter.propTypes = {
     onDrawerChangeDrawerVisibilityRequest : PropTypes.func,
     categories : PropTypes.arrayOf(categoryType),
-    onUploadFile : PropTypes.func
+    onUploadFile : PropTypes.func,
+    onDownloadFile : PropTypes.func,
+    onFetchUploadedFiles : PropTypes.func
 };
 
 export default DataImporter;

@@ -4,7 +4,7 @@
  * Created by Alex Elkin on 01.11.2017.
  */
 import {changeDrawerState} from '../actions/actions'
-import {uploadFile} from '../actions/uploaderActions'
+import {uploadFile, fetchUploadedFiles, downloadFile} from '../actions/uploaderActions'
 import DataImporter from '../components/importer/DataImporter'
 
 import React from 'react'
@@ -19,11 +19,15 @@ const buildCategories = (uploads, uploadedFiles) => {
     });
 };
 
-const DataImporterContainer = ({isDrawerOpened, changeDrawerState, uploadFile, uploads, uploadedFiles}) => {
+const DataImporterContainer = ({
+    isDrawerOpened, changeDrawerState, uploadFile, uploads, uploadedFiles, fetchUploadedFiles, downloadFile
+}) => {
     return (
         <DataImporter onDrawerChangeDrawerVisibilityRequest={() => changeDrawerState({isDrawerOpened: !isDrawerOpened})}
                       onUploadFile={(file, category) => uploadFile(file, category.name)}
+                      onDownloadFile={downloadFile}
                       categories={buildCategories(uploads, uploadedFiles)}
+                      onFetchUploadedFiles={fetchUploadedFiles}
         />
     )
 };
@@ -31,11 +35,14 @@ DataImporterContainer.propTypes = {
     isDrawerOpened : PropTypes.bool,
     changeDrawerState : PropTypes.func,
     uploads : PropTypes.object,
-    uploadedFiles: PropTypes.object
+    uploadedFiles: PropTypes.object,
+    fetchUploadedFiles : PropTypes.func,
+    uploadFile : PropTypes.func,
+    downloadFile : PropTypes.func,
 };
 const mapStateToProps = (state, ownProps) => ({
     isDrawerOpened: state.drawer.isDrawerOpened,
     uploads: state.uploads,
     uploadedFiles: state.uploadedFiles
 });
-export default connect(mapStateToProps, {changeDrawerState, uploadFile})(DataImporterContainer);
+export default connect(mapStateToProps, {changeDrawerState, uploadFile, fetchUploadedFiles, downloadFile})(DataImporterContainer);
