@@ -5,7 +5,7 @@
  */
 
 import FileOpenDialog from '../dialog/FileOpenDialog'
-import UploadsTable, {fileType} from './UploadsTable'
+import FilesTable, {fileType} from './FilesTable'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -19,7 +19,21 @@ class FileUploader extends React.Component {
         this.onUploadFile = this.onUploadFile.bind(this);
         this.onTabChange = this.onTabChange.bind(this);
         this.renderCategory = this.renderCategory.bind(this);
+        this.onFetchFiles = this.onFetchFiles.bind(this);
         this.state = {}
+    }
+
+    componentDidMount() {
+        this.onTabChange(FileUploader.firstCategoryName(this.props))
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (FileUploader.firstCategoryName(nextProps)!== FileUploader.firstCategoryName(this.props))
+            this.onTabChange(FileUploader.firstCategoryName(nextProps))
+    }
+
+    static firstCategoryName(props) {
+        return props && props.categories && props.categories[0] && props.categories[0].name;
     }
 
     onUploadFile(file, category) {
@@ -27,15 +41,23 @@ class FileUploader extends React.Component {
     }
 
     onTabChange(categoryName) {
-        this.setState({categoryName})
+        this.setState({categoryName});
+        this.onFetchFiles(categoryName);
+    }
+
+    onFetchFiles(category) {
+        this.props.onFetchFiles && this.props.onFetchFiles(category);
     }
 
     renderCategory(category) {
         const {name, displayName, fileType, fileExtension, isFetching, files} = category;
+        const {onDownloadFile} = this.props;
         const label = `Загрузить файл${displayName ? ' ' + displayName : ""}`;
         return (
             <Tab key={name} label={displayName} value={name}>
-                <UploadsTable data={files} isFetching={isFetching}/>
+                <FilesTable data={files}
+                            isFetching={isFetching}
+                            onDownload={onDownloadFile && (fileName => onDownloadFile(name, fileName))}/>
                 <FileOpenDialog onSubmit={file => this.onUploadFile(file, category)}
                                 buttonLabel={label}
                                 title={`${label}${fileExtension ? ' (.' + fileExtension + ')':''}`}
@@ -73,7 +95,9 @@ FileUploader.propTypes = {
     categories : PropTypes.arrayOf(categoryType),
     title : PropTypes.string,
     subtitle: PropTypes.string,
-    onUploadFile: PropTypes.func
+    onUploadFile: PropTypes.func,
+    onFetchFiles: PropTypes.func,
+    onDownloadFile : PropTypes.func
 };
 
 export default FileUploader;

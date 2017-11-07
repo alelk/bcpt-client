@@ -36,5 +36,22 @@ const fetchUploadedFilesWithApi = (category) => ({
 });
 
 export const fetchUploadedFiles = (category) => (dispatch) => {
+    return dispatch(fetchUploadedFilesWithApi(category));
+};
 
+export const ACTION_DOWNLOAD_FILE_REQUEST = 'ACTION_DOWNLOAD_FILE_REQUEST';
+export const ACTION_DOWNLOAD_FILE_SUCCESS = 'ACTION_DOWNLOAD_FILE_SUCCESS';
+export const ACTION_DOWNLOAD_FILE_FAILURE = 'ACTION_DOWNLOAD_FILE_FAILURE';
+
+const downloadFileWithApi = (category, fileName) => ({
+    [CALL_BCPT_UPLOADER_API] : {
+        types : [ACTION_DOWNLOAD_FILE_REQUEST, ACTION_DOWNLOAD_FILE_SUCCESS, ACTION_DOWNLOAD_FILE_FAILURE],
+        method : 'downloadFile',
+        category,
+        fileName
+    }
+});
+
+export const downloadFile = (category, fileName) => (dispatch) => {
+    return dispatch(downloadFileWithApi(category, fileName));
 };
