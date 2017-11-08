@@ -18,8 +18,8 @@ const DateTimeCell = ({value, column, original, row}) => {
             {
                 original.isEditing && column.isEditable
                     ? <DateTimeInput inputType={column.inputType} value={value}
-                             onChange={(value) => onCellChange(value, column, row)}/>
-                    : <DateTimeLabel value={value} inputType={column.inputType}/>
+                                     onChange={(value) => onCellChange(value, column, row)}/>
+                    : <DateTimeLabel value={value} type={column.inputType}/>
             }
         </div>
     )

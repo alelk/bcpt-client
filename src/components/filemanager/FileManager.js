@@ -51,13 +51,15 @@ class FileUploader extends React.Component {
 
     renderCategory(category) {
         const {name, displayName, fileType, fileExtension, isFetching, files} = category;
-        const {onDownloadFile} = this.props;
+        const {onDownloadFile, onRemoveFile, onClickFile} = this.props;
         const label = `Загрузить файл${displayName ? ' ' + displayName : ""}`;
         return (
             <Tab key={name} label={displayName} value={name}>
                 <FilesTable data={files}
                             isFetching={isFetching}
-                            onDownload={onDownloadFile && (fileName => onDownloadFile(name, fileName))}/>
+                            onDownload={onDownloadFile && (fileName => onDownloadFile(name, fileName))}
+                            onFileSelect={onClickFile && (fileName => onClickFile(name, fileName))}
+                            onRemove={onRemoveFile && (fileName => onRemoveFile(name, fileName))}/>
                 <FileOpenDialog onSubmit={file => this.onUploadFile(file, category)}
                                 buttonLabel={label}
                                 title={`${label}${fileExtension ? ' (.' + fileExtension + ')':''}`}
@@ -95,9 +97,11 @@ FileUploader.propTypes = {
     categories : PropTypes.arrayOf(categoryType),
     title : PropTypes.string,
     subtitle: PropTypes.string,
+    onClickFile : PropTypes.func,
     onUploadFile: PropTypes.func,
     onFetchFiles: PropTypes.func,
-    onDownloadFile : PropTypes.func
+    onDownloadFile : PropTypes.func,
+    onRemoveFile : PropTypes.func
 };
 
 export default FileUploader;

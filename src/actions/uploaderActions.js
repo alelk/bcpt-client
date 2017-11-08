@@ -55,3 +55,20 @@ const downloadFileWithApi = (category, fileName) => ({
 export const downloadFile = (category, fileName) => (dispatch) => {
     return dispatch(downloadFileWithApi(category, fileName));
 };
+
+export const ACTION_REMOVE_FILE_REQUEST = 'ACTION_REMOVE_FILE_REQUEST';
+export const ACTION_REMOVE_FILE_SUCCESS = 'ACTION_REMOVE_FILE_SUCCESS';
+export const ACTION_REMOVE_FILE_FAILURE = 'ACTION_REMOVE_FILE_FAILURE';
+
+const removeFileWithApi = (category, fileName) => ({
+    [CALL_BCPT_UPLOADER_API] : {
+        types : [ACTION_REMOVE_FILE_REQUEST, ACTION_REMOVE_FILE_SUCCESS, ACTION_REMOVE_FILE_FAILURE],
+        method : 'removeFile',
+        category,
+        fileName
+    }
+});
+
+export const removeFile = (category, fileName) => (dispatch) => {
+    return dispatch(removeFileWithApi(category, fileName));
+};

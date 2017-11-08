@@ -1,0 +1,17 @@
+.FilesTable .actionBtn:hover {
+    color: #ff00f0 !important;
+}
+
+.FilesTable .clickableRow {
+    cursor: pointer;
+}
+
+.FilesTable .clickableRow:hover {
+    box-shadow: 0 0 4px #555 inset;
+    background-color: #e5eaff;
+}
+
+.FilesTable .clickableRow:active {
+    box-shadow: 0 0 8px #333 inset;
+    background-color: #ffb3b5;
+}

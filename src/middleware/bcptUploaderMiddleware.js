@@ -4,7 +4,7 @@
  * Created by Alex Elkin on 02.11.2017.
  */
 
-import {uploadFile, fetchUploadedFileList, downloadFile} from '../api/bcptUploaderApi'
+import {uploadFile, fetchUploadedFileList, downloadFile, deleteFile} from '../api/bcptUploaderApi'
 import {validateCallApiTypes, validateIsString} from './util'
 
 export const CALL_BCPT_UPLOADER_API = 'CALL_BCPT_UPLOADER_API';
@@ -30,18 +30,23 @@ export default store => nextProcedure => action => {
 
     if (/uploadFile/.test(method)) {
         uploadFile(file, category).then(
-            response => nextProcedure(actionWith({type: successType, category, response})),
-            error => nextProcedure(actionWith({type: failureType, category, error: "Unable to upload file " + file + " to '" + category + "': " + error}))
+            response => nextProcedure(actionWith({type: successType, response})),
+            error => nextProcedure(actionWith({type: failureType, error: "Unable to upload file " + file + " to '" + category + "': " + error}))
         )
     } else if (/fetchUploadedFiles/.test(method)) {
         fetchUploadedFileList(category).then(
-            response => nextProcedure(actionWith({type: successType, category, response})),
-            error => nextProcedure(actionWith({type: failureType, category, error: "Unable to fetch uploaded files from '" + category + "': " + error}))
+            response => nextProcedure(actionWith({type: successType, response})),
+            error => nextProcedure(actionWith({type: failureType, error: "Unable to fetch uploaded files from '" + category + "': " + error}))
         )
     } else if (/downloadFile/.test(method)) {
         downloadFile(category, fileName);
         nextProcedure(actionWith({type: successType, category}))
+    } else if (/removeFile/.test(method)) {
+        deleteFile(category, fileName).then(
+            response => nextProcedure(actionWith({type: successType, response})),
+            error => nextProcedure(actionWith({type: failureType, error: "Unable to remove file " + fileName + " from '" + category + "': " + error}))
+        );
     } else {
-        nextProcedure(actionWith({type: failureType, category, error: "Unexpected method: " + method}))
+        nextProcedure(actionWith({type: failureType, error: "Unexpected method: " + method}))
     }
 }
