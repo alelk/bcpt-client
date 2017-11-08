@@ -9,7 +9,6 @@ import {fetchBcptApi, getObject} from './fetchFunctions'
 
 import { schema } from 'normalizr'
 import urlencode from 'urlencode'
-import download from 'downloadjs'
 
 const uploadedFileSchema = new schema.Entity('files', {}, {
     idAttribute : value => urlencode.decode(value.fileName),
@@ -32,4 +31,8 @@ export const fetchUploadedFileList = (category) => {
 
 export const downloadFile = (category, fileName) => {
     window.open(BcptConfig.get("rest-api-uri") + "upload/download/" + category + "?fileName=" + urlencode(fileName), '_blank');
+};
+
+export const deleteFile = function (category, fileName) {
+    return fetch(BcptConfig.get("rest-api-uri") + "upload/" + category + "?fileName=" + urlencode(fileName), {method:"delete"})
 };

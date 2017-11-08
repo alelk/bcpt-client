@@ -16,7 +16,7 @@ const TextCell = ({value, column, original, row}) => {
         <div key={original.localId} className={`Cell${(original.isDeleted && ' deleted') || ''}`}>
             {
                 original.isEditing && column.isEditable
-                    ? <Input inputType={column.inputType} value={value}
+                    ? <Input inputType={column.type} value={value}
                              onChange={(value) => onCellChange(value, column, row)}
                              error={error}/>
                     : <label>{value}</label>
@@ -37,7 +37,7 @@ TextCell.propTypes = {
     }),
     column : PropTypes.shape({
         id : PropTypes.string,
-        inputType : PropTypes.oneOf(["text", "number"]),
+        type : PropTypes.oneOf(["text", "number"]),
         isEditable : PropTypes.bool,
         onChange : PropTypes.func
     }),

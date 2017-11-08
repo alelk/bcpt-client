@@ -36,7 +36,7 @@ DropDownCell.propTypes = {
         isDeleted: PropTypes.bool
     }),
     column : PropTypes.shape({
-        inputType : PropTypes.oneOf(["text", "number"]),
+        type : PropTypes.oneOf(["text", "number"]),
         isEditable : PropTypes.bool,
         onChange : PropTypes.func,
         allowedValues : PropTypes.arrayOf(PropTypes.shape({

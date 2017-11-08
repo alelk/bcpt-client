@@ -24,7 +24,7 @@ class DateTimeEditable extends Editable {
 
     render() {
         const {inputType, onValueClick, isEditMode, error, value} = this.props;
-        this.pattern = /datetime*/.test(this.props.inputType) ? 'YYYY-MM-DD HH:mm' : /time*/.test(this.props.inputType) ? 'HH:mm' : 'YYYY-MM-DD';
+        this.pattern = /datetime*/.test(this.props.type) ? 'YYYY-MM-DD HH:mm' : /time*/.test(this.props.type) ? 'HH:mm' : 'YYYY-MM-DD';
         if (!isEditMode)
             return (
                 <label className={this.className + ' DateTimeEditable'} onClick={onValueClick}>

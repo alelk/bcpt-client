@@ -10,7 +10,8 @@ import {
     ACTION_UPLOAD_FILE_FAILURE,
     ACTION_FETCH_UPLOADED_FILES_REQUEST,
     ACTION_FETCH_UPLOADED_FILES_SUCCESS,
-    ACTION_FETCH_UPLOADED_FILES_FAILURE
+    ACTION_FETCH_UPLOADED_FILES_FAILURE,
+    ACTION_REMOVE_FILE_SUCCESS
 } from '../actions/uploaderActions'
 import {objectWith} from './util'
 
@@ -21,7 +22,7 @@ const categoryWith = (state, category, changes) => {
 
 export const uploads = (state={
     dbf: {displayName: "DBF", fileType:"text/plain", fileExtension:"txt"},
-    ant: {displayName: "ANT", fileType:"text/plain", fileExtension:"ant"},
+    ant: {displayName: "ANT", fileExtension:"ant"},
 }, action) => {
     const {type, category} = action;
     if (ACTION_FETCH_UPLOADED_FILES_REQUEST === type)
@@ -59,5 +60,10 @@ export const uploadedFiles = (state = {}, action) => {
         return uploadedFileWith(state, category, fileName, {isFetching:false, isFetched:false, error});
     else if (ACTION_FETCH_UPLOADED_FILES_SUCCESS === type)
         return categoryWith(state, category, filesFromResponse(response));
+    else if (ACTION_REMOVE_FILE_SUCCESS === type) {
+        const files = objectWith(state[category]);
+        delete files[action.fileName];
+        return objectWith(state, {[category] : files});
+    }
     return state;
 };

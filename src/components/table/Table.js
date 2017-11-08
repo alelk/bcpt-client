@@ -18,7 +18,7 @@ export const Cell = (cellInfo, onChange, keyName, onClick) => (
     <EditableLabel key={cellInfo.original[keyName]} value={cellInfo.value}
                    valueSet={cellInfo.column.allowedValues}
                    valueSplitRegex={cellInfo.column.valueSplitRegex}
-                   inputType={cellInfo.column.inputType}
+                   inputType={cellInfo.column.type}
                    isEditable={cellInfo.column.isEditable}
                    isEditMode={cellInfo.original.isEditing}
                    onClick={onClick && (() => onClick(cellInfo.value, cellInfo.original[keyName]))}

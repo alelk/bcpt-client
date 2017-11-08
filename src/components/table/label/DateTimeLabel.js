@@ -8,8 +8,8 @@ import PropTypes from 'prop-types';
 import moment from 'moment'
 import 'moment/locale/ru';
 
-const DateTimeLabel = ({inputType, className, value, onValueClick, error}) => {
-    const pattern = /datetime*/.test(inputType) ? 'YYYY-MM-DD HH:mm' : /time*/.test(inputType) ? 'HH:mm' : 'YYYY-MM-DD';
+const DateTimeLabel = ({type, className, value, onValueClick, error}) => {
+    const pattern = /datetime*/.test(type) ? 'YYYY-MM-DD HH:mm' : /time*/.test(type) ? 'HH:mm' : 'YYYY-MM-DD';
     return (
         <label className={className} onClick={onValueClick} title={error}>
             {value && moment(value).format(pattern)}
@@ -18,7 +18,7 @@ const DateTimeLabel = ({inputType, className, value, onValueClick, error}) => {
 };
 DateTimeLabel.propTypes = {
     className : PropTypes.string,
-    inputType : PropTypes.oneOf(["datetime-local", "date", "time"]),
+    type : PropTypes.oneOf(["datetime-local", "date", "time"]),
     value : PropTypes.string,
     onValueClick : PropTypes.func,
     error: PropTypes.string
