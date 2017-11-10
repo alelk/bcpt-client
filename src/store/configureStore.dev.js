@@ -7,6 +7,7 @@
 import bcptRestApiMiddleware from '../middleware/bcptRestApiMiddleware'
 import bcptUploaderMiddleware from '../middleware/bcptUploaderMiddleware'
 import bcptImporterMiddleware from '../middleware/bcptImporterMiddleware'
+import bcptWebSocketMiddleware from '../middleware/bcptWebSocketMiddleware'
 import rootReducer from '../reducers/reducers'
 
 import { createStore, applyMiddleware, compose } from 'redux'
@@ -24,6 +25,7 @@ const configureStore = (history, preloadedState) => {
                 bcptRestApiMiddleware,
                 bcptUploaderMiddleware,
                 bcptImporterMiddleware,
+                bcptWebSocketMiddleware,
                 routerMiddleware(history),
                 createLogger()
             )
