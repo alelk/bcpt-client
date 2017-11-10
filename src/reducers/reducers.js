@@ -26,6 +26,8 @@ import {objectWith} from './util'
 
 import {uploads, uploadedFiles} from './uploaderReducers'
 
+import {imports} from './importerReducers'
+
 import {extractTableName, isSubtable} from '../util/util'
 
 import {urlQueryAsFilters} from '../components/table/Table'
@@ -267,6 +269,7 @@ const rootReducer = combineReducers({
     drawer,
     uploads,
     uploadedFiles,
+    imports,
     routing: routerReducer
 });
 
