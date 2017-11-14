@@ -5,21 +5,22 @@
  */
 
 import {connectStompClient} from '../actions/webSocketActions'
-import {createStompClient, subscribeImporterProcess} from '../api/bcptWebSocketApi'
+import {createStompClient, subscribeImporterProcesses} from '../api/bcptWebSocketApi'
 import {validateCallApiTypes, validateIsString} from './util'
+import {updateImporterProcesses} from '../actions/importerActions'
 
 export const CALL_BCPT_WEB_SOCKET = 'CALL_BCPT_WEB_SOCKET';
 
 let stompClient = null;
 
-const _importerSubscriptions = {};
+let importerProcessesSubscription = null;
 
 export default store => nextProcedure => action => {
 
     const callApi = action[CALL_BCPT_WEB_SOCKET];
     if (typeof callApi === 'undefined') return nextProcedure(action);
 
-    const {types, method, importerProcessId} = callApi;
+    const {types, method} = callApi;
     validateIsString(method, "Expected a method signature");
     validateCallApiTypes(types);
 
@@ -29,18 +30,15 @@ export default store => nextProcedure => action => {
         return newAction;
     };
 
-    const _subscribeImporterProcess = (importerProcessId) => {
-        if (_importerSubscriptions[importerProcessId]) return;
-        console.log("Subscribe importer process : " + importerProcessId);
-        _importerSubscriptions[importerProcessId] = subscribeImporterProcess(stompClient, importerProcessId, (message) => {
-            let processStatus = JSON.parse(message.body);
-            //todo add functionality
-            console.log("Process status ", processStatus)
+    const _subscribeImporterProcesses = () => {
+        if (importerProcessesSubscription) return;
+        importerProcessesSubscription = subscribeImporterProcesses(stompClient, (response) => {
+            store.dispatch(updateImporterProcesses(response));
         });
     };
 
     const [requestType, successType, failureType] = types;
-    nextProcedure(actionWith({type: requestType, importerProcessId}));
+    nextProcedure(actionWith({type: requestType}));
 
     if (/connect/.test(method)) {
         if (stompClient) {
@@ -50,11 +48,9 @@ export default store => nextProcedure => action => {
         stompClient = createStompClient();
         stompClient.connect({}, () => {
             stompClient.debug = null;
-            const {importerSubscriptions} = store.getState();
-            Object.keys(importerSubscriptions).forEach(key => {
-                if (importerSubscriptions[key].subscribers > 0)
-                    _subscribeImporterProcess(key)
-            });
+            const {stompClientSubscriptions} = store.getState();
+            if (stompClientSubscriptions.importer && stompClientSubscriptions.importer.subscribers > 0)
+                _subscribeImporterProcesses();
             nextProcedure(actionWith({type: successType}));
         }, (exc) => {
             nextProcedure(actionWith({type: failureType, error: "Unable to connect BCMS Stomp client: " + exc}))
@@ -63,20 +59,17 @@ export default store => nextProcedure => action => {
         if (!stompClient) {
             store.dispatch(connectStompClient());
             nextProcedure(actionWith({type: successType}));
-        } else if (/^subscribeImporterProcess/.test(method)) {
+        } else if (/^subscribeImporterProcesses/.test(method)) {
             nextProcedure(actionWith({type: successType}));
-            _subscribeImporterProcess(importerProcessId);
+            _subscribeImporterProcesses();
         }
-    } else if (/^unsubscribeImporterProcess/.test(method)) {
-        const {importerSubscriptions} = store.getState();
-        if (importerSubscriptions[importerProcessId]
-            && importerSubscriptions[importerProcessId].subscribers <= 0
-            && _importerSubscriptions[importerProcessId]) {
-            _importerSubscriptions[importerProcessId].unsubscribe();
+    } else if (/^unsubscribeImporterProcesses/.test(method)) {
+        if (importerProcessesSubscription) {
+            importerProcessesSubscription.unsubscribe();
             nextProcedure(actionWith({type: successType}));
         } else {
             nextProcedure(actionWith({type: failureType,
-                error: "Unable to unsubscribe  importer process '" + importerProcessId + "': No subscription found."
+                error: "Unable to unsubscribe  importer processes: No subscription found."
             }));
         }
     } else {

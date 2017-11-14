@@ -24,16 +24,37 @@ export const importFile = (fileName, category) => (dispatch) => {
     return dispatch(importFileWithApi(fileName, category));
 };
 
-export const ACTION_SUBSCRIBE_IMPORT_PROCESS_REQUEST = 'ACTION_SUBSCRIBE_IMPORT_PROCESS_REQUEST';
-export const ACTION_SUBSCRIBE_IMPORT_PROCESS_SUCCESS = 'ACTION_SUBSCRIBE_IMPORT_PROCESS_SUCCESS';
-export const ACTION_SUBSCRIBE_IMPORT_PROCESS_FAILURE = 'ACTION_SUBSCRIBE_IMPORT_PROCESS_FAILURE';
+export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST';
+export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_SUCCESS = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_SUCCESS';
+export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_FAILURE = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_FAILURE';
 
-const subscribeImporterProcessWithApi = (importerProcessId) => ({
+const subscribeImporterProcessesWithApi = () => ({
     [CALL_BCPT_WEB_SOCKET] : {
-        types : [ACTION_SUBSCRIBE_IMPORT_PROCESS_REQUEST, ACTION_SUBSCRIBE_IMPORT_PROCESS_SUCCESS, ACTION_SUBSCRIBE_IMPORT_PROCESS_FAILURE],
-        method : 'subscribeImporterProcess',
-        importerProcessId
+        types : [ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST, ACTION_SUBSCRIBE_IMPORT_PROCESSES_SUCCESS, ACTION_SUBSCRIBE_IMPORT_PROCESSES_FAILURE],
+        method : 'subscribeImporterProcesses'
     }
 });
 
-export const subscribeImporterProcess = importerProcessId => dispatch => dispatch(subscribeImporterProcessWithApi(importerProcessId));
+export const subscribeImporterProcesses = () => dispatch => dispatch(subscribeImporterProcessesWithApi());
+
+export const ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_REQUEST = 'ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_REQUEST';
+export const ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_SUCCESS = 'ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_SUCCESS';
+export const ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_FAILURE = 'ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_FAILURE';
+
+const unsubscribeImporterProcessesWithApi = () => ({
+    [CALL_BCPT_WEB_SOCKET] : {
+        types : [ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_REQUEST, ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_SUCCESS, ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_FAILURE],
+        method : 'subscribeImporterProcesses'
+    }
+});
+
+export const unsubscribeImporterProcesses = () => dispatch => dispatch(unsubscribeImporterProcessesWithApi());
+
+export const ACTION_IMPORTER_PROCESSES_UPDATE = "ACTION_IMPORTER_PROCESSES_UPDATE";
+
+export const updateImporterProcesses = (response) => {
+    return {
+        type : ACTION_IMPORTER_PROCESSES_UPDATE,
+        response
+    }
+};
