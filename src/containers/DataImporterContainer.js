@@ -5,7 +5,7 @@
  */
 import {changeDrawerState} from '../actions/actions'
 import {uploadFile, fetchUploadedFiles, downloadFile, removeFile} from '../actions/uploaderActions'
-import {importFile} from '../actions/importerActions'
+import {importFile, subscribeImporterProcesses, unsubscribeImporterProcesses} from '../actions/importerActions'
 import DataImporter from '../components/importer/DataImporter'
 
 import React from 'react'
@@ -20,21 +20,33 @@ const buildCategories = (uploads, uploadedFiles) => {
     });
 };
 
-const DataImporterContainer = ({
-    isDrawerOpened, changeDrawerState, uploadFile, uploads, uploadedFiles, fetchUploadedFiles, downloadFile,
-    removeFile, importFile
-}) => {
-    return (
-        <DataImporter onDrawerChangeDrawerVisibilityRequest={() => changeDrawerState({isDrawerOpened: !isDrawerOpened})}
-                      onUploadFile={(file, category) => uploadFile(file, category.name)}
-                      onDownloadFile={downloadFile}
-                      onRemoveFile={removeFile}
-                      categories={buildCategories(uploads, uploadedFiles)}
-                      onFetchUploadedFiles={fetchUploadedFiles}
-                      onImportFile={importFile}
-        />
-    )
-};
+class DataImporterContainer extends React.Component {
+
+    componentDidMount() {
+        this.props.subscribeImporterProcesses();
+    }
+
+    componentWillUnmount() {
+        this.props.unsubscribeImporterProcesses();
+    }
+
+    render() {
+        const {
+            isDrawerOpened, changeDrawerState, uploadFile, uploads, uploadedFiles, fetchUploadedFiles, downloadFile,
+            removeFile, importFile
+        } = this.props;
+        return (
+            <DataImporter onDrawerChangeDrawerVisibilityRequest={() => changeDrawerState({isDrawerOpened: !isDrawerOpened})}
+                          onUploadFile={(file, category) => uploadFile(file, category.name)}
+                          onDownloadFile={downloadFile}
+                          onRemoveFile={removeFile}
+                          categories={buildCategories(uploads, uploadedFiles)}
+                          onFetchUploadedFiles={fetchUploadedFiles}
+                          onImportFile={importFile}
+            />
+        )
+    }
+}
 DataImporterContainer.propTypes = {
     isDrawerOpened : PropTypes.bool,
     changeDrawerState : PropTypes.func,
@@ -45,6 +57,8 @@ DataImporterContainer.propTypes = {
     downloadFile : PropTypes.func,
     importFile : PropTypes.func,
     removeFile : PropTypes.func,
+    subscribeImporterProcesses : PropTypes.func,
+    unsubscribeImporterProcesses : PropTypes.func,
 };
 const mapStateToProps = (state, ownProps) => ({
     isDrawerOpened: state.drawer.isDrawerOpened,
@@ -53,5 +67,14 @@ const mapStateToProps = (state, ownProps) => ({
 });
 export default connect(
     mapStateToProps,
-    {changeDrawerState, uploadFile, fetchUploadedFiles, downloadFile, removeFile, importFile}
+    {
+        changeDrawerState,
+        uploadFile,
+        fetchUploadedFiles,
+        downloadFile,
+        removeFile,
+        importFile,
+        subscribeImporterProcesses,
+        unsubscribeImporterProcesses
+    }
 )(DataImporterContainer);

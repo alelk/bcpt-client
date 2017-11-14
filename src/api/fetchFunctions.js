@@ -52,7 +52,7 @@ export const fetchBcptApi = function (uri, requestBody, schema) {
     return fetch(uri, requestBody).then(response =>
         response.json().then(json => {
             if (!response.ok) return Promise.reject(json);
-            return schema !== undefined ? normalize(json, schema) : json;
+            return schema ? normalize(json, schema) : json;
         })
     );
 };

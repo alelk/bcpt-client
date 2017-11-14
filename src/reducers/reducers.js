@@ -28,7 +28,7 @@ import {uploads, uploadedFiles} from './uploaderReducers'
 
 import {imports} from './importerReducers'
 
-import {stompClient, importerSubscriptions} from './webSocketReducers'
+import {stompClient, stompClientSubscriptions} from './webSocketReducers'
 
 import {extractTableName, isSubtable} from '../util/util'
 
@@ -273,7 +273,7 @@ const rootReducer = combineReducers({
     uploadedFiles,
     imports,
     stompClient,
-    importerSubscriptions,
+    stompClientSubscriptions,
     routing: routerReducer
 });
 
