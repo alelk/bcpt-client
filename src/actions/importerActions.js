@@ -24,6 +24,19 @@ export const importFile = (fileName, category) => (dispatch) => {
     return dispatch(importFileWithApi(fileName, category));
 };
 
+export const ACTION_FETCH_IMPORT_RESULTS_REQUEST = 'ACTION_FETCH_IMPORT_RESULTS_REQUEST';
+export const ACTION_FETCH_IMPORT_RESULTS_SUCCESS = 'ACTION_FETCH_IMPORT_RESULTS_SUCCESS';
+export const ACTION_FETCH_IMPORT_RESULTS_FAILURE = 'ACTION_FETCH_IMPORT_RESULTS_FAILURE';
+
+const fetchImportResultsWithApi = () => ({
+    [CALL_BCPT_IMPORTER_API] : {
+        types : [ACTION_FETCH_IMPORT_RESULTS_REQUEST, ACTION_FETCH_IMPORT_RESULTS_SUCCESS, ACTION_FETCH_IMPORT_RESULTS_FAILURE],
+        method : 'fetchImportResults'
+    }
+});
+
+export const fetchImportResults = () => (dispatch) => dispatch(fetchImportResultsWithApi());
+
 export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST';
 export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_SUCCESS = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_SUCCESS';
 export const ACTION_SUBSCRIBE_IMPORT_PROCESSES_FAILURE = 'ACTION_SUBSCRIBE_IMPORT_PROCESSES_FAILURE';

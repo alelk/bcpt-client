@@ -6,7 +6,8 @@
 
 import {
     ACTION_IMPORT_FILE_DATA_SUCCESS,
-    ACTION_IMPORTER_PROCESSES_UPDATE
+    ACTION_IMPORTER_PROCESSES_UPDATE,
+    ACTION_FETCH_IMPORT_RESULTS_SUCCESS
 } from '../actions/importerActions'
 
 import {objectWith} from './util'
@@ -15,9 +16,9 @@ const importsFromResponse = (response) => response && response.entities && respo
 
 export const imports = (state = {}, action) => {
     const {type, response} = action;
-    if (ACTION_IMPORT_FILE_DATA_SUCCESS === type)
-        return objectWith(state, importsFromResponse(response));
-    if (ACTION_IMPORTER_PROCESSES_UPDATE === type)
+    if (ACTION_IMPORT_FILE_DATA_SUCCESS === type
+        || ACTION_IMPORTER_PROCESSES_UPDATE === type
+        || ACTION_FETCH_IMPORT_RESULTS_SUCCESS === type)
         return objectWith(state, importsFromResponse(response));
     return state;
 };
