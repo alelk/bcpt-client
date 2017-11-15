@@ -6,6 +6,8 @@
 
 import FileUploader, {categoryType} from '../filemanager/FileManager'
 import ImportConfirmDialog from '../dialog/YesNoDialog'
+import ImportResults, {importResultType} from './ImportResults'
+import './DataImporter.css'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -24,18 +26,22 @@ class DataImporter extends React.Component {
     }
 
     onSelectFileToImport(category, fileName) {
-        this.setState({isImportConfirmDialogOpened:true, importingFileName:fileName, importingFileCategory:category});
+        this.setState({
+            isImportConfirmDialogOpened: true,
+            importingFileName: fileName,
+            importingFileCategory: category
+        });
     }
 
     onResultImportConfirmation(result) {
         const {onImportFile} = this.props;
         onImportFile && result && onImportFile(this.state.importingFileName, this.state.importingFileCategory);
-        this.setState({isImportConfirmDialogOpened:false});
+        this.setState({isImportConfirmDialogOpened: false});
     }
 
     render() {
         const {
-            onDrawerChangeDrawerVisibilityRequest, categories,
+            onDrawerChangeDrawerVisibilityRequest, categories, imports,
             onUploadFile, onFetchUploadedFiles, onDownloadFile, onRemoveFile
         } = this.props;
         const {isImportConfirmDialogOpened, importingFileName, importingFileCategory} = this.state;
@@ -43,21 +49,26 @@ class DataImporter extends React.Component {
                 .find(c => c.name === importingFileCategory)['displayName'];
         return (
             <div className="DataImporter">
-                <AppBar onLeftIconButtonTouchTap={onDrawerChangeDrawerVisibilityRequest} title="Импорт данных"/>
+                <AppBar className="AppBar" onLeftIconButtonTouchTap={onDrawerChangeDrawerVisibilityRequest}
+                        title="Импорт данных"/>
 
-                <FileUploader title="Файлы для импорта"
-                              subtitle="Выберите файл или загрузите новый"
-                              categories={categories}
-                              onUploadFile={onUploadFile}
-                              onDownloadFile={onDownloadFile}
-                              onClickFile={this.onSelectFileToImport}
-                              onRemoveFile={onRemoveFile}
-                              onFetchFiles={onFetchUploadedFiles}/>
+                <div className="content">
+                    <FileUploader title="Файлы для импорта"
+                                  subtitle="Выберите файл или загрузите новый"
+                                  categories={categories}
+                                  onUploadFile={onUploadFile}
+                                  onDownloadFile={onDownloadFile}
+                                  onClickFile={this.onSelectFileToImport}
+                                  onRemoveFile={onRemoveFile}
+                                  onFetchFiles={onFetchUploadedFiles}/>
 
+                    <ImportResults title="Результаты импорта" imports={imports}/>
+                </div>
                 <ImportConfirmDialog open={isImportConfirmDialogOpened}
                                      title={`Подтверждение импорта данных ${importingFileCategoryDisplayName} файла`}
                                      onSelect={this.onResultImportConfirmation}>
-                    Импортировать данные файла '{importingFileName}' в базу данных 'BCPT'? Операция необратима и не может быть остановлена.
+                    Импортировать данные файла '{importingFileName}' в базу данных 'BCPT'? Операция необратима и не
+                    может быть остановлена.
                 </ImportConfirmDialog>
             </div>
         )
@@ -66,6 +77,7 @@ class DataImporter extends React.Component {
 DataImporter.propTypes = {
     onDrawerChangeDrawerVisibilityRequest : PropTypes.func,
     categories : PropTypes.arrayOf(categoryType),
+    imports : PropTypes.arrayOf(importResultType),
     onUploadFile : PropTypes.func,
     onDownloadFile : PropTypes.func,
     onRemoveFile : PropTypes.func,

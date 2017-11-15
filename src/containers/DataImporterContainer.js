@@ -5,7 +5,9 @@
  */
 import {changeDrawerState} from '../actions/actions'
 import {uploadFile, fetchUploadedFiles, downloadFile, removeFile} from '../actions/uploaderActions'
-import {importFile, subscribeImporterProcesses, unsubscribeImporterProcesses} from '../actions/importerActions'
+import {
+    importFile, subscribeImporterProcesses, unsubscribeImporterProcesses, fetchImportResults
+} from '../actions/importerActions'
 import DataImporter from '../components/importer/DataImporter'
 
 import React from 'react'
@@ -20,9 +22,12 @@ const buildCategories = (uploads, uploadedFiles) => {
     });
 };
 
+const mapImports = (imports) => Object.keys(imports).map(key => imports[key]);
+
 class DataImporterContainer extends React.Component {
 
     componentDidMount() {
+        this.props.fetchImportResults();
         this.props.subscribeImporterProcesses();
     }
 
@@ -32,7 +37,8 @@ class DataImporterContainer extends React.Component {
 
     render() {
         const {
-            isDrawerOpened, changeDrawerState, uploadFile, uploads, uploadedFiles, fetchUploadedFiles, downloadFile,
+            isDrawerOpened, changeDrawerState, uploadFile, uploads, imports,
+            uploadedFiles, fetchUploadedFiles, downloadFile,
             removeFile, importFile
         } = this.props;
         return (
@@ -41,6 +47,7 @@ class DataImporterContainer extends React.Component {
                           onDownloadFile={downloadFile}
                           onRemoveFile={removeFile}
                           categories={buildCategories(uploads, uploadedFiles)}
+                          imports={mapImports(imports)}
                           onFetchUploadedFiles={fetchUploadedFiles}
                           onImportFile={importFile}
             />
@@ -51,6 +58,7 @@ DataImporterContainer.propTypes = {
     isDrawerOpened : PropTypes.bool,
     changeDrawerState : PropTypes.func,
     uploads : PropTypes.object,
+    imports : PropTypes.object,
     uploadedFiles: PropTypes.object,
     fetchUploadedFiles : PropTypes.func,
     uploadFile : PropTypes.func,
@@ -59,10 +67,12 @@ DataImporterContainer.propTypes = {
     removeFile : PropTypes.func,
     subscribeImporterProcesses : PropTypes.func,
     unsubscribeImporterProcesses : PropTypes.func,
+    fetchImportResults : PropTypes.func,
 };
 const mapStateToProps = (state, ownProps) => ({
     isDrawerOpened: state.drawer.isDrawerOpened,
     uploads: state.uploads,
+    imports : state.imports,
     uploadedFiles: state.uploadedFiles
 });
 export default connect(
@@ -75,6 +85,7 @@ export default connect(
         removeFile,
         importFile,
         subscribeImporterProcesses,
-        unsubscribeImporterProcesses
+        unsubscribeImporterProcesses,
+        fetchImportResults
     }
 )(DataImporterContainer);

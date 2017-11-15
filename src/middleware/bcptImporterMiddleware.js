@@ -5,8 +5,7 @@
  */
 
 import {validateCallApiTypes, validateIsString} from './util'
-import {importFile} from '../api/bcptImporterApi'
-import {subscribeImporterProcesses} from '../actions/importerActions'
+import {importFile, fetchImportResults} from '../api/bcptImporterApi'
 
 export const CALL_BCPT_IMPORTER_API = 'CALL_BCPT_IMPORTER_API';
 
@@ -25,12 +24,6 @@ export default store => nextProcedure => action => {
         return Object.assign({}, callApi, data);
     };
 
-    const _subscribeImporterProcesses = (response) => {
-        if (!response || !response.entities || !response.entities.imports) return;
-        const imports = response.entities.imports;
-        Object.keys(imports).forEach(importerProcessId => store.dispatch(subscribeImporterProcesses(importerProcessId)));
-    };
-
     const [requestType, successType, failureType] = types;
     nextProcedure(actionWith({type: requestType}));
 
@@ -41,6 +34,15 @@ export default store => nextProcedure => action => {
             }, error => nextProcedure(actionWith({
                 type: failureType,
                 error: "Unable to import file '" + fileName + "' category '" + category + "': " + error
+            }))
+        )
+    } else if (/fetchImportResults/.test(method)) {
+        fetchImportResults().then(
+            response => {
+                nextProcedure(actionWith({type: successType, response}));
+            }, error => nextProcedure(actionWith({
+                type: failureType,
+                error: "Unable to fetch import results: " + error
             }))
         )
     } else {
