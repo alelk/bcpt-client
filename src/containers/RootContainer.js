@@ -10,6 +10,7 @@ import BloodPoolsContainer from './table/BloodPoolsContainer'
 import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
 import DataImporterContainer from './DataImporterContainer'
+import HomePageContainer from './HomePageContainer'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -21,8 +22,19 @@ import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
 import Divider from 'material-ui/Divider';
 
+const tableLinks = [
+    {link:"/table/persons", title:"Доноры", iconName:"person"},
+    {link:"/table/bloodDonations", title:"Пакеты с плазмой", iconName:"invert_colors"},
+    {link:"/table/bloodInvoices", title:"Накладные", iconName:"format_list_bulleted"},
+    {link:"/table/bloodPools", title:"Пулы", iconName:"poll"},
+    {link:"/table/productBatches", title:"Загрузки", iconName:"call_merge"},
+];
+const toolLinks = [
+    {link:"/import", title:"Импорт данных", iconName:"file_upload"}
+];
+
 const renderMenuItem = (link, label, iconName) => (
-    <MenuItem>
+    <MenuItem key={link}>
         <Link to={link}>
             <FlatButton label={label} secondary style={{width: "100%", textAlign:"left", color: "#7e22c1"}}
                         icon={<FontIcon className="material-icons">{iconName}</FontIcon>}
@@ -36,15 +48,14 @@ const Root = ({store, history}) => (
         <ConnectedRouter history={history}>
             <div>
                 <DrawerContainer>
-                    {renderMenuItem("/table/persons", "Доноры", "person")}
-                    {renderMenuItem("/table/bloodDonations", "Пакеты с плазмой", "invert_colors")}
-                    {renderMenuItem("/table/bloodInvoices", "Накладные", "format_list_bulleted")}
-                    {renderMenuItem("/table/bloodPools", "Пулы", "poll")}
-                    {renderMenuItem("/table/productBatches", "Загрузки", "call_merge")}
+                    {renderMenuItem("/", "Главная", "home")}
                     <Divider />
-                    {renderMenuItem("/import", "Импорт данных", "file_upload")}
+                    {tableLinks.map(link => renderMenuItem(link.link, link.title, link.iconName))}
+                    <Divider />
+                    {toolLinks.map(link => renderMenuItem(link.link, link.title, link.iconName))}
                 </DrawerContainer>
                 <div>
+                    <Route exact path='/' render={() => <HomePageContainer tableLinks={tableLinks} toolLinks={toolLinks}/>}/>
                     <Route path='*/table/persons' component={PersonsContainer}/>
                     <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>

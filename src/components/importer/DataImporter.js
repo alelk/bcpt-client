@@ -4,6 +4,7 @@
  * Created by Alex Elkin on 01.11.2017.
  */
 
+import AppPage from '../AppPage'
 import FileUploader, {categoryType} from '../filemanager/FileManager'
 import ImportConfirmDialog from '../dialog/YesNoDialog'
 import ImportResults, {importResultType} from './ImportResults'
@@ -48,29 +49,26 @@ class DataImporter extends React.Component {
         const importingFileCategoryDisplayName = categories && importingFileCategory && categories
                 .find(c => c.name === importingFileCategory)['displayName'];
         return (
-            <div className="DataImporter">
-                <AppBar className="AppBar" onLeftIconButtonTouchTap={onDrawerChangeDrawerVisibilityRequest}
-                        title="Импорт данных"/>
+            <AppPage className="DataImporter"
+                     onDrawerChangeDrawerVisibilityRequest={onDrawerChangeDrawerVisibilityRequest}
+                     title="Импорт данных">
+                <FileUploader title="Файлы для импорта"
+                              subtitle="Выберите файл или загрузите новый"
+                              categories={categories}
+                              onUploadFile={onUploadFile}
+                              onDownloadFile={onDownloadFile}
+                              onClickFile={this.onSelectFileToImport}
+                              onRemoveFile={onRemoveFile}
+                              onFetchFiles={onFetchUploadedFiles}/>
 
-                <div className="content">
-                    <FileUploader title="Файлы для импорта"
-                                  subtitle="Выберите файл или загрузите новый"
-                                  categories={categories}
-                                  onUploadFile={onUploadFile}
-                                  onDownloadFile={onDownloadFile}
-                                  onClickFile={this.onSelectFileToImport}
-                                  onRemoveFile={onRemoveFile}
-                                  onFetchFiles={onFetchUploadedFiles}/>
-
-                    <ImportResults title="Результаты импорта" imports={imports}/>
-                </div>
+                <ImportResults title="Результаты импорта" imports={imports}/>
                 <ImportConfirmDialog open={isImportConfirmDialogOpened}
                                      title={`Подтверждение импорта данных ${importingFileCategoryDisplayName} файла`}
                                      onSelect={this.onResultImportConfirmation}>
                     Импортировать данные файла '{importingFileName}' в базу данных 'BCPT'? Операция необратима и не
                     может быть остановлена.
                 </ImportConfirmDialog>
-            </div>
+            </AppPage>
         )
     }
 }
