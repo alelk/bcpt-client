@@ -9,7 +9,7 @@ import FilesTable, {fileType} from './FilesTable'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardTitle, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
 class FileUploader extends React.Component {

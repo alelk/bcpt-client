@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom'
 import FontIcon from 'material-ui/FontIcon';
 import Avatar from 'material-ui/Avatar';
 import {GridList, GridTile} from 'material-ui/GridList';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardTitle, CardText} from 'material-ui/Card';
 
 const HomePageContainer = ({changeDrawerState, isDrawerOpened, tableLinks, toolLinks}) => (
     <AppPage className="HomePage"

@@ -15,7 +15,7 @@ import FontIcon from 'material-ui/FontIcon';
 import List from 'material-ui/List/List';
 import ListItem from 'material-ui/List/ListItem';
 import Chip from 'material-ui/Chip';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardTitle, CardText} from 'material-ui/Card';
 
 const renderListItem = (iconName, countItems, label) => (
     <ListItem>
@@ -44,7 +44,7 @@ const renderImortErrors = (errors) => (
     </List>
 );
 
-const YesNoDialog = ({title, open, onRequestClose, importResult}) => (
+const ImportDetailedResultDialog = ({title, open, onRequestClose, importResult}) => (
     <Dialog
         className="ImportDetailedResultDialog"
         title={title}
@@ -68,7 +68,7 @@ const YesNoDialog = ({title, open, onRequestClose, importResult}) => (
                 {`Временная метка: ${new Date(importResult.importTimestamp).toLocaleDateString()} ${new Date(importResult.importTimestamp).toLocaleTimeString()}`}
             </CardText>
             <CardText>
-                {`Завершено: ${parseInt(importResult.progress || 0)}%`}
+                {`Завершено: ${parseInt(importResult.progress || 0, 10)}%`}
             </CardText>
             <CardText>
                 {importResult.operationName}
@@ -94,11 +94,11 @@ const YesNoDialog = ({title, open, onRequestClose, importResult}) => (
     </Dialog>
 );
 
-YesNoDialog.propTypes = {
+ImportDetailedResultDialog.propTypes = {
     open: PropTypes.bool,
     onRequestClose: PropTypes.func,
     title : PropTypes.string,
-    importResult : importResultType
+    importResult : PropTypes.shape(importResultType)
 };
 
-export default YesNoDialog;
+export default ImportDetailedResultDialog;

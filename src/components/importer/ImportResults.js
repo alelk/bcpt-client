@@ -13,7 +13,7 @@ import PropTypes from 'prop-types'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import FontIcon from 'material-ui/FontIcon';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardTitle, CardText} from 'material-ui/Card';
 import LinearProgress from 'material-ui/LinearProgress';
 
 const iconCellStyle = {
@@ -79,7 +79,7 @@ class ImportResults extends React.Component {
             }, {
                 Header: "Завершено",
                 id: "progress",
-                accessor: (row) => (<LinearProgress mode="determinate" value={row.progress ? parseInt(row.progress) : 0}/>),
+                accessor: (row) => (<LinearProgress mode="determinate" value={row.progress ? parseInt(row.progress, 10) : 0}/>),
                 minWidth: 200
             }, {
                 Header: "Временная метка",
