@@ -9,24 +9,38 @@ import {importResultType} from '../ImportResults'
 import React from 'react';
 import PropTypes from 'prop-types'
 import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
+import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
 import List from 'material-ui/List/List';
 import ListItem from 'material-ui/List/ListItem';
 import Chip from 'material-ui/Chip';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 
 const renderListItem = (iconName, countItems, label) => (
-    <ListItem leftAvatar={<Avatar icon={<FontIcon className="material-icons">{iconName}</FontIcon>}/>}>
-        <Chip><label>{countItems}</label> {label}</Chip>
+    <ListItem>
+        <Chip>
+            <Avatar icon={<FontIcon className="material-icons">{iconName}</FontIcon>}/>
+            <label>{countItems || 0}</label> {label}
+        </Chip>
     </ListItem>
 );
 
 const renderImportResult = (importResult) => (
     <List>
         {renderListItem("person", importResult.countPersons, "доноров импортировано")}
-        {renderListItem("person", importResult.countBloodDonations, "донаций импортировано")}
-        {renderListItem("person", importResult.countBloodInvoices, "накладных импортировано")}
+        {renderListItem("invert_colors", importResult.countBloodDonations, "донаций импортировано")}
+        {renderListItem("format_list_bulleted", importResult.countBloodInvoices, "накладных импортировано")}
+        {renderListItem("poll", importResult.countBloodPools, "пулов импортировано")}
+        {renderListItem("call_merge", importResult.countProductBatches, "загрузок импортировано")}
+    </List>
+);
+
+const renderImortErrors = (errors) => (
+    <List>
+        {errors.map((error, key) => (
+            <ListItem key={key}>{error}</ListItem>
+        ))}
     </List>
 );
 
@@ -45,8 +59,38 @@ const YesNoDialog = ({title, open, onRequestClose, importResult}) => (
         modal={false}
         open={open}
         onRequestClose={onRequestClose}
+        autoScrollBodyContent={true}
     >
-        {importResult && renderImportResult(importResult)}
+        { importResult &&
+        <Card>
+            <CardTitle title="Состояние процесса импорта" subtitle={`ID процесса: ${importResult.importProcessId}`}/>
+            <CardText>
+                {`Временная метка: ${new Date(importResult.importTimestamp).toLocaleDateString()} ${new Date(importResult.importTimestamp).toLocaleTimeString()}`}
+            </CardText>
+            <CardText>
+                {`Завершено: ${parseInt(importResult.progress || 0)}%`}
+            </CardText>
+            <CardText>
+                {importResult.operationName}
+            </CardText>
+        </Card>
+        }
+        { importResult &&
+        <Card>
+            <CardTitle title="Импортированные данные"/>
+            <CardText>
+                {renderImportResult(importResult)}
+            </CardText>
+        </Card>
+        }
+        { importResult && Array.isArray(importResult.errors) && importResult.errors.length > 0 &&
+        <Card>
+            <CardTitle title="Ошибки импорта данных"/>
+            <CardText>
+                {renderImortErrors(importResult.errors)}
+            </CardText>
+        </Card>
+        }
     </Dialog>
 );
 

@@ -129,13 +129,14 @@ class ImportResults extends React.Component {
                     open={this.state.isImportResultDialogOpened}
                     title={`Результаты импорта файла ${this.state.importResult.fileName}`}
                     onRequestClose={this.closeImportResultDialog}
-                    importResult={this.state.importResult}
+                    importResult={imports.find(importResult => importResult.importProcessId === this.state.importResult.importProcessId)}
                 />
             </Card>
         )
     }
 }
 export const importResultType = PropTypes.shape({
+    importProcessId: PropTypes.string,
     fileName : PropTypes.string,
     operationName : PropTypes.string,
     importTimestamp : PropTypes.string,
