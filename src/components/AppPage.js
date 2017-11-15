@@ -8,7 +8,6 @@ import './AppPage.css'
 import React from 'react'
 import PropTypes from 'prop-types'
 import AppBar from 'material-ui/AppBar';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 
 class AppPage extends React.Component {
 

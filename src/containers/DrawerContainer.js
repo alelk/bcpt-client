@@ -35,7 +35,7 @@ class DrawerContainer extends React.Component {
     }
 
     render() {
-        const {isDrawerOpened, children} = this.props;
+        const {isDrawerOpened} = this.props;
         return (
             <Drawer className="Drawer" open={isDrawerOpened} docked={false} onRequestChange={this.onRequestVisibilityChange}>
                 {this.renderChildren()}

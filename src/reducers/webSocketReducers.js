@@ -35,9 +35,9 @@ const subscriptionWith = (state, subscriptionType, changes) => {
 
 export const stompClientSubscriptions = (state = {}, action) => {
     const {type} = action;
-    if (type == ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST)
+    if (type === ACTION_SUBSCRIBE_IMPORT_PROCESSES_REQUEST)
         return subscriptionWith(state, "importer", {subscribers : (state.importer ? state.importer.subscribers + 1 : 1)});
-    if (type == ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_REQUEST)
+    if (type === ACTION_UNSUBSCRIBE_IMPORT_PROCESSES_REQUEST)
         return subscriptionWith(state, "importer", {
             subscribers : (state.importer && state.importer.subscribers > 0 ? state.importer.subscribers - 1 : 0)
         });
