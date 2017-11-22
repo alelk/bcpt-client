@@ -19,7 +19,7 @@ const TextCell = ({value, column, original, row}) => {
                     ? <Input inputType={column.type} value={value}
                              onChange={(value) => onCellChange(value, column, row)}
                              error={error}/>
-                    : <label>{value}</label>
+                    : <label title={value}>{value}</label>
             }
         </div>
     )

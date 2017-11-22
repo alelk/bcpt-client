@@ -33,7 +33,8 @@ class ProductBatchTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 100,
             }, {
                 Header: "Номер загрузки",
                 accessor: "batchNumber",
@@ -41,7 +42,8 @@ class ProductBatchTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 80,
             }, {
                 Header: "Номера пулов",
                 accessor: "bloodPools",
@@ -51,7 +53,8 @@ class ProductBatchTable extends Table {
                 sortable: false,
                 isEditable: true,
                 filterable: false,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 170
             }, {
                 Header: "Суммарный объем, мл.",
                 accessor: "totalAmount",
@@ -59,6 +62,7 @@ class ProductBatchTable extends Table {
                 Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 sortable: false,
                 filterable: false,
+                minWidth: 120,
                 maxWidth: 190
             }, {
                 Header: "Дата загрузки",
@@ -69,7 +73,43 @@ class ProductBatchTable extends Table {
                 onChange: this.onValueChange,
                 Cell: DateTimeCell,
                 minWidth: 90
-            },  {
+            }, {
+                Header: "Ответственный",
+                accessor: "batchAuthor",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                minWidth: 100
+            }, {
+                Header: "Место проведения",
+                accessor: "location",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                minWidth: 120
+            }, {
+                Header: "Наименование продукта",
+                accessor: "productName",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                minWidth: 150
+            },{
+                Header: "Поставщик",
+                accessor: "productProvider",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                minWidth: 100
+            }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",

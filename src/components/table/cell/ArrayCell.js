@@ -35,7 +35,7 @@ class ArrayChip extends React.Component {
     render() {
         const {column, value, error} = this.props;
         return (
-            <Chip onClick={this.onOpenDialog} backgroundColor={error && "#aa6056"}>
+            <Chip onClick={this.onOpenDialog} backgroundColor={error && "#aa6056"} title={value}>
                 {column.iconName && <Avatar icon={
                     <FontIcon className="material-icons">{column.iconName}</FontIcon>
                 } backgroundColor={error && "#aa6056"}/>}
