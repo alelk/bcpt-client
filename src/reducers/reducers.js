@@ -46,6 +46,7 @@ const tables = (state = {
     persons: {displayName:"Доноры"},
     bloodDonations: {displayName:"Пакеты с плазмой"},
     bloodInvoices: {displayName:"Накладные"},
+    bloodInvoiceSeries: {displayName:"Серии ПДФ"},
     bloodPools: {displayName:"Пулы"},
     productBatches: {displayName:"Загрузки"},
 }, action) => {

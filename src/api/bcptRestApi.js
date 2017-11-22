@@ -20,6 +20,9 @@ const bloodDonationPageSchema = new schema.Entity('pages', {items:bloodDonations
 const bloodInvoiceSchema = new schema.Entity('bloodInvoices', {}, { idAttribute : value => value.externalId });
 const bloodInvoicesSchema = new schema.Array(bloodInvoiceSchema);
 const bloodInvoicePageSchema = new schema.Entity('pages', {items:bloodInvoicesSchema}, { idAttribute : value => value.pageNumber });
+const bloodInvoiceSeriesSchema = new schema.Entity('bloodInvoiceSeries', {}, { idAttribute : value => value.externalId });
+const bloodInvoiceSeriesSetSchema = new schema.Array(bloodInvoiceSeriesSchema);
+const bloodInvoiceSeriesPageSchema = new schema.Entity('pages', {items:bloodInvoiceSeriesSetSchema}, { idAttribute : value => value.pageNumber });
 const bloodPoolSchema = new schema.Entity('bloodPools', {}, { idAttribute : value => value.externalId });
 const bloodPoolsSchema = new schema.Array(bloodPoolSchema);
 const bloodPoolPageSchema = new schema.Entity('pages', {items:bloodPoolsSchema}, { idAttribute : value => value.pageNumber });
@@ -31,6 +34,7 @@ const SchemaPage = {
     persons : personPageSchema,
     bloodDonations : bloodDonationPageSchema,
     bloodInvoices : bloodInvoicePageSchema,
+    bloodInvoiceSeries : bloodInvoiceSeriesPageSchema,
     bloodPools : bloodPoolPageSchema,
     productBatches : productBatchPageSchema
 };
@@ -39,6 +43,7 @@ const SchemaTable = {
     persons : personsSchema,
     bloodDonations : bloodDonationsSchema,
     bloodInvoices: bloodInvoicesSchema,
+    bloodInvoiceSeries: bloodInvoiceSeriesSetSchema,
     bloodPools : bloodPoolsSchema,
     productBatches : productBatchesSchema
 };
@@ -47,6 +52,7 @@ const SchemaTableEntity = {
     persons : personSchema,
     bloodDonations : bloodDonationSchema,
     bloodInvoices: bloodInvoiceSchema,
+    bloodInvoiceSeries: bloodInvoiceSeriesSchema,
     bloodPools : bloodPoolSchema,
     productBatches : productBatchSchema
 };

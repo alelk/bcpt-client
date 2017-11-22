@@ -1,7 +1,7 @@
 .bloodInvoiceBloodDonations {
     background-color: #e8eaf6;
 }
-.bloodInvoiceBloodDonations > label {
+.bloodInvoiceBloodDonations > div > label {
     margin-left: 20px;
     margin-top: 30px;
     font-size: 20px;

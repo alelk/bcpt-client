@@ -6,6 +6,7 @@
 
 import BloodInvoicesTable from '../../components/table/BloodInvoicesTable'
 import BloodDonationsContainer from './BloodDonationsContainer'
+import BloodInvoiceSeriesContainer from './BloodInvoiceSeriesContainer'
 import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
 import './BloodInvoicesContainer.css'
 
@@ -16,15 +17,26 @@ const BloodInvoiceSubTable = (row) => {
     const bloodDonationsSize = Array.isArray(row.bloodDonations) ? row.bloodDonations.length : undefined;
     return (
         <div className="bloodInvoiceBloodDonations">
-            <label style={{margin: '20px', fontSize: '18px'}}>
-                Контейнеры с плазмой для накладной <b>{row.externalId}</b> (количество контейнеров: {bloodDonationsSize})
-            </label>
-            <BloodDonationsContainer
-                isSimpleTable={true}
-                tableInstanceId={"bloodInvoice-" + row.externalId}
-                filtered={[{key: "bloodInvoice", value: row.externalId}]}
-                defaultPageSize={bloodDonationsSize}
-            />
+            {bloodDonationsSize > 0 && <div>
+                <label>
+                    Контейнеры с плазмой для накладной <b>{row.externalId}</b> (количество контейнеров: {bloodDonationsSize})
+                </label>
+                <BloodDonationsContainer
+                    isSimpleTable={true}
+                    tableInstanceId={"bloodInvoice-" + row.externalId}
+                    filtered={[{key: "bloodInvoice", value: row.externalId}]}
+                    defaultPageSize={bloodDonationsSize}
+                />
+            </div>}
+            {row.bloodInvoiceSeries && <div>
+                <label>Серия ПДФ для накладной <b>{row.externalId}</b></label>
+                <BloodInvoiceSeriesContainer
+                    isSimpleTable={true}
+                    tableInstanceId={"bloodInvoice-" + row.externalId}
+                    filtered={[{key: "externalId", value: row.bloodInvoiceSeries}]}
+                    defaultPageSize={1}
+                />
+            </div>}
         </div>
     )
 };
