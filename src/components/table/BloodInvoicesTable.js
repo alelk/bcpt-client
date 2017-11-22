@@ -11,6 +11,8 @@ import DateTimeCell from './cell/DateTimeCell'
 import TextFilter from './filter/TextFilter'
 import Table from './Table'
 import SumCheckedFooter from './footer/SumCheckedFooter'
+import Button from '../Button'
+import SimpleValueDialog from './dialog/SimpleValueDialog'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -20,11 +22,61 @@ class BloodInvoicesTable extends Table {
     constructor(props) {
         super(props);
         this.onBloodDonationsClick=this.onBloodDonationsClick.bind(this);
+        this.onAddToBloodInvoiceSeriesOpen = this.onAddToBloodInvoiceSeriesOpen.bind(this);
+        this.onAddToBloodInvoiceSeriesClose = this.onAddToBloodInvoiceSeriesClose.bind(this);
+        this.onAddToBloodInvoiceSeriesSubmit = this.onAddToBloodInvoiceSeriesSubmit.bind(this);
+        this.onAddToBloodInvoiceSeriesValueChanged = this.onAddToBloodInvoiceSeriesValueChanged.bind(this);
+        this.state = {
+            dialogAddToBloodInvoiceSeries : false
+        }
     }
 
     onBloodDonationsClick(value, row, column, original) {
         const {onBloodDonationsClick} = this.props;
         onBloodDonationsClick && onBloodDonationsClick(value, original, row.localId);
+    }
+
+    controls() {
+        return [
+            {
+                control: <Button iconName="picture_as_pdf"
+                                 className="change"
+                                 title="Назначить серию ПДФ"
+                                 key="add_blood_invoice_series"
+                                 onClick={this.onAddToBloodInvoiceSeriesOpen}/>,
+                onCheckedItems:true
+            }
+        ]
+    }
+
+    onAddToBloodInvoiceSeriesOpen() {
+        this.setState({dialogAddToBloodInvoiceSeries:true});
+    }
+
+    onAddToBloodInvoiceSeriesClose() {
+        this.setState({dialogAddToBloodInvoiceSeries:false});
+    }
+
+    onAddToBloodInvoiceSeriesSubmit() {
+        const {checkedItems, onChange} = this.props;
+        const {bloodInvoiceSeries} = this.state;
+        checkedItems && onChange && checkedItems.forEach(item => onChange(item.localId, {bloodInvoiceSeries}));
+        this.setState({dialogAddToBloodInvoiceSeries:false});
+    }
+
+    onAddToBloodInvoiceSeriesValueChanged(e, value) {
+        this.setState({bloodInvoiceSeries : value})
+    }
+
+    extraContent() {
+        return (
+            <SimpleValueDialog title="Введите номер серии ПДФ"
+                               inputType="string"
+                               open={this.state.dialogAddToBloodInvoiceSeries}
+                               onClose={this.onAddToBloodInvoiceSeriesClose}
+                               onChange={this.onAddToBloodInvoiceSeriesValueChanged}
+                               onSubmit={this.onAddToBloodInvoiceSeriesSubmit} />
+        )
     }
 
     columns() {
@@ -64,6 +116,14 @@ class BloodInvoicesTable extends Table {
                 sortable: false,
                 filterable: false,
                 maxWidth: 190
+            }, {
+                Header: "Серия ПДФ",
+                accessor: "bloodInvoiceSeries",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter
             }, {
                 Header: "Дата накладной",
                 isEditable: true,

@@ -6,6 +6,7 @@
 import PersonsContainer from './table/PersonsContainer'
 import BloodDonationsContainer from './table/BloodDonationsContainer'
 import BloodInvoicesContainer from './table/BloodInvoicesContainer'
+import BloodInvoiceSeriesContainer from './table/BloodInvoiceSeriesContainer'
 import BloodPoolsContainer from './table/BloodPoolsContainer'
 import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
@@ -26,6 +27,7 @@ const tableLinks = [
     {link:"/table/persons", title:"Доноры", iconName:"person"},
     {link:"/table/bloodDonations", title:"Пакеты с плазмой", iconName:"invert_colors"},
     {link:"/table/bloodInvoices", title:"Накладные", iconName:"format_list_bulleted"},
+    {link:"/table/bloodInvoiceSeries", title:"Серии ПДФ", iconName:"picture_as_pdf"},
     {link:"/table/bloodPools", title:"Пулы", iconName:"poll"},
     {link:"/table/productBatches", title:"Загрузки", iconName:"call_merge"},
 ];
@@ -59,6 +61,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/persons' component={PersonsContainer}/>
                     <Route path='*/table/bloodDonations' component={BloodDonationsContainer}/>
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
+                    <Route path='*/table/bloodInvoiceSeries' component={BloodInvoiceSeriesContainer}/>
                     <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                     <Route path='*/import' component={DataImporterContainer}/>
