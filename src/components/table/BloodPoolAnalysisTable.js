@@ -1,7 +1,7 @@
 /**
- * Blood Invoice Series Table
+ * Blood Pool Analysis Table
  *
- * Created by Alex Elkin on 22.11.2017.
+ * Created by Alex Elkin on 23.11.2017.
  */
 
 import TextCell from './cell/TextCell'
@@ -15,19 +15,19 @@ import SumCheckedFooter from './footer/SumCheckedFooter'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class BloodInvoiceSeriesTable extends Table {
+class BloodPoolAnalysisTable extends Table {
 
     columns() {
         return [
             {
                 Header: "",
                 accessor: "localId",
-                iconName: "picture_as_pdf",
+                iconName: "colorize",
                 Cell: IconCell,
                 width: 30,
                 filterable: false
             }, {
-                Header: "Номер серии ПДФ",
+                Header: "ID пула",
                 accessor: "externalId",
                 onChange: this.onValueChange,
                 Cell: TextCell,
@@ -35,32 +35,49 @@ class BloodInvoiceSeriesTable extends Table {
                 filterable: true,
                 Filter: TextFilter
             }, {
-                Header: "Накладные",
-                accessor: "bloodInvoices",
-                iconName: "format_list_bulleted",
-                onChange: this.onValueChange,
-                Cell: ArrayCell,
-                sortable: false,
-                isEditable: true,
+                Header: "Номер пула",
+                accessor: "poolNumber",
+                Cell: TextCell,
+                isEditable: false,
                 filterable: false,
-                Filter: TextFilter
+                sortable: false,
             }, {
-                Header: "Суммарный объем, мл.",
-                accessor: "totalAmount",
+                Header: "pH",
+                accessor: "pH",
                 onChange: this.onValueChange,
                 Cell: TextCell,
-                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
-                sortable: false,
-                filterable: false,
-                maxWidth: 190
-            }, {
-                Header: "Дата",
+                type: "number",
                 isEditable: true,
-                accessor: "seriesDate",
-                inputType: "date",
+                filterable: false,
+                sortable: true,
+                Filter: TextFilter
+            },{
+                Header: "Концентрация белка",
+                accessor: "proteinConcentration",
                 onChange: this.onValueChange,
-                Cell: DateTimeCell,
-                minWidth: 90
+                Cell: TextCell,
+                type: "number",
+                isEditable: true,
+                filterable: false,
+                sortable: true,
+                Filter: TextFilter
+            }, {
+                Header: "Контейнеры с плазмой",
+                accessor: "bloodDonations",
+                iconName: "invert_colors",
+                onClick: this.onBloodDonationsClick,
+                Cell: ArrayCell,
+                sortable: false,
+                isEditable: false,
+                filterable: false,
+            }, {
+                Header: "ID загрузки",
+                accessor: "productBatch",
+                Cell: TextCell,
+                isEditable: false,
+                filterable: true,
+                sortable: false,
+                Filter: TextFilter
             }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
@@ -75,13 +92,15 @@ const dataItem = PropTypes.shape({
     isChecked : PropTypes.bool,
     localId : PropTypes.string,
     externalId : PropTypes.string,
-    bloodInvoices : PropTypes.arrayOf(PropTypes.string),
-    totalAmount : PropTypes.number,
-    seriesDate : PropTypes.string,
+    productBatch : PropTypes.string,
+    pH : PropTypes.number,
+    proteinConcentration: PropTypes.number,
+    bloodDonations : PropTypes.arrayOf(PropTypes.string),
+    poolNumber : PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     updateTimestamp : PropTypes.string,
     errors : PropTypes.object | PropTypes.array
 });
-BloodInvoiceSeriesTable.propTypes = {
+BloodPoolAnalysisTable.propTypes = {
     name : PropTypes.string,
     data : PropTypes.arrayOf(dataItem),
     checkedItems : PropTypes.arrayOf(dataItem),
@@ -97,9 +116,10 @@ BloodInvoiceSeriesTable.propTypes = {
     onRefreshData : PropTypes.func,
     onSaveChanges : PropTypes.func,
     onAddNewItem : PropTypes.func,
+    onBloodDonationsClick: PropTypes.func,
     isSimpleTable : PropTypes.bool,
     subComponent : PropTypes.func,
     filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
-export default BloodInvoiceSeriesTable;
+export default BloodPoolAnalysisTable;

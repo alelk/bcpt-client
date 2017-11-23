@@ -8,6 +8,7 @@ import BloodDonationsContainer from './table/BloodDonationsContainer'
 import BloodInvoicesContainer from './table/BloodInvoicesContainer'
 import BloodInvoiceSeriesContainer from './table/BloodInvoiceSeriesContainer'
 import BloodPoolsContainer from './table/BloodPoolsContainer'
+import BloodPoolAnalysisContainer from './table/BloodPoolAnalysisContainer'
 import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
 import DataImporterContainer from './DataImporterContainer'
@@ -29,6 +30,7 @@ const tableLinks = [
     {link:"/table/bloodInvoices", title:"Накладные", iconName:"format_list_bulleted"},
     {link:"/table/bloodInvoiceSeries", title:"Серии ПДФ", iconName:"picture_as_pdf"},
     {link:"/table/bloodPools", title:"Пулы", iconName:"poll"},
+    {link:"/table/bloodPoolAnalysis", title:"Анализы пулов", iconName:"colorize"},
     {link:"/table/productBatches", title:"Загрузки", iconName:"call_merge"},
 ];
 const toolLinks = [
@@ -63,6 +65,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/bloodInvoices' component={BloodInvoicesContainer}/>
                     <Route path='*/table/bloodInvoiceSeries' component={BloodInvoiceSeriesContainer}/>
                     <Route path='*/table/bloodPools' component={BloodPoolsContainer}/>
+                    <Route path='*/table/bloodPoolAnalysis' component={BloodPoolAnalysisContainer}/>
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                     <Route path='*/import' component={DataImporterContainer}/>
                 </div>

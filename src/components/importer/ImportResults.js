@@ -23,13 +23,13 @@ const iconCellStyle = {
 const stateIcon = (row) => {
     let color;
     let iconName;
-    if (/success/i.test(row.result)) {
+    if (/success/i.test(row.processState)) {
         color = "#00a941";
         iconName = "done";
-    } else if (/failed/i.test(row.result)) {
+    } else if (/failed/i.test(row.processState)) {
         color = "#ff3f36";
         iconName = "error";
-    } else if (/warning/i.test(row.result)) {
+    } else if (/warning/i.test(row.processState)) {
         color = "#ff9300";
         iconName = "warning";
     } else {
@@ -141,7 +141,7 @@ export const importResultType = PropTypes.shape({
     operationName : PropTypes.string,
     importTimestamp : PropTypes.string,
     progress: PropTypes.number,
-    result: PropTypes.oneOf(["SUCCESS", "IN_PROGRESS", "FAILED", "WITH_WARNINGS"]),
+    processState: PropTypes.oneOf(["SUCCESS", "IN_PROGRESS", "FAILED", "WITH_WARNINGS"]),
     errors: PropTypes.array,
     countPersons: PropTypes.number,
     countBloodDonations: PropTypes.number,

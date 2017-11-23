@@ -1,0 +1,9 @@
+.BloodPoolAnalysisSubTable {
+    background-color: #eae7ff;
+}
+.BloodPoolAnalysisSubTable > div > label {
+    margin-left: 20px;
+    margin-top: 30px;
+    font-size: 20px;
+    color: #003f16;
+}
