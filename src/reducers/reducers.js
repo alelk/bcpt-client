@@ -48,6 +48,7 @@ const tables = (state = {
     bloodInvoices: {displayName:"Накладные"},
     bloodInvoiceSeries: {displayName:"Серии ПДФ"},
     bloodPools: {displayName:"Пулы"},
+    bloodPoolAnalysis: {displayName:"Анализы пулов"},
     productBatches: {displayName:"Загрузки"},
 }, action) => {
     const {type, tableName, localId, error, changes} = action;

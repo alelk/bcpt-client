@@ -23,10 +23,10 @@ const HomePageContainer = ({changeDrawerState, isDrawerOpened, tableLinks, toolL
         <Card>
             <CardTitle title="Blood Centre Product Tracker" titleStyle={{textAlign:'center'}}/>
             <CardText>
-                <GridList cols={5} padding={20} style={{textAlign:"center"}}>
+                <GridList cols={3} padding={20} style={{textAlign:"center"}}>
                     {tableLinks.map((link, key) => (
-                        <Link to={link.link} style={{textDecoration:'none'}}>
-                            <GridTile key={key} title={link.title}>
+                        <Link key={key} to={link.link} style={{textDecoration:'none'}}>
+                            <GridTile title={link.title}>
                                 <Avatar size={70} style={{marginTop:30}}
                                         backgroundColor="#893"
                                         icon={<FontIcon className="material-icons">{link.iconName}</FontIcon>}/>
@@ -36,10 +36,10 @@ const HomePageContainer = ({changeDrawerState, isDrawerOpened, tableLinks, toolL
                 </GridList>
             </CardText>
             <CardText>
-                <GridList cols={5} padding={20} style={{textAlign:"center"}}>
+                <GridList cols={3} padding={20} style={{textAlign:"center"}}>
                     {toolLinks.map((link, key) => (
-                        <Link to={link.link} style={{textDecoration:'none'}}>
-                            <GridTile key={key} title={link.title}>
+                        <Link key={key} to={link.link} style={{textDecoration:'none'}}>
+                            <GridTile title={link.title}>
                                 <Avatar size={70} style={{marginTop:30}}
                                         backgroundColor="#827"
                                         icon={<FontIcon className="material-icons">{link.iconName}</FontIcon>}/>

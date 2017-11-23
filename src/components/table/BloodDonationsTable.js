@@ -168,6 +168,7 @@ class BloodDonationsTable extends Table {
                 accessor: "amount",
                 onChange: this.onValueChange,
                 Cell: TextCell,
+                type: "number",
                 Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 isEditable: true,
                 filterable: true,
