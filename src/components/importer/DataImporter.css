@@ -1,6 +1,0 @@
-.DataImporter .content {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 64px);
-    overflow-y: scroll;
-}

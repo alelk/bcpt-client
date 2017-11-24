@@ -12,6 +12,7 @@ import BloodPoolAnalysisContainer from './table/BloodPoolAnalysisContainer'
 import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
 import DataImporterContainer from './DataImporterContainer'
+import DataExporterContainer from './DataExporterContainer'
 import HomePageContainer from './HomePageContainer'
 
 import React from 'react'
@@ -34,7 +35,8 @@ const tableLinks = [
     {link:"/table/productBatches", title:"Загрузки", iconName:"call_merge"},
 ];
 const toolLinks = [
-    {link:"/import", title:"Импорт данных", iconName:"file_upload"}
+    {link:"/import", title:"Импорт данных", iconName:"file_upload"},
+    {link:"/export", title:"Экспорт данных", iconName:"file_download"}
 ];
 
 const renderMenuItem = (link, label, iconName) => (
@@ -68,6 +70,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/bloodPoolAnalysis' component={BloodPoolAnalysisContainer}/>
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                     <Route path='*/import' component={DataImporterContainer}/>
+                    <Route path='*/export' component={DataExporterContainer}/>
                 </div>
             </div>
         </ConnectedRouter>
