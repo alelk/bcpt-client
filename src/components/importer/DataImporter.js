@@ -8,7 +8,6 @@ import AppPage from '../AppPage'
 import FileUploader, {categoryType} from '../filemanager/FileManager'
 import ImportConfirmDialog from '../dialog/YesNoDialog'
 import ImportResults, {importResultType} from './ImportResults'
-import './DataImporter.css'
 
 import React from 'react'
 import PropTypes from 'prop-types'

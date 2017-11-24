@@ -23,7 +23,7 @@ const HomePageContainer = ({changeDrawerState, isDrawerOpened, tableLinks, toolL
         <Card>
             <CardTitle title="Blood Centre Product Tracker" titleStyle={{textAlign:'center'}}/>
             <CardText>
-                <GridList cols={3} padding={20} style={{textAlign:"center"}}>
+                <GridList cols={4} padding={20} style={{textAlign:"center"}}>
                     {tableLinks.map((link, key) => (
                         <Link key={key} to={link.link} style={{textDecoration:'none'}}>
                             <GridTile title={link.title}>
@@ -36,7 +36,7 @@ const HomePageContainer = ({changeDrawerState, isDrawerOpened, tableLinks, toolL
                 </GridList>
             </CardText>
             <CardText>
-                <GridList cols={3} padding={20} style={{textAlign:"center"}}>
+                <GridList cols={4} padding={20} style={{textAlign:"center"}}>
                     {toolLinks.map((link, key) => (
                         <Link key={key} to={link.link} style={{textDecoration:'none'}}>
                             <GridTile title={link.title}>
