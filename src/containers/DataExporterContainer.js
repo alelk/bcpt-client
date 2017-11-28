@@ -5,6 +5,7 @@
  */
 
 import {changeDrawerState} from '../actions/actions'
+import {generateProductBatchReport} from '../actions/reportGeneratorActions'
 import DataExporter from '../components/exporter/DataExporter'
 
 import React from 'react'
@@ -15,10 +16,11 @@ class DataExporterContainer extends React.Component {
 
     render() {
         const {
-            isDrawerOpened, changeDrawerState
+            isDrawerOpened, changeDrawerState, generateProductBatchReport
         } = this.props;
         return (
-            <DataExporter onDrawerChangeDrawerVisibilityRequest={() => changeDrawerState({isDrawerOpened: !isDrawerOpened})}/>
+            <DataExporter onDrawerChangeDrawerVisibilityRequest={() => changeDrawerState({isDrawerOpened: !isDrawerOpened})}
+                          onExportProductBatch={generateProductBatchReport}/>
         )
     }
 }
@@ -32,6 +34,6 @@ const mapStateToProps = (state, ownProps) => ({
 export default connect(
     mapStateToProps,
     {
-        changeDrawerState
+        changeDrawerState, generateProductBatchReport
     }
 )(DataExporterContainer);
