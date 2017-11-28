@@ -18,13 +18,13 @@ class DataExporter extends React.Component {
 
     render() {
         const {
-            onDrawerChangeDrawerVisibilityRequest
+            onDrawerChangeDrawerVisibilityRequest, onExportProductBatch
         } = this.props;
         return (
             <AppPage className="DataExporter"
                      onDrawerChangeDrawerVisibilityRequest={onDrawerChangeDrawerVisibilityRequest}
                      title="Экспорт данных">
-                <ProductBatchReportGenerator/>
+                <ProductBatchReportGenerator onSubmit={onExportProductBatch}/>
             </AppPage>
         )
     }
