@@ -198,7 +198,7 @@ class BloodDonationsTable extends Table {
         ];
     }
 }
-const dataItem = PropTypes.shape({
+export const bloodDonationType = PropTypes.shape({
     isChecked : PropTypes.bool,
     localId : PropTypes.string,
     externalId : PropTypes.string,
@@ -214,8 +214,8 @@ const dataItem = PropTypes.shape({
 });
 BloodDonationsTable.propTypes = {
     name : PropTypes.string,
-    data : PropTypes.arrayOf(dataItem),
-    checkedItems : PropTypes.arrayOf(dataItem),
+    data : PropTypes.arrayOf(bloodDonationType),
+    checkedItems : PropTypes.arrayOf(bloodDonationType),
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
     isEditing : PropTypes.bool,

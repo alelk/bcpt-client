@@ -34,13 +34,20 @@ export default store => nextProcedure => action => {
             error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
         )
     }  else if (/fetchTableRow/.test(method)) {
-        const{localId} = callApi;
-        getTableEntity(tableName, localId).then(
-            response => nextProcedure(actionWith({type: successType, tableName, response})),
-            error => nextProcedure(actionWith({type: failureType, tableName, error: "Unable to fetch data from table '" + tableName + "': " + error}))
-        )
+        const {localId} = callApi;
+        const errorMsg = "Unable to fetch data from table '" + tableName + "': ";
+        if (localId == null || /^\s*$/.test(localId))
+            nextProcedure(actionWith({
+                type: failureType,
+                tableName,
+                error: errorMsg + "Table row id is not specified!"
+            }));
+        else
+            getTableEntity(tableName, localId).then(
+                response => nextProcedure(actionWith({type: successType, tableName, response})),
+                error => nextProcedure(actionWith({type: failureType, tableName, error: errorMsg + error}))
+            )
     }
-
     else if (/saveChanges/.test(method)) {
         const items = store.getState().tableItems[tableName];
         const table = store.getState().tables[tableName];

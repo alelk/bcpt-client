@@ -101,6 +101,10 @@ const fetchTableRowWithApi = (tableName, localId, overrideChanges) => ({
     }
 });
 
+export const fetchTableRow = (tableName, localId) => (dispatch) => {
+    return dispatch(fetchTableRowWithApi(tableName, localId));
+};
+
 export const resetTableRowChanges = (tableName, localId) => (dispatch) => {
     return dispatch(fetchTableRowWithApi(tableName, localId, true));
 };
