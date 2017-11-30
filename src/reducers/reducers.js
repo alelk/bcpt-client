@@ -5,6 +5,7 @@
  */
 import {
     ACTION_TABLE_DATA_REQUEST,
+    ACTION_TABLE_ROW_SUCCESS,
     ACTION_TABLE_DATA_SUCCESS,
     ACTION_TABLE_DATA_FAILURE,
     ACTION_TABLE_MODIFY_INFO,
@@ -209,7 +210,7 @@ export const tableItemsChecked = (tableItems, tableName) => {
 
 const tableItems = (state = {}, action) => {
     const {type, tableName, localId, changes, response, error} = action;
-    if (ACTION_TABLE_DATA_SUCCESS === type) {
+    if (ACTION_TABLE_DATA_SUCCESS === type || ACTION_TABLE_ROW_SUCCESS === type) {
         const tableRealName = extractTableName(tableName);
         if (!response || !response.entities || !response.entities[tableRealName]) return state;
         return tableItemsMerge(state, tableName, response.entities[tableRealName]);

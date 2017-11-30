@@ -9,8 +9,10 @@ import BloodDonationsContainer from './BloodDonationsContainer'
 import ProductBatchesContainer from './ProductBatchesContainer'
 import TableContainerAdapter, {mapStateToProps, mapDispatchToProps} from './TableContainerAdapter'
 import './BloodPoolsContainer.css'
+import {fetchTableRow} from '../../actions/actions'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
 const BloodPoolSubTable = (row) => {
@@ -39,10 +41,27 @@ const BloodPoolSubTable = (row) => {
 
 class BloodPoolsContainer extends TableContainerAdapter {
     render() {
+        const {bloodDonationItems, fetchTableRow} = this.props;
+        const bloodDonations = bloodDonationItems && Object.keys(bloodDonationItems).map(localId => Object.assign({localId}, bloodDonationItems[localId]));
         return (
-            <BloodPoolsTable {...this.tableProps()} subComponent={BloodPoolSubTable}/>
+            <BloodPoolsTable {...this.tableProps()}
+                             bloodDonations={bloodDonations}
+                             onFetchBloodDonation={localId => fetchTableRow("bloodDonations", localId)}
+                             subComponent={BloodPoolSubTable}/>
         )
     }
 }
 
-export default connect(mapStateToProps("bloodPools"), mapDispatchToProps)(BloodPoolsContainer);
+BloodPoolsContainer.propTypes = {
+    fetchTableRow: PropTypes.func,
+    bloodDonationItems: PropTypes.object
+};
+
+export const _mapStateToProps = (state, ownProps) => {
+    return {
+        bloodDonationItems: state.tableItems["bloodDonations"],
+        ...mapStateToProps("bloodPools")(state, ownProps)
+    }
+};
+
+export default connect(_mapStateToProps, {fetchTableRow, ...mapDispatchToProps})(BloodPoolsContainer);

@@ -12,7 +12,9 @@ import TextFilter from './filter/TextFilter'
 import Table from './Table'
 import Button from '../Button'
 import CreatePoolsDialog from './dialog/CreatePoolsDialog'
+import PoolScanningDialog from './dialog/PoolScanningDialog'
 import SumCheckedFooter from './footer/SumCheckedFooter'
+import {bloodDonationType} from './BloodDonationsTable'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -24,9 +26,12 @@ class BloodPoolsTable extends Table {
         this.onBloodDonationsClick=this.onBloodDonationsClick.bind(this);
         this.onCreatePoolsOpen = this.onCreatePoolsOpen.bind(this);
         this.onCreatePoolsClose = this.onCreatePoolsClose.bind(this);
+        this.onPoolScanningOpen = this.onPoolScanningOpen.bind(this);
+        this.onPoolScanningClose = this.onPoolScanningClose.bind(this);
         this.onCreatePoolsSubmit = this.onCreatePoolsSubmit.bind(this);
         this.state = {
             isCreatePoolsDialogOpened: false,
+            isPoolScanningDialogOpened: false,
             productBatchId : '',
             poolStartNumber : 1,
             poolsCount : 10
@@ -41,6 +46,12 @@ class BloodPoolsTable extends Table {
                                  title="Создать пулы"
                                  key="add_pulls"
                                  onClick={this.onCreatePoolsOpen}/>
+            }, {
+                control: <Button iconName="camera_alt"
+                                 className="change"
+                                 title="Создание пулов сканером штрих-кодов"
+                                 key="scan_pools"
+                                 onClick={this.onPoolScanningOpen}/>
             }
         ]
     }
@@ -65,14 +76,29 @@ class BloodPoolsTable extends Table {
         this.setState({productBatchId, poolStartNumber, poolsCount, isCreatePoolsDialogOpened:false})
     }
 
+    onPoolScanningOpen() {
+        this.setState({isPoolScanningDialogOpened:true})
+    }
+
+    onPoolScanningClose() {
+        this.setState({isPoolScanningDialogOpened:false})
+    }
+
     extraContent() {
+        const {bloodDonations, onFetchBloodDonation} = this.props;
         return (
-            <CreatePoolsDialog open={this.state.isCreatePoolsDialogOpened}
+            <div>
+                <CreatePoolsDialog open={this.state.isCreatePoolsDialogOpened}
                                productBatchId={this.state.productBatchId}
                                poolStartNumber={this.state.poolStartNumber}
                                poolsCount={this.state.poolsCount}
                                onSubmit={this.onCreatePoolsSubmit}
                                onCancel={this.onCreatePoolsClose}/>
+                <PoolScanningDialog open={this.state.isPoolScanningDialogOpened}
+                                    bloodDonations={bloodDonations}
+                                    requestBloodDonation={onFetchBloodDonation}
+                                    onCancel={this.onPoolScanningClose}/>
+            </div>
         )
     }
 
@@ -144,7 +170,7 @@ class BloodPoolsTable extends Table {
         ];
     }
 }
-const dataItem = PropTypes.shape({
+export const dataItem = PropTypes.shape({
     isChecked : PropTypes.bool,
     localId : PropTypes.string,
     externalId : PropTypes.string,
@@ -158,6 +184,8 @@ const dataItem = PropTypes.shape({
 BloodPoolsTable.propTypes = {
     name : PropTypes.string,
     data : PropTypes.arrayOf(dataItem),
+    bloodDonations : PropTypes.arrayOf(bloodDonationType),
+    onFetchBloodDonation : PropTypes.func,
     checkedItems : PropTypes.arrayOf(dataItem),
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
