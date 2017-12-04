@@ -29,6 +29,7 @@ class BloodPoolsTable extends Table {
         this.onPoolScanningOpen = this.onPoolScanningOpen.bind(this);
         this.onPoolScanningClose = this.onPoolScanningClose.bind(this);
         this.onCreatePoolsSubmit = this.onCreatePoolsSubmit.bind(this);
+        this.onPoolScanningSubmit = this.onPoolScanningSubmit.bind(this);
         this.state = {
             isCreatePoolsDialogOpened: false,
             isPoolScanningDialogOpened: false,
@@ -84,6 +85,12 @@ class BloodPoolsTable extends Table {
         this.setState({isPoolScanningDialogOpened:false})
     }
 
+    onPoolScanningSubmit(bloodPools) {
+        const {onAddNewItem} = this.props;
+        bloodPools && onAddNewItem && bloodPools.forEach(bloodPool => onAddNewItem(bloodPool));
+        this.setState({isPoolScanningDialogOpened:false})
+    }
+
     extraContent() {
         const {bloodDonations, onFetchBloodDonation} = this.props;
         return (
@@ -97,6 +104,7 @@ class BloodPoolsTable extends Table {
                 <PoolScanningDialog open={this.state.isPoolScanningDialogOpened}
                                     bloodDonations={bloodDonations}
                                     requestBloodDonation={onFetchBloodDonation}
+                                    onSubmit={this.onPoolScanningSubmit}
                                     onCancel={this.onPoolScanningClose}/>
             </div>
         )
