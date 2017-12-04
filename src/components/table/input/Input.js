@@ -26,7 +26,7 @@ class Input extends React.Component {
         if (onChange)
             Rx.Observable.create(o => {
                 this.observer = o;
-            }).sampleTime(onChangeDelayMillis || 1000).subscribe(value => onChange(value));
+            }).debounceTime(onChangeDelayMillis || 1000).subscribe(value => onChange(value));
     }
 
     componentWillUnmount() {
