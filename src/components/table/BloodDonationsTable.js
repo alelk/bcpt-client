@@ -14,6 +14,7 @@ import SumCheckedFooter from './footer/SumCheckedFooter'
 import Table from './Table'
 import Button from '../Button'
 import SimpleValueDialog from './dialog/SimpleValueDialog'
+import DonationScanningDialog from './dialog/DonationScanningDialog'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -26,8 +27,12 @@ class BloodDonationsTable extends Table {
         this.onAddToPoolClose = this.onAddToPoolClose.bind(this);
         this.onAddToPoolSubmit = this.onAddToPoolSubmit.bind(this);
         this.onAddToPoolValueChanged = this.onAddToPoolValueChanged.bind(this);
+        this.onDonationScanningOpen = this.onDonationScanningOpen.bind(this);
+        this.onDonationScanningClose = this.onDonationScanningClose.bind(this);
+        this.onDonationScanningSubmit = this.onDonationScanningSubmit.bind(this);
         this.state = {
-            dialogAddToPool : false
+            dialogAddToPool : false,
+            dialogDonationScanning : false
         }
     }
 
@@ -40,6 +45,12 @@ class BloodDonationsTable extends Table {
                                  key="add_pool"
                                  onClick={this.onAddToPoolOpen}/>,
                 onCheckedItems:true
+            }, {
+                control: <Button iconName="camera_alt"
+                                 className="change"
+                                 title="Добавление донаций сканером штрих-кодов"
+                                 key="scan_bloodDonations"
+                                 onClick={this.onDonationScanningOpen}/>
             }
         ]
     }
@@ -62,14 +73,36 @@ class BloodDonationsTable extends Table {
         this.setState({bloodPool : value})
     }
 
+    onDonationScanningOpen() {
+        this.setState({dialogDonationScanning:true})
+    }
+
+    onDonationScanningClose() {
+        this.setState({dialogDonationScanning:false})
+    }
+
+    onDonationScanningSubmit(bloodDonations) {
+        this.setState({dialogDonationScanning:false})
+    }
+
     extraContent() {
+        const {bloodDonations, getOrCreateBloodDonation, resetBloodDonationChanges} = this.props;
         return (
-            <SimpleValueDialog title="Введите номер пула"
-                               inputType="string"
-                               open={this.state.dialogAddToPool}
-                               onClose={this.onAddToPoolClose}
-                               onChange={this.onAddToPoolValueChanged}
-                               onSubmit={this.onAddToPoolSubmit} />
+            <div>
+                <SimpleValueDialog title="Введите номер пула"
+                                   inputType="string"
+                                   open={this.state.dialogAddToPool}
+                                   onClose={this.onAddToPoolClose}
+                                   onChange={this.onAddToPoolValueChanged}
+                                   onSubmit={this.onAddToPoolSubmit} />
+                <DonationScanningDialog open={this.state.dialogDonationScanning}
+                                        onCancel={this.onDonationScanningClose}
+                                        bloodDonations={bloodDonations}
+                                        requestBloodDonation={getOrCreateBloodDonation}
+                                        resetBloodDonationChanges={resetBloodDonationChanges}
+                                        onSubmit={this.onDonationScanningSubmit}
+                                        changeBloodDonation={this.props.onChange}/>
+            </div>
         )
     }
 
@@ -216,6 +249,9 @@ BloodDonationsTable.propTypes = {
     name : PropTypes.string,
     data : PropTypes.arrayOf(bloodDonationType),
     checkedItems : PropTypes.arrayOf(bloodDonationType),
+    bloodDonations : PropTypes.arrayOf(bloodDonationType),
+    getOrCreateBloodDonation: PropTypes.func,
+    resetBloodDonationChanges: PropTypes.func,
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
     isEditing : PropTypes.bool,

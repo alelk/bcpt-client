@@ -91,9 +91,9 @@ export const ACTION_TABLE_ROW_REQUEST = 'ACTION_TABLE_ROW_REQUEST';
 export const ACTION_TABLE_ROW_SUCCESS = 'ACTION_TABLE_ROW_SUCCESS';
 export const ACTION_TABLE_ROW_FAILURE = 'ACTION_TABLE_ROW_FAILURE';
 
-const fetchTableRowWithApi = (tableName, localId, overrideChanges) => ({
+const fetchTableRowWithApi = (types, tableName, localId, overrideChanges) => ({
     [CALL_BCPT_REST_API] : {
-        types : [ACTION_TABLE_ROW_REQUEST, ACTION_TABLE_ROW_SUCCESS, ACTION_TABLE_ROW_FAILURE],
+        types,
         method : 'fetchTableRow',
         tableName,
         localId,
@@ -101,13 +101,34 @@ const fetchTableRowWithApi = (tableName, localId, overrideChanges) => ({
     }
 });
 
-export const fetchTableRow = (tableName, localId) => (dispatch) => {
-    return dispatch(fetchTableRowWithApi(tableName, localId));
+export const fetchTableRow = (tableName, localId, overrideChanges) => (dispatch) => {
+    return dispatch(fetchTableRowWithApi(
+        [ACTION_TABLE_ROW_REQUEST, ACTION_TABLE_ROW_SUCCESS, ACTION_TABLE_ROW_FAILURE],
+        tableName,
+        localId,
+        overrideChanges
+    ));
 };
 
-export const resetTableRowChanges = (tableName, localId) => (dispatch) => {
-    return dispatch(fetchTableRowWithApi(tableName, localId, true));
+export const ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST = "ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST";
+export const ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS = "ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS";
+export const ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE = "ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE";
+
+export const getOrCreateTableRow = (tableName, localId) => (dispatch) => {
+    return dispatch(fetchTableRowWithApi(
+        [
+            ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST,
+            ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS,
+            ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE
+        ], tableName,
+        localId
+    )).catch(action => {
+        const {localId, tableName} = action;
+        dispatch(tableRowCreate(tableName, {externalId: localId}))
+    })
 };
+
+export const resetTableRowChanges = (tableName, localId) => fetchTableRow(tableName, localId, true);
 
 export const ACTION_TABLE_RESET_CHANGES = 'ACTION_TABLE_RESET_CHANGES';
 export const resetTableChanges = (tableName) => (dispatch, getState) => {

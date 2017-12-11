@@ -25,11 +25,11 @@ const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation, productB
             </div>
             <div style={{display: 'flex', flexWrap: 'wrap'}}>
                 {bloodDonations && Object.keys(bloodDonations).map(bloodDonationId => {
-                    const {amount, localId} = bloodDonations[bloodDonationId];
+                    const {amount, localId, externalId} = bloodDonations[bloodDonationId];
                     return (
                         <Chip key={bloodDonationId} style={{margin: 6}}
                               onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber))}>
-                            {localId} ({amount} мл.)
+                            {externalId} ({amount} мл.)
                         </Chip>
                     )
                 })}

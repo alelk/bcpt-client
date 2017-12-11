@@ -6,6 +6,9 @@
 import {
     ACTION_TABLE_DATA_REQUEST,
     ACTION_TABLE_ROW_SUCCESS,
+    ACTION_TABLE_ROW_FAILURE,
+    ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS,
+    ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE,
     ACTION_TABLE_DATA_SUCCESS,
     ACTION_TABLE_DATA_FAILURE,
     ACTION_TABLE_MODIFY_INFO,
@@ -189,6 +192,7 @@ const tableItemWith = (tableItems, tableName, itemLocalId, itemChanges) => {
 
 const tableItemsDeleteItem = (items, tableName, localId) => {
     const tableItems = tableItemsWith(items, tableName);
+    console.log("delete", tableItems);
     delete tableItems[tableName][localId];
     return tableItems;
 };
@@ -209,11 +213,14 @@ export const tableItemsChecked = (tableItems, tableName) => {
 };
 
 const tableItems = (state = {}, action) => {
-    const {type, tableName, localId, changes, response, error} = action;
-    if (ACTION_TABLE_DATA_SUCCESS === type || ACTION_TABLE_ROW_SUCCESS === type) {
+    const {type, tableName, localId, changes, response, error, overrideChanges} = action;
+    if (ACTION_TABLE_DATA_SUCCESS === type || ACTION_TABLE_ROW_SUCCESS === type || ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS === type) {
         const tableRealName = extractTableName(tableName);
         if (!response || !response.entities || !response.entities[tableRealName]) return state;
-        return tableItemsMerge(state, tableName, response.entities[tableRealName]);
+        return tableItemsMerge(state, tableName, response.entities[tableRealName], overrideChanges);
+    } else if (ACTION_TABLE_ROW_FAILURE === type) {
+        if (overrideChanges) return tableItemsDeleteItem(state, tableName, localId);
+        return state;
     } else if (ACTION_TABLE_CHECK_ROW === type) {
         return tableItemWith(state, tableName, localId, changes);
     } else if (ACTION_TABLE_DELETE_ROW === type && localId) {
@@ -233,7 +240,7 @@ const tableItems = (state = {}, action) => {
         const {errors, localId} = error;
         return tableItemWith(state, tableName, localId, {errors})
     } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
-        return tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true});
+        return tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true, creationTimestamp: Date.now()});
     } else if (ACTION_TABLE_CLEAN_UP_SUBTABLE && isSubtable(tableName)) {
         const items = objectWith(state);
         delete items[tableName];
