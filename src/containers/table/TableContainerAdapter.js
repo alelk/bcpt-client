@@ -4,7 +4,7 @@
  * Created by Alex Elkin on 14.09.2017.
  */
 import {
-    fetchTableData, fetchTableRow, tableRowChange, checkTableRow, deleteTableRow, editTableRow,
+    fetchTableData, tableRowChange, checkTableRow, deleteTableRow, editTableRow,
     resetTableChanges, saveChanges, tableRowCreate, cleanUpSubtable, changeDrawerState
 } from '../../actions/actions'
 

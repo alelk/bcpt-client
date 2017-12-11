@@ -10,6 +10,7 @@ import PersonsContainer from './PersonsContainer'
 import BloodInvoicesContainer from './BloodInvoicesContainer'
 import BloodPoolsContainer from './BloodPoolsContainer'
 import './BloodDonationsContainer.css'
+import {getOrCreateTableRow, resetTableRowChanges} from '../../actions/actions'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -45,14 +46,29 @@ const BloodDonationSubTable = (row) => {
 
 class BloodDonationsContainer extends TableContainerAdapter {
     render() {
+        const {bloodDonationItems, getOrCreateTableRow, resetTableRowChanges} = this.props;
+        const bloodDonations = bloodDonationItems && Object.keys(bloodDonationItems).map(localId => Object.assign({localId}, bloodDonationItems[localId]));
         return (
-            <BloodDonationsTable {...this.tableProps()} subComponent={BloodDonationSubTable}/>
+            <BloodDonationsTable {...this.tableProps()}
+                                 subComponent={BloodDonationSubTable}
+                                 bloodDonations={bloodDonations}
+                                 resetBloodDonationChanges={(localId) => resetTableRowChanges("bloodDonations", localId)}
+                                 getOrCreateBloodDonation={localId => getOrCreateTableRow("bloodDonations", localId)}/>
         )
     }
 }
 BloodDonationsContainer.propTypes = {
+    getOrCreateTableRow: PropTypes.func,
+    resetTableRowChanges: PropTypes.func,
     isSimpleTable: PropTypes.bool,
     filtered : PropTypes.arrayOf(PropTypes.shape({id:PropTypes.string, value:PropTypes.string}))
 };
 
-export default connect(mapStateToProps("bloodDonations"), mapDispatchToProps)(BloodDonationsContainer);
+export const _mapStateToProps = (state, ownProps) => {
+    return {
+        bloodDonationItems: state.tableItems["bloodDonations"],
+        ...mapStateToProps("bloodDonations")(state, ownProps)
+    }
+};
+
+export default connect(_mapStateToProps, {getOrCreateTableRow, resetTableRowChanges, ...mapDispatchToProps})(BloodDonationsContainer);
