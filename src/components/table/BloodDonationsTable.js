@@ -86,7 +86,7 @@ class BloodDonationsTable extends Table {
     }
 
     extraContent() {
-        const {bloodDonations, getOrCreateBloodDonation, resetBloodDonationChanges} = this.props;
+        const {bloodDonations, getOrCreateBloodDonation, getOrCreateBloodInvoice, resetBloodDonationChanges} = this.props;
         return (
             <div>
                 <SimpleValueDialog title="Введите номер пула"
@@ -99,6 +99,7 @@ class BloodDonationsTable extends Table {
                                         onCancel={this.onDonationScanningClose}
                                         bloodDonations={bloodDonations}
                                         requestBloodDonation={getOrCreateBloodDonation}
+                                        requestBloodInvoice={getOrCreateBloodInvoice}
                                         resetBloodDonationChanges={resetBloodDonationChanges}
                                         onSubmit={this.onDonationScanningSubmit}
                                         changeBloodDonation={this.props.onChange}/>
@@ -251,6 +252,7 @@ BloodDonationsTable.propTypes = {
     checkedItems : PropTypes.arrayOf(bloodDonationType),
     bloodDonations : PropTypes.arrayOf(bloodDonationType),
     getOrCreateBloodDonation: PropTypes.func,
+    getOrCreateBloodInvoice: PropTypes.func,
     resetBloodDonationChanges: PropTypes.func,
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,

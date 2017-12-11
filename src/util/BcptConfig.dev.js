@@ -4,10 +4,10 @@
  * Created by Alex Elkin on 05.09.2017.
  */
 
-const BcmsConfig = (function () {
+const BcptConfig = (function () {
     const constants = {
-        'rest-api-uri':"http://localhost:8080/rest-api-1.0.0-ALPHA/"
-        //'rest-api-uri':"http://localhost:8080/web-app-1.0.1-BETA/"
+        'rest-api-uri':"http://localhost:8080/rest-api-1.0.0-ALPHA/",
+        'base-uri' : "/"
     };
     return {
         get: function (name) {
@@ -16,4 +16,4 @@ const BcmsConfig = (function () {
     }
 })();
 
-export default BcmsConfig;
+export default BcptConfig;

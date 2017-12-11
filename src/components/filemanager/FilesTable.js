@@ -10,7 +10,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-import prettyBytes from 'pretty-bytes'
+import bytes from 'bytes';
 import FontIcon from 'material-ui/FontIcon';
 
 const iconCellStyle = {
@@ -35,7 +35,7 @@ class FilesTable extends React.Component {
             }, {
                 Header: "Размер",
                 id: "fileSize",
-                accessor: row => row.fileSize && prettyBytes(row.fileSize),
+                accessor: row => row.fileSize && bytes(row.fileSize),
                 filterable: true
 
             }, {
