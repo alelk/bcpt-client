@@ -26,17 +26,17 @@ class DonationScanningDialog extends React.Component {
         this.deleteBloodDonation = this.deleteBloodDonation.bind(this);
         this.onAddBloodDonationToPool = this.onAddBloodDonationToPool.bind(this);
         this.state = {
-            bloodInvoiceSeriesId: undefined,
             bloodInvoiceId: undefined,
+            bloodInvoiceSeriesId: undefined,
             productBatchId: undefined,
             currentPoolNumber: 1,
             totalAmountLimit: 5000,
             bloodDonationIds: "",
-            requestedBloodDonations: [],
             addedBloodDonationIds: [],
+            addedBloodInvoiceIds: [],
             bloodPools: {},
-            bloodInvoiceSeriesIdError: undefined,
             bloodInvoiceIdError: undefined,
+            bloodInvoiceSeriesIdError: undefined,
             productBatchIdError: undefined
         }
     }
@@ -53,13 +53,8 @@ class DonationScanningDialog extends React.Component {
     }
 
     onNewBloodDonation(externalId) {
-        const {bloodDonations} = this.props;
-        const {requestedBloodDonations} = this.state;
-        if (bloodDonations.find(bd => bd.externalId === externalId)
-            || requestedBloodDonations.find(id => id === externalId)) return;
-        this.props.requestBloodDonation(externalId);
-        requestedBloodDonations.push(externalId);
-        this.setState({requestedBloodDonations});
+        const {bloodInvoiceId} = this.state;
+        this.props.requestBloodDonation(externalId, {bloodInvoice: bloodInvoiceId});
     }
 
     addToBloodDonations(bloodDonation) {
@@ -67,16 +62,18 @@ class DonationScanningDialog extends React.Component {
         const errors = {};
         const hasErrors = !DonationScanningDialog.setErrorMessages(this.state, errors);
         if (hasErrors) return this.setState(errors);
-        const {changeBloodDonation} = this.props;
-        const {addedBloodDonationIds, bloodDonationIds, bloodInvoiceId} = this.state;
+        const {addedBloodDonationIds, addedBloodInvoiceIds, bloodInvoiceId, bloodDonationIds, bloodInvoiceSeriesId} = this.state;
         if (!addedBloodDonationIds.find(id => id === bloodDonation.externalId))
             addedBloodDonationIds.push(bloodDonation.externalId);
+        if (!addedBloodInvoiceIds.find(id => id === bloodInvoiceId)) {
+            addedBloodInvoiceIds.push(bloodInvoiceId);
+            this.props.requestBloodInvoice(bloodInvoiceId, {bloodInvoiceSeries: bloodInvoiceSeriesId});
+        }
         this.setState({
             addedBloodDonationIds,
+            addedBloodInvoiceIds,
             bloodDonationIds: bloodDonationIds.replace(bloodDonation.externalId, "").replace(/^\s+/, '')
         });
-        if (!bloodDonation.bloodInvoice && bloodInvoiceId && changeBloodDonation)
-            changeBloodDonation(bloodDonation.localId, {bloodInvoice: bloodInvoiceId});
     }
 
     deleteBloodDonation(localId, bloodDonation) {
@@ -126,7 +123,7 @@ class DonationScanningDialog extends React.Component {
     }
 
     onChange(propName, value) {
-        if (/bloodInvoiceSeriesId|bloodInvoiceId|productBatchId|totalAmountLimit|currentPoolNumber/.test(propName)) {
+        if (/bloodInvoiceId|bloodInvoiceSeriesId|productBatchId|totalAmountLimit|currentPoolNumber/.test(propName)) {
             this.setState({[propName]: value, ...DonationScanningDialog.resetErrorMessages()});
         }
         else if (/bloodDonationIds/.test(propName)) {
@@ -141,12 +138,12 @@ class DonationScanningDialog extends React.Component {
         const errorMsg = "Требуется ввести значение";
         const newState = Object.assign({}, state, changes);
         let result = true;
-        if (newState.bloodInvoiceSeriesId === undefined) {
-            changes.bloodInvoiceSeriesIdError = errorMsg;
-            result = false;
-        }
         if (newState.bloodInvoiceId === undefined) {
             changes.bloodInvoiceIdError = errorMsg;
+            result = false;
+        }
+        if (newState.bloodInvoiceSeriesId === undefined) {
+            changes.bloodInvoiceSeriesIdError = errorMsg;
             result = false;
         }
         if (newState.productBatchId === undefined) {
@@ -158,34 +155,30 @@ class DonationScanningDialog extends React.Component {
 
     static resetErrorMessages() {
         return {
-            bloodInvoiceSeriesIdError: undefined,
             bloodInvoiceIdError: undefined,
-            productBatchIdError: undefined
+            productBatchIdError: undefined,
+            bloodInvoiceSeriesIdError: undefined
         }
     }
 
     onSubmit() {
-        const {onSubmit} = this.props;
+        const {onSubmit, changeBloodDonation} = this.props;
         const {productBatchId, bloodPools} = this.state;
         if (!productBatchId || /^\s+$/.test(productBatchId)) {
             this.setState({productBatchIdError: "Введите номер загрузки."});
             return;
         }
-        onSubmit && onSubmit(Object.keys(bloodPools).map(poolNumber => {
+        Object.keys(bloodPools).forEach(poolNumber => {
             const externalId = productBatchId + "-" + poolNumber;
-            const {totalAmount, bloodDonations} = bloodPools[poolNumber];
-            return {
-                externalId,
-                poolNumber,
-                productBatch: productBatchId,
-                totalAmount,
-                bloodDonations : Object.keys(bloodDonations)
-            };
-        }));
+            const {bloodDonations} = bloodPools[poolNumber];
+            Object.keys(bloodDonations).map(key => bloodDonations[key]).forEach(bd => changeBloodDonation && changeBloodDonation(bd.localId, {bloodPool: externalId}));
+        });
+        onSubmit && onSubmit();
         this.setState({
             bloodDonationIds: "",
             bloodPools: {},
-            productBatchIdError: undefined
+            addedBloodDonationIds : [],
+            ...DonationScanningDialog.resetErrorMessages()
         });
     }
 
@@ -194,7 +187,8 @@ class DonationScanningDialog extends React.Component {
         this.setState({
             bloodDonationIds: "",
             bloodPools: {},
-            productBatchIdError: undefined
+            addedBloodDonationIds : [],
+            ...DonationScanningDialog.resetErrorMessages()
         });
         onCancel && onCancel();
     }
@@ -202,8 +196,9 @@ class DonationScanningDialog extends React.Component {
     render() {
         const {open, changeBloodDonation, bloodDonations} = this.props;
         const {
-            bloodInvoiceId, productBatchId, currentPoolNumber, bloodDonationIds, totalAmountLimit, bloodInvoiceSeriesIdError,
-            bloodPools, productBatchIdError, bloodInvoiceIdError, addedBloodDonationIds, bloodInvoiceSeriesId
+            bloodInvoiceId, productBatchId, currentPoolNumber, bloodDonationIds, totalAmountLimit,
+            bloodPools, productBatchIdError, bloodInvoiceIdError, addedBloodDonationIds, bloodInvoiceSeriesId,
+            bloodInvoiceSeriesIdError
         } = this.state;
 
         return (
@@ -223,10 +218,10 @@ class DonationScanningDialog extends React.Component {
                            floatingLabelText="ID загрузки"
                            style={{width:200}}
                            onChange={e => this.onChange('productBatchId', e.target.value)}/>
-                <TextField hintText="Введите серию ПДФ"
+                <TextField hintText="Введите номер ПДФ"
                            value={bloodInvoiceSeriesId}
                            errorText={bloodInvoiceSeriesIdError}
-                           floatingLabelText="Серия ПДФ"
+                           floatingLabelText="Номер ПДФ"
                            style={{width:200}}
                            onChange={e => this.onChange('bloodInvoiceSeriesId', e.target.value)}/>
                 <TextField hintText="Введите ID накладной"
@@ -288,6 +283,7 @@ DonationScanningDialog.propTypes = {
     requestBloodDonation: PropTypes.func,
     resetBloodDonationChanges: PropTypes.func,
     changeBloodDonation: PropTypes.func,
+    requestBloodInvoice: PropTypes.func,
     bloodDonations : PropTypes.arrayOf(bloodDonationType),
     onCancel : PropTypes.func,
     onSubmit : PropTypes.func

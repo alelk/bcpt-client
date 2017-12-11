@@ -2,17 +2,18 @@
   "name": "bcpt-client",
   "version": "0.1.0",
   "description": "Web Client for the BCPT Project",
+  "homepage":"./",
   "private": true,
   "author": "Alex Elkin",
   "license": "MIT",
   "dependencies": {
+    "bytes": "^3.0.0",
     "downloadjs": "^1.4.7",
     "history": "^4.7.2",
     "material-design-icons": "^3.0.1",
     "material-ui": "^0.19.4",
     "moment": "^2.18.1",
     "normalizr": "^3.2.3",
-    "pretty-bytes": "^4.0.2",
     "prop-types": "^15.5.10",
     "query-string": "^5.0.0",
     "react": "^15.6.1",
@@ -23,7 +24,6 @@
     "react-router-redux": "next",
     "react-table": "^6.5.3",
     "redux": "^3.7.2",
-    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "rxjs": "^5.4.3",
     "sockjs-client": "^1.1.4",
@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "cpx": "^1.5.0",
-    "react-scripts": "1.0.13"
+    "react-scripts": "1.0.13",
+    "redux-logger": "^3.0.6"
   }
 }

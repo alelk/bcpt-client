@@ -114,7 +114,9 @@ export const ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST = "ACTION_TABLE_ROW_GET_OR_C
 export const ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS = "ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS";
 export const ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE = "ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE";
 
-export const getOrCreateTableRow = (tableName, localId) => (dispatch) => {
+export const getOrCreateTableRow = (tableName, localId, changes) => (dispatch, getState) => {
+    const tableItems = getState().tableItems[tableName];
+    if (tableItems && Object.keys(tableItems).map(key => tableItems[key]).find(item => item && item.externalId === localId)) return;
     return dispatch(fetchTableRowWithApi(
         [
             ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST,
@@ -122,9 +124,11 @@ export const getOrCreateTableRow = (tableName, localId) => (dispatch) => {
             ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE
         ], tableName,
         localId
-    )).catch(action => {
+    )).then(() => {
+        if (changes) dispatch(tableRowChange(tableName, localId, changes))
+    }, action => {
         const {localId, tableName} = action;
-        dispatch(tableRowCreate(tableName, {externalId: localId}))
+        dispatch(tableRowCreate(tableName, Object.assign({externalId: localId}, changes)))
     })
 };
 
@@ -185,7 +189,7 @@ export const tableRowCreate = (tableName, initialData) => (dispatch, getState) =
     dispatch({
         type: ACTION_TABLE_ADD_NEW_ITEM,
         tableName,
-        pageNumber: table && table.pageNumber,
+        pageNumber: (table && table.pageNumber) || 1,
         localId
     });
     initialData && dispatch(tableRowChange(tableName, localId, initialData));

@@ -12,10 +12,6 @@ import PropTypes from 'prop-types'
 
 class DataExporter extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const {
             onDrawerChangeDrawerVisibilityRequest, onExportProductBatch

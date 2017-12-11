@@ -53,7 +53,8 @@ class BloodDonationsContainer extends TableContainerAdapter {
                                  subComponent={BloodDonationSubTable}
                                  bloodDonations={bloodDonations}
                                  resetBloodDonationChanges={(localId) => resetTableRowChanges("bloodDonations", localId)}
-                                 getOrCreateBloodDonation={localId => getOrCreateTableRow("bloodDonations", localId)}/>
+                                 getOrCreateBloodInvoice={(localId, changes) => getOrCreateTableRow("bloodInvoices", localId, changes)}
+                                 getOrCreateBloodDonation={(localId, changes) => getOrCreateTableRow("bloodDonations", localId, changes)}/>
         )
     }
 }
