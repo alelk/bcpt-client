@@ -50,6 +50,8 @@ class BloodDonation extends React.Component {
                                hintText="Введите объём"
                                errorText={this.state.amountError}
                                style={{width:150}}
+
+                               onBlur={() => console.log("On blur!")}
                                onChange={e => this.onChange(localId, "amount", parseInt(e.target.value, 10))}/>
                     <TextField floatingLabelText="Номер накладной"
                                value={bloodInvoice}

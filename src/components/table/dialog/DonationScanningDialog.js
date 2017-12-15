@@ -33,11 +33,8 @@ class DonationScanningDialog extends React.Component {
             totalAmountLimit: 5000,
             bloodDonationIds: "",
             addedBloodDonationIds: [],
-            addedBloodInvoiceIds: [],
-            bloodPools: {},
-            bloodInvoiceIdError: undefined,
-            bloodInvoiceSeriesIdError: undefined,
-            productBatchIdError: undefined
+            addedBloodInvoices: [],
+            bloodPools: {}
         }
     }
 
@@ -52,9 +49,10 @@ class DonationScanningDialog extends React.Component {
         }
     }
 
-    onNewBloodDonation(externalId) {
+    onNewBloodDonation(externalId, amount) {
         const {bloodInvoiceId} = this.state;
-        this.props.requestBloodDonation(externalId, {bloodInvoice: bloodInvoiceId});
+        this.props.addScannedDonation(externalId, {bloodInvoice: bloodInvoiceId, amount});
+        //this.props.requestBloodDonation(externalId, {bloodInvoice: bloodInvoiceId, amount});
     }
 
     addToBloodDonations(bloodDonation) {
@@ -62,17 +60,23 @@ class DonationScanningDialog extends React.Component {
         const errors = {};
         const hasErrors = !DonationScanningDialog.setErrorMessages(this.state, errors);
         if (hasErrors) return this.setState(errors);
-        const {addedBloodDonationIds, addedBloodInvoiceIds, bloodInvoiceId, bloodDonationIds, bloodInvoiceSeriesId} = this.state;
+        const {addedBloodDonationIds, bloodInvoiceId, bloodDonationIds, bloodInvoiceSeriesId} = this.state;
+        let {addedBloodInvoices} = this.state;
         if (!addedBloodDonationIds.find(id => id === bloodDonation.externalId))
             addedBloodDonationIds.push(bloodDonation.externalId);
-        if (!addedBloodInvoiceIds.find(id => id === bloodInvoiceId)) {
-            addedBloodInvoiceIds.push(bloodInvoiceId);
-            this.props.requestBloodInvoice(bloodInvoiceId, {bloodInvoiceSeries: bloodInvoiceSeriesId});
+        if (!addedBloodInvoices.find(bi => bi.bloodInvoiceId === bloodInvoiceId && bi.bloodInvoiceSeriesId === bloodInvoiceSeriesId)) {
+            addedBloodInvoices = addedBloodInvoices.filter(bi => bi.bloodInvoiceId !== bloodInvoiceId);
+            addedBloodInvoices.push({bloodInvoiceId, bloodInvoiceSeriesId});
+            this.props.requestBloodInvoice(
+                bloodInvoiceId,
+                bloodInvoiceSeriesId && /\s*[\w\d]+\s*/.test(bloodInvoiceSeriesId)
+                    ? {bloodInvoiceSeries: bloodInvoiceSeriesId} : undefined
+            );
         }
         this.setState({
             addedBloodDonationIds,
-            addedBloodInvoiceIds,
-            bloodDonationIds: bloodDonationIds.replace(bloodDonation.externalId, "").replace(/^\s+/, '')
+            addedBloodInvoices,
+            bloodDonationIds: bloodDonationIds.replace(new RegExp(bloodDonation.externalId + "\\s+\\d{2,4}\\s+", "g"), "\t").replace(/^\s+/, '')
         });
     }
 
@@ -85,36 +89,14 @@ class DonationScanningDialog extends React.Component {
     }
 
     onAddBloodDonationToPool(localId, bloodDonation) {
-        const {bloodPools, addedBloodDonationIds, totalAmountLimit} = this.state;
-        let {currentPoolNumber} = this.state;
-        let currentPool = bloodPools[currentPoolNumber] || {bloodDonations:{}, poolNumber: currentPoolNumber};
-        const totalAmount = this.bloodPoolTotalAmount(currentPool);
-        if (totalAmount + parseInt(bloodDonation.amount, 10) < totalAmountLimit) {
-            currentPool.bloodDonations[bloodDonation.localId] = bloodDonation;
-        } else {
-            currentPoolNumber ++;
-            currentPool = {
-                bloodDonations:{[bloodDonation.localId]:bloodDonation},
-                poolNumber: currentPoolNumber,
-            }
-        }
-        currentPool.totalAmount = this.bloodPoolTotalAmount(currentPool);
-        bloodPools[currentPool.poolNumber] = currentPool;
-        this.setState({
-            bloodPools,
-            currentPoolNumber,
-            addedBloodDonationIds : addedBloodDonationIds.filter(id => id !== bloodDonation.externalId)
-        });
+        const {poolScanning, assignScannedDonationToPool} = this.props;
+        const {productBatch, poolNumber} = poolScanning;
+        if (assignScannedDonationToPool) assignScannedDonationToPool(localId, productBatch, poolNumber);
     }
 
-    deleteFromPool(bloodDonationId, poolNumber) {
-        let {bloodPools} = this.state;
-        const bloodPool = bloodPools[poolNumber];
-        const bloodDonations = bloodPool && bloodPool.bloodDonations;
-        if (!bloodDonations) return;
-        delete bloodDonations[bloodDonationId];
-        bloodPool.totalAmount = this.bloodPoolTotalAmount(bloodPool);
-        this.setState({bloodPools})
+    deleteFromPool(bloodDonationId, poolNumber, productBatchId) {
+        const {removeDonationFromPool} = this.props;
+        if (removeDonationFromPool) removeDonationFromPool(bloodDonationId, productBatchId, poolNumber);
     }
 
     bloodPoolTotalAmount(bloodPool) {
@@ -123,14 +105,20 @@ class DonationScanningDialog extends React.Component {
     }
 
     onChange(propName, value) {
-        if (/bloodInvoiceId|bloodInvoiceSeriesId|productBatchId|totalAmountLimit|currentPoolNumber/.test(propName)) {
-            this.setState({[propName]: value, ...DonationScanningDialog.resetErrorMessages()});
+        if (/bloodInvoice|bloodInvoiceSeries|productBatch|totalAmountLimit|poolNumber/.test(propName)) {
+            this.props.changeScanningProps({[propName]: value});
         }
         else if (/bloodDonationIds/.test(propName)) {
-            const result = /^\s*(\w+\s+)*(\w+)\s+$/.exec(value);
+            const result = /^\s*(\w+\s+)*(\w{6,20})\s+(\d{2,4})\s+$/.exec(value);
             const localId = result && result[2];
-            this.setState({[propName]: value.replace(/\s+/g, '\t')});
-            if (localId) this.onNewBloodDonation(localId);
+            const amount = result && result[3];
+            if (localId && amount) {
+                this.onNewBloodDonation(localId, parseInt(amount, 10));
+                this.setState({
+                    bloodDonationIds: value.replace(new RegExp(localId + "\\s+" + amount + "\\s+"), "\t").replace(/^\s+/, '')
+                });
+            } else
+                this.setState({[propName]: value.replace(/\s+/g, '\t')});
         }
     }
 
@@ -140,10 +128,6 @@ class DonationScanningDialog extends React.Component {
         let result = true;
         if (newState.bloodInvoiceId === undefined) {
             changes.bloodInvoiceIdError = errorMsg;
-            result = false;
-        }
-        if (newState.bloodInvoiceSeriesId === undefined) {
-            changes.bloodInvoiceSeriesIdError = errorMsg;
             result = false;
         }
         if (newState.productBatchId === undefined) {
@@ -157,7 +141,6 @@ class DonationScanningDialog extends React.Component {
         return {
             bloodInvoiceIdError: undefined,
             productBatchIdError: undefined,
-            bloodInvoiceSeriesIdError: undefined
         }
     }
 
@@ -193,13 +176,62 @@ class DonationScanningDialog extends React.Component {
         onCancel && onCancel();
     }
 
+    renderBloodPools() {
+        const {bloodPools, poolScanning} = this.props;
+        const {managingPools, productBatch, totalAmountLimit} = poolScanning;
+        const managingPoolItems = Object.keys(managingPools)
+            .map(externalId => managingPools[externalId])
+            .sort((p1, p2) => p2.timestamp - p1.timestamp)
+            .map(pool => ({
+                ...pool,
+                ...this.totalAmountAndDonations(pool)
+            })).map(pool => {
+                const bloodPool = bloodPools.find(bp => bp.externalId === pool.externalId);
+                return {
+                    ...pool,
+                    poolNumber: bloodPool && bloodPool.poolNumber,
+                    totalAmount: pool.totalAmount + (bloodPool && bloodPool.totalAmount ? bloodPool.totalAmount : 0)
+                }
+            });
+        console.log("managingPools: ", managingPoolItems, managingPools);
+        return managingPoolItems.map(pool =>
+            <BloodPool key={pool.externalId}
+                       bloodPool={pool}
+                       productBatchId={productBatch}
+                       totalAmountLimit={totalAmountLimit}
+                       onDeleteBloodDonation={this.deleteFromPool}/>
+        )
+    }
+
+    totalAmountAndDonations(pool) {
+        const {bloodDonations} = this.props;
+        const {donations} = pool;
+        return donations.reduce((acc, id) => {
+            const donation = bloodDonations && bloodDonations.find(d => d.externalId === id);
+            return {
+                totalAmount: acc.totalAmount + (donation ? donation.amount | 0 : 0),
+                bloodDonations : Object.assign(acc.bloodDonations, donation ? {[id] : donation} : undefined)
+            };
+        }, {totalAmount : 0, bloodDonations : {}});
+    }
+
     render() {
-        const {open, changeBloodDonation, bloodDonations} = this.props;
+        const {open, changeBloodDonation, bloodDonations, poolScanning} = this.props;
         const {
-            bloodInvoiceId, productBatchId, currentPoolNumber, bloodDonationIds, totalAmountLimit,
-            bloodPools, productBatchIdError, bloodInvoiceIdError, addedBloodDonationIds, bloodInvoiceSeriesId,
-            bloodInvoiceSeriesIdError
+            productBatch, bloodInvoice, bloodInvoiceSeries, poolNumber, totalAmountLimit,
+            productBatchError, poolNumberError, bloodInvoiceError, bloodInvoiceSeriesError, totalAmountLimitError,
+            scannedTextError, scannedDonations
+        } = poolScanning;
+        const {
+            bloodDonationIds
         } = this.state;
+
+        const scannedDonationItems = Object.keys(scannedDonations)
+            .map(externalId => scannedDonations[externalId])
+            .filter(sd => sd.isPreparing)
+            .sort((sd1, sd2) => sd2.timestamp - sd1.timestamp)
+            .map(donation => bloodDonations.find(bd => bd.externalId === donation.externalId))
+            .filter(donation => donation != null);
 
         return (
             <Dialog open={open}
@@ -213,39 +245,42 @@ class DonationScanningDialog extends React.Component {
                     autoScrollBodyContent
                     title="Сканирование пакетов с плазмой">
                 <TextField hintText="Введите ID загрузки"
-                           value={productBatchId}
-                           errorText={productBatchIdError}
+                           value={productBatch}
+                           errorText={productBatchError}
                            floatingLabelText="ID загрузки"
                            style={{width:200}}
-                           onChange={e => this.onChange('productBatchId', e.target.value)}/>
+                           onChange={e => this.onChange('productBatch', e.target.value)}/>
                 <TextField hintText="Введите номер ПДФ"
-                           value={bloodInvoiceSeriesId}
-                           errorText={bloodInvoiceSeriesIdError}
+                           errorText={bloodInvoiceSeriesError}
+                           value={bloodInvoiceSeries}
                            floatingLabelText="Номер ПДФ"
                            style={{width:200}}
-                           onChange={e => this.onChange('bloodInvoiceSeriesId', e.target.value)}/>
+                           onChange={e => this.onChange('bloodInvoiceSeries', e.target.value)}/>
                 <TextField hintText="Введите ID накладной"
-                           value={bloodInvoiceId}
-                           errorText={bloodInvoiceIdError}
+                           value={bloodInvoice}
+                           errorText={bloodInvoiceError}
                            floatingLabelText="ID накладной"
                            style={{width:200}}
-                           onChange={e => this.onChange('bloodInvoiceId', e.target.value)}/>
+                           onChange={e => this.onChange('bloodInvoice', e.target.value)}/>
                 <TextField hintText="Введите номер"
                            type="number"
-                           value={currentPoolNumber}
-                           floatingLabelText="Начальный номер пула"
+                           errorText={poolNumberError}
+                           value={poolNumber}
+                           floatingLabelText="Номер пула"
                            style={{width:200}}
                            onChange={
-                               e => this.onChange('currentPoolNumber', e.target.value)
+                               e => this.onChange('poolNumber', e.target.value)
                            }/>
                 <TextField hintText="Выберите максимальный объём"
                            type="number"
+                           errorText={totalAmountLimitError}
                            value={totalAmountLimit}
                            style={{width:250}}
                            floatingLabelText="Максимальный объем пула, мл."
                            onChange={e => this.onChange('totalAmountLimit', e.target.value)}/>
                 <TextField hintText="Сканируйте номера донаций"
                            value={bloodDonationIds}
+                           errorText={scannedTextError}
                            multiLine
                            fullWidth
                            rows={1}
@@ -254,36 +289,30 @@ class DonationScanningDialog extends React.Component {
                            floatingLabelText="Номера донаций"
                            onChange={e => this.onChange('bloodDonationIds', e.target.value)}/>
                 <div style={{display:'flex', flexWrap:'wrap'}}>
-                    {addedBloodDonationIds.map(externalId => bloodDonations.find(bd => bd.externalId === externalId))
-                        .filter(bd => bd != null)
-                        .sort((bd1, bd2) => bd2.creationTimestamp - bd1.creationTimestamp)
-                        .map(bd =>
+                    {scannedDonationItems.map(bd =>
                             <BloodDonation key={bd.localId}
                                            bloodDonation={bd}
-                                           productBatchId={productBatchId}
+                                           productBatchId={productBatch}
                                            onApply={this.onAddBloodDonationToPool}
                                            onDeleteBloodDonation={this.deleteBloodDonation}
                                            onChangeBloodDonation={changeBloodDonation}/>
                         )}
                 </div>
-
-                {Object.keys(bloodPools).sort((a,b) => b-a).map(bloodPoolId =>
-                    <BloodPool key={bloodPoolId}
-                               bloodPool={bloodPools[bloodPoolId]}
-                               productBatchId={productBatchId}
-                               totalAmountLimit={parseInt(totalAmountLimit, 10)}
-                               onDeleteBloodDonation={this.deleteFromPool}/>
-                )}
+                {this.renderBloodPools()}
             </Dialog>
         )
     }
 }
 DonationScanningDialog.propTypes = {
     open: PropTypes.bool,
+    poolScanning: PropTypes.object.isRequired,
     requestBloodDonation: PropTypes.func,
     resetBloodDonationChanges: PropTypes.func,
     changeBloodDonation: PropTypes.func,
     requestBloodInvoice: PropTypes.func,
+    changeScanningProps: PropTypes.func,
+    addScannedDonation: PropTypes.func,
+    removeDonationFromPool: PropTypes.func,
     bloodDonations : PropTypes.arrayOf(bloodDonationType),
     onCancel : PropTypes.func,
     onSubmit : PropTypes.func

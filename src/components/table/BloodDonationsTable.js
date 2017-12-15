@@ -86,7 +86,11 @@ class BloodDonationsTable extends Table {
     }
 
     extraContent() {
-        const {bloodDonations, getOrCreateBloodDonation, getOrCreateBloodInvoice, resetBloodDonationChanges} = this.props;
+        const {
+            bloodDonations, getOrCreateBloodDonation, getOrCreateBloodInvoice, resetBloodDonationChanges,
+            changeScanningProps, poolScanning, addScannedDonation, bloodPools, removeDonationFromPool,
+            assignScannedDonationToPool
+        } = this.props;
         return (
             <div>
                 <SimpleValueDialog title="Введите номер пула"
@@ -98,9 +102,15 @@ class BloodDonationsTable extends Table {
                 <DonationScanningDialog open={this.state.dialogDonationScanning}
                                         onCancel={this.onDonationScanningClose}
                                         bloodDonations={bloodDonations}
+                                        bloodPools={bloodPools}
+                                        poolScanning={poolScanning}
                                         requestBloodDonation={getOrCreateBloodDonation}
                                         requestBloodInvoice={getOrCreateBloodInvoice}
                                         resetBloodDonationChanges={resetBloodDonationChanges}
+                                        changeScanningProps={changeScanningProps}
+                                        addScannedDonation={addScannedDonation}
+                                        removeDonationFromPool={removeDonationFromPool}
+                                        assignScannedDonationToPool={assignScannedDonationToPool}
                                         onSubmit={this.onDonationScanningSubmit}
                                         changeBloodDonation={this.props.onChange}/>
             </div>
@@ -253,7 +263,11 @@ BloodDonationsTable.propTypes = {
     bloodDonations : PropTypes.arrayOf(bloodDonationType),
     getOrCreateBloodDonation: PropTypes.func,
     getOrCreateBloodInvoice: PropTypes.func,
+    changeScanningProps: PropTypes.func,
+    addScannedDonation: PropTypes.func,
+    removeDonationFromPool: PropTypes.func,
     resetBloodDonationChanges: PropTypes.func,
+    poolScanning: PropTypes.object,
     pagesCount: PropTypes.number,
     isFetching : PropTypes.bool,
     isEditing : PropTypes.bool,

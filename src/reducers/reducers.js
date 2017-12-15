@@ -33,6 +33,8 @@ import {imports} from './importerReducers'
 
 import {stompClient, stompClientSubscriptions} from './webSocketReducers'
 
+import {poolScanning} from './poolScanningReducers'
+
 import {extractTableName, isSubtable} from '../util/util'
 
 import {urlQueryAsFilters} from '../components/table/Table'
@@ -211,11 +213,20 @@ export const tableItemsChecked = (tableItems, tableName) => {
             .map(({localId, item}) => localId);
 };
 
+export const tableItemsFromResponse = (response, tableName) =>
+    response && response.entities && response.entities[tableName];
+
+
+export const tableItemFromResponse = (response, tableName, externalId) => {
+    const items = tableItemsFromResponse(response, tableName);
+    return items && items[externalId];
+};
+
 const tableItems = (state = {}, action) => {
-    const {type, tableName, localId, changes, response, error, overrideChanges} = action;
+    const {type, tableName, localId, changes, response, error, overrideChanges, onComplete} = action;
     if (ACTION_TABLE_DATA_SUCCESS === type || ACTION_TABLE_ROW_SUCCESS === type || ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS === type) {
         const tableRealName = extractTableName(tableName);
-        if (!response || !response.entities || !response.entities[tableRealName]) return state;
+        if (!tableItemsFromResponse(response, tableRealName)) return state;
         return tableItemsMerge(state, tableName, response.entities[tableRealName], overrideChanges);
     } else if (ACTION_TABLE_ROW_FAILURE === type) {
         if (overrideChanges) return tableItemsDeleteItem(state, tableName, localId);
@@ -227,7 +238,9 @@ const tableItems = (state = {}, action) => {
     } else if (ACTION_TABLE_EDIT_ROW === type && localId) {
         return tableItemWith(state, tableName, localId, {isEditing:true, isDeleted:false});
     } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
-        return tableItemWith(state, tableName, localId, objectWith({isEdited:true, isEditing:true}, changes));
+        const newState = tableItemWith(state, tableName, localId, objectWith({isEdited:true, isEditing:true}, changes));
+        onComplete && onComplete(newState[tableName][localId]);
+        return newState;
     } else if (ACTION_TABLE_RESET_CHANGES === type) {
         return objectWith(state, {[tableName]:{}})
     } else if (ACTION_TABLE_SAVED_CHANGES === type) {
@@ -283,6 +296,7 @@ const rootReducer = combineReducers({
     imports,
     stompClient,
     stompClientSubscriptions,
+    poolScanning,
     routing: routerReducer
 });
 
