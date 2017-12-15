@@ -28,7 +28,7 @@ const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation, productB
                     const {amount, localId, externalId} = bloodDonations[bloodDonationId];
                     return (
                         <Chip key={bloodDonationId} style={{margin: 6}}
-                              onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber))}>
+                              onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber, productBatchId))}>
                             {externalId} ({amount} мл.)
                         </Chip>
                     )

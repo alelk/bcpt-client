@@ -4,8 +4,9 @@
  * Created by Alex Elkin on 12.09.2017.
  */
 
-import {tableItemsChecked, isPageFetched} from '../reducers/reducers'
+import {tableItemsChecked, isPageFetched, tableItemFromResponse} from '../reducers/reducers'
 import {sortedAsParams, filteredAsParams} from '../api/bcptRestApi'
+import {getTableRowByLocalIdOrExternalId} from './utils'
 import {CALL_BCPT_REST_API} from '../middleware/bcptRestApiMiddleware'
 
 export const ACTION_TABLE_DATA_REQUEST = 'ACTION_TABLE_DATA_REQUEST';
@@ -115,21 +116,29 @@ export const ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS = "ACTION_TABLE_ROW_GET_OR_C
 export const ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE = "ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE";
 
 export const getOrCreateTableRow = (tableName, localId, changes) => (dispatch, getState) => {
-    const tableItems = getState().tableItems[tableName];
-    if (tableItems && Object.keys(tableItems).map(key => tableItems[key]).find(item => item && item.externalId === localId)) return;
-    return dispatch(fetchTableRowWithApi(
-        [
-            ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST,
-            ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS,
-            ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE
-        ], tableName,
-        localId
-    )).then(() => {
-        if (changes) dispatch(tableRowChange(tableName, localId, changes))
-    }, action => {
-        const {localId, tableName} = action;
-        dispatch(tableRowCreate(tableName, Object.assign({externalId: localId}, changes)))
-    })
+    const existing = getTableRowByLocalIdOrExternalId(getState().tableItems[tableName], localId);
+    let existingLocalId = existing && existing.localId;
+    return new Promise(resolve => {
+        if (existingLocalId) {
+            if (changes) return dispatch(tableRowChangeOnFeature(tableName, existingLocalId, changes)).then(changedItem => resolve(changedItem));
+            return resolve(existing);
+        } else dispatch(fetchTableRowWithApi(
+            [
+                ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST,
+                ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS,
+                ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE
+            ], tableName,
+            localId
+        )).then(action => {
+            if (changes)
+                return dispatch(tableRowChangeOnFeature(tableName, localId, changes)).then(changedItem => resolve(changedItem));
+            else resolve(tableItemFromResponse(action.response, tableName, localId));
+        }, action => {
+            const item = Object.assign({externalId: localId}, changes);
+            dispatch(tableRowCreate(tableName, item));
+            resolve(item);
+        })
+    });
 };
 
 export const resetTableRowChanges = (tableName, localId) => fetchTableRow(tableName, localId, true);
@@ -155,6 +164,15 @@ export const tableRowChange = (tableName, localId, changes) => ({
     localId,
     changes
 });
+
+export const tableRowChangeOnFeature = (tableName, localId, changes) => dispatch => {
+    return new Promise(resolve => {
+        dispatch({
+            onComplete: (tableItem) => resolve(tableItem),
+            ...tableRowChange(tableName, localId, changes)
+        })
+    });
+};
 
 export const ACTION_TABLE_SAVE_CHANGES_REQUEST = 'ACTION_TABLE_SAVE_CHANGES_REQUEST';
 export const ACTION_TABLE_SAVE_CHANGES_SUCCESS = 'ACTION_TABLE_SAVE_CHANGES_SUCCESS';
