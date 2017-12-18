@@ -13,12 +13,14 @@ class AppPage extends React.Component {
 
     render() {
         const {
-            onDrawerChangeDrawerVisibilityRequest, className, title, children
+            onDrawerChangeDrawerVisibilityRequest, className, title, iconElementRight, onRightIconButtonTouchTap, children
         } = this.props;
         return (
             <div className={`AppPage${className?' ' + className:''}`}>
                 <AppBar className="AppBar" onLeftIconButtonTouchTap={onDrawerChangeDrawerVisibilityRequest}
-                        title={title}/>
+                        title={title}
+                        iconElementRight={iconElementRight}
+                        onRightIconButtonTouchTap={onRightIconButtonTouchTap}/>
                 <div className="content">
                     {children}
                 </div>
@@ -30,6 +32,8 @@ AppPage.propTypes = {
     title: PropTypes.string,
     className: PropTypes.string,
     onDrawerChangeDrawerVisibilityRequest : PropTypes.func,
+    iconElementRight: PropTypes.element,
+    onRightIconButtonTouchTap: PropTypes.func
 };
 
 export default AppPage;

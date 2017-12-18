@@ -33,7 +33,7 @@ import {imports} from './importerReducers'
 
 import {stompClient, stompClientSubscriptions} from './webSocketReducers'
 
-import {poolScanning} from './poolScanningReducers'
+import {poolScanningConfigs, poolScanningErrors, scannedDonations} from './poolScanningReducers'
 
 import {extractTableName, isSubtable} from '../util/util'
 
@@ -296,7 +296,9 @@ const rootReducer = combineReducers({
     imports,
     stompClient,
     stompClientSubscriptions,
-    poolScanning,
+    poolScanningConfigs,
+    poolScanningErrors,
+    scannedDonations,
     routing: routerReducer
 });
 

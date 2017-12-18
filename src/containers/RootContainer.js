@@ -13,6 +13,7 @@ import ProductBatchesContainer from './table/ProductBatchesContainer'
 import DrawerContainer from './DrawerContainer'
 import DataImporterContainer from './DataImporterContainer'
 import DataExporterContainer from './DataExporterContainer'
+import PoolScannerContainer from './PoolScannerContainer'
 import HomePageContainer from './HomePageContainer'
 
 import React from 'react'
@@ -36,7 +37,8 @@ const tableLinks = [
 ];
 const toolLinks = [
     {link:"/import", title:"Импорт данных", iconName:"file_upload"},
-    {link:"/export", title:"Экспорт данных", iconName:"file_download"}
+    {link:"/export", title:"Экспорт данных", iconName:"file_download"},
+    {link:"/poolScanner", title:"Сканирование пулов", iconName:"camera_alt"}
 ];
 
 const renderMenuItem = (link, label, iconName) => (
@@ -71,6 +73,7 @@ const Root = ({store, history}) => (
                     <Route path='*/table/productBatches' component={ProductBatchesContainer}/>
                     <Route path='*/import' component={DataImporterContainer}/>
                     <Route path='*/export' component={DataExporterContainer}/>
+                    <Route path='*/poolScanner' component={PoolScannerContainer}/>
                 </div>
             </div>
         </ConnectedRouter>
