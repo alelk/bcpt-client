@@ -12,7 +12,7 @@ import Chip from 'material-ui/Chip';
 const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation}) => {
     const {productBatch, poolNumber, totalAmount, bloodDonations} = bloodPool;
     return (
-        <Paper style={{width: '100%', margin: '20px 0'}} zDepth={3}>
+        <Paper style={{width: '100%', margin: '20px 0', padding: 10}} zDepth={3}>
             <div>
                 <span>Загрузка</span>
                 <span style={{fontSize: '2em', padding: 10}}>{productBatch}</span>
@@ -27,7 +27,7 @@ const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation}) => {
                     return (
                         <Chip key={bloodDonationId} style={{margin: 6}}
                               onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber, productBatch))}>
-                            <b>{externalId}</b> ({amount} мл., накл. {bloodInvoice})
+                            <b>{externalId}</b>  <span style={{color:'#00693d'}}>{amount} мл.</span> (накл. <span style={{color:'#333'}}>{bloodInvoice}</span>)
                         </Chip>
                     )
                 })}

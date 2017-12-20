@@ -68,12 +68,7 @@ export default store => nextProcedure => action => {
         else if (/saveChanges/.test(method)) {
             const items = store.getState().tableItems[tableName];
             const table = store.getState().tables[tableName];
-            if (!items || !table)
-                nextProcedure(rejectWithAction({
-                    type: failureType,
-                    error: "Unable to save table '" + tableName + "': no table or table items found!"
-                }));
-            else if (!table.isEdited)
+            if (!items || !table || !table.isEdited)
                 nextProcedure(resolveWithAction({
                     type: successType,
                     message: "No changes found in the '" + tableName + "' table"

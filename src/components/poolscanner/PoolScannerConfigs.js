@@ -14,14 +14,27 @@ class PoolScannerConfigs extends React.Component {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);
+        this.state = {
+            productBatch: undefined,
+            bloodInvoiceSeries: undefined,
+            bloodInvoice: undefined,
+            poolNumber: undefined,
+            totalAmountLimit: undefined
+        }
     }
 
     componentWillMount() {
-        const {onChange} = this.props;
+        const {onChange, config} = this.props;
+        this.setState(config);
         if (onChange)
             Rx.Observable.create(o => {
                 this.observer = o;
             }).debounceTime(500).subscribe(changes => onChange(changes));
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.config !== this.props.config)
+            this.setState(nextProps.config);
     }
 
     componentWillUnmount() {
@@ -29,30 +42,31 @@ class PoolScannerConfigs extends React.Component {
     }
 
     onChange(fieldName, value) {
-        this.changes = Object.assign({}, this.changes, {[fieldName]: value});
-        this.observer && this.observer.next(this.changes);
+        const changes = Object.assign(this.state, {[fieldName]: value});
+        this.setState({[fieldName]: value});
+        this.observer && this.observer.next(changes);
     }
 
     render() {
-        const {config, errors} = this.props;
-        const {productBatch, bloodInvoice, bloodInvoiceSeries, poolNumber, totalAmountLimit} = config || {};
+        const {errors} = this.props;
+        const {productBatch, bloodInvoice, bloodInvoiceSeries, poolNumber, totalAmountLimit} = this.state;
         const {productBatchError, poolNumberError, bloodInvoiceError, bloodInvoiceSeriesError, totalAmountLimitError} = errors || {};
         return (
             <div>
                 <TextField hintText="Введите ID загрузки"
-                           defaultValue={productBatch}
+                           value={productBatch}
                            errorText={productBatchError}
                            floatingLabelText="ID загрузки"
                            style={{width: 200}}
                            onChange={e => this.onChange('productBatch', e.target.value)}/>
                 <TextField hintText="Введите номер ПДФ"
                            errorText={bloodInvoiceSeriesError}
-                           defaultValue={bloodInvoiceSeries}
+                           value={bloodInvoiceSeries}
                            floatingLabelText="Номер ПДФ"
                            style={{width: 200}}
                            onChange={e => this.onChange('bloodInvoiceSeries', e.target.value)}/>
                 <TextField hintText="Введите ID накладной"
-                           defaultValue={bloodInvoice}
+                           value={bloodInvoice}
                            errorText={bloodInvoiceError}
                            floatingLabelText="ID накладной"
                            style={{width: 200}}
@@ -60,14 +74,14 @@ class PoolScannerConfigs extends React.Component {
                 <TextField hintText="Введите номер"
                            type="number"
                            errorText={poolNumberError}
-                           defaultValue={poolNumber}
+                           value={poolNumber}
                            floatingLabelText="Номер пула"
                            style={{width: 200}}
                            onChange={e => this.onChange('poolNumber', parseInt(e.target.value, 10))}/>
                 <TextField hintText="Выберите максимальный объём"
                            type="number"
                            errorText={totalAmountLimitError}
-                           defaultValue={totalAmountLimit}
+                           value={totalAmountLimit}
                            style={{width: 250}}
                            floatingLabelText="Максимальный объем пула, мл."
                            onChange={e => this.onChange('totalAmountLimit', parseInt(e.target.value, 10))}/>
