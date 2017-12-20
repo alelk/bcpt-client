@@ -9,13 +9,13 @@ import Paper from 'material-ui/Paper';
 import LinearProgress from 'material-ui/LinearProgress';
 import Chip from 'material-ui/Chip';
 
-const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation, productBatchId}) => {
-    const {poolNumber, totalAmount, bloodDonations} = bloodPool;
+const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation}) => {
+    const {productBatch, poolNumber, totalAmount, bloodDonations} = bloodPool;
     return (
         <Paper style={{width: '100%', margin: '20px 0'}} zDepth={3}>
             <div>
                 <span>Загрузка</span>
-                <span style={{fontSize: '2em', padding: 10}}>{productBatchId}</span>
+                <span style={{fontSize: '2em', padding: 10}}>{productBatch}</span>
                 <span>Пул №</span>
                 <span style={{fontSize: '2em', padding: 10}}>{poolNumber}</span>
                 <span>Объём:</span>
@@ -23,11 +23,11 @@ const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation, productB
             </div>
             <div style={{display: 'flex', flexWrap: 'wrap'}}>
                 {bloodDonations && Object.keys(bloodDonations).map(bloodDonationId => {
-                    const {amount, localId, externalId} = bloodDonations[bloodDonationId];
+                    const {amount, localId, externalId, bloodInvoice} = bloodDonations[bloodDonationId];
                     return (
                         <Chip key={bloodDonationId} style={{margin: 6}}
-                              onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber, productBatchId))}>
-                            {externalId} ({amount} мл.)
+                              onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber, productBatch))}>
+                            <b>{externalId}</b> ({amount} мл., накл. {bloodInvoice})
                         </Chip>
                     )
                 })}
@@ -40,9 +40,9 @@ BloodPool.propTypes = {
     bloodPool: PropTypes.shape({
         poolNumber: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
         totalAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-        bloodDonations: PropTypes.object
+        bloodDonations: PropTypes.object,
+        productBatchId: PropTypes.string,
     }),
-    productBatchId: PropTypes.string,
     totalAmountLimit: PropTypes.number,
     onDeleteBloodDonation: PropTypes.func
 };

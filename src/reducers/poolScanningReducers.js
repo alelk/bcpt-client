@@ -13,9 +13,9 @@ import {
     ACTION_REMOVE_SCANNED_DONATION,
     ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE,
     ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_REQUEST,
-
-    ACTION_REMOVE_DONATION_FROM_POOL,
     ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS,
+    ACTION_REMOVE_DONATION_FROM_POOL_SUCCESS,
+
 
 } from '../actions/poolScanningActions'
 import {objectWith} from './util'
@@ -34,24 +34,6 @@ const updateConfigForceOverride = (state, newConfig, allowedFields) => {
     allowedFields.forEach(key => newState[key] = newConfig && newConfig[key]);
     return newState;
 };
-
-/*
-const assignDonationToPool = (state, donationId, poolId) => {
-    let {managingPools} = state;
-    const donations = managingPools[poolId] && managingPools[poolId].donations
-        ? [donationId, ...managingPools[poolId].donations.filter(id => id !== donationId)] : [donationId];
-    managingPools = objectWith(managingPools, {[poolId]: {externalId: poolId, timestamp: Date.now(), donations}});
-    return Object.assign({}, removeScannedDonation(state, donationId), {managingPools, scannedTextError: undefined});
-};
-
-const removeDonationFromPool = (state, donationId, poolId) => {
-    let {managingPools} = state;
-    if (!managingPools[poolId] || !managingPools[poolId].donations) return state;
-    const donations = managingPools[poolId].donations.filter(id => id !== donationId);
-    const pool = objectWith(managingPools[poolId], {timestamp: Date.now(), donations});
-    managingPools = objectWith(managingPools, {[poolId]: pool});
-    return Object.assign({}, addScannedDonation(state, donationId, true), {managingPools, scannedTextError: undefined});
-}; */
 
 const configFieldNames = ['productBatch', 'poolNumber', 'bloodInvoice', 'bloodInvoiceSeries', 'totalAmountLimit'];
 
@@ -94,7 +76,7 @@ const removeScannedDonation = (state, externalId) => {
 };
 
 export const scannedDonations = (state = {}, action) => {
-    const {type, externalId, changes} = action;
+    const {type, externalId, donationId, changes, bloodDonation} = action;
     if (type === ACTION_ADD_SCANNED_DONATION_REQUEST) {
         return scannedDonationWith(state, externalId, objectWith(changes, {isFetching: true, isFetched: false}));
     } else if (type === ACTION_ADD_SCANNED_DONATION_SUCCESS) {
@@ -103,6 +85,18 @@ export const scannedDonations = (state = {}, action) => {
         return scannedDonationWith(state, externalId, objectWith(changes, {isFetching: false, isFetched: false}));
     } else if (type === ACTION_REMOVE_SCANNED_DONATION) {
         return removeScannedDonation(state, externalId);
+    } else if (type === ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS) {
+        return scannedDonationWith(state, donationId, {isAssignedToPool: true});
+    } else if (type === ACTION_REMOVE_DONATION_FROM_POOL_SUCCESS) {
+        return scannedDonationWith(state, donationId, objectWith(bloodDonation, {isAssignedToPool: false}));
+    }
+    return state;
+};
+
+export const scannedPools = (state = {}, action) => {
+    const {type, externalId, localId, totalAmount} = action;
+    if (type === ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS) {
+        return objectWith(state, {[externalId] : {externalId, localId, totalAmount, timestamp: Date.now()}})
     }
     return state;
 };

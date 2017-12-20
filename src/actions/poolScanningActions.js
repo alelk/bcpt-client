@@ -4,7 +4,7 @@
  * Created by Alex Elkin on 13.12.2017.
  */
 
-import {getOrCreateTableRow, tableRowChangeOnFeature, resetTableRowChanges} from './actions'
+import {getOrCreateTableRow, tableRowChangeOnFeature, resetTableRowChanges, getOrFetchTableRow} from './actions'
 import {getTableRowByLocalIdOrExternalId} from './utils'
 
 export const ACTION_CHANGE_SCANNING_CONFIG = "ACTION_CHANGE_SCANNING_CONFIG";
@@ -45,6 +45,14 @@ export const addScannedDonation = (externalId, changes) => (dispatch, getState) 
     });
 };
 
+export const addScannedDonationAndAssignToPool = (externalId, changes) => (dispatch, getState) => {
+    dispatch(addScannedDonation(externalId, changes)).then(() => {
+        const {poolScanningConfigs} = getState();
+        const {productBatch, poolNumber} = poolScanningConfigs;
+        dispatch(assignScannedDonationToPool(externalId, productBatch, poolNumber));
+    })
+};
+
 export const ACTION_REMOVE_SCANNED_DONATION = "ACTION_REMOVE_SCANNED_DONATION";
 
 export const removeScannedDonation = (localId) => (dispatch, getState) => {
@@ -53,38 +61,21 @@ export const removeScannedDonation = (localId) => (dispatch, getState) => {
     dispatch(Object.assign({type: ACTION_REMOVE_SCANNED_DONATION}, bloodDonation))
 };
 
-/*
-export const addScannedDonationAndAssignToPool = (externalId, changes) => (dispatch, getState) => {
-    const {productBatch, poolNumber, bloodInvoice, bloodInvoiceSeries} = getState().poolScanning;
-    dispatch({
-        type: ACTION_ADD_SCANNED_DONATION,
-        externalId,
-        productBatch,
-        poolNumber
-    });
-    if (bloodInvoice) dispatch(initBloodInvoice(bloodInvoice, bloodInvoiceSeries ? {bloodInvoiceSeries} : undefined));
-    const donationChanges = Object.assign({}, changes, bloodInvoice ? {bloodInvoice} : undefined);
-    dispatch(
-        getOrCreateTableRow("bloodDonations", externalId, donationChanges)
-    ).then(() => {
-        if (!productBatch || !poolNumber || poolNumber <= 0) {
-            return dispatch(changeScanningConfig({
-                productBatchError: productBatch ? undefined : "Введите ID загрузки",
-                poolNumberError: poolNumber && poolNumber > 0 ? undefined : "Неверный номер",
-                scannedTextError: "Для добавления в пул, требуется указать ID загрузки и номер пула."
-            }));
-        }
-        dispatch(assignScannedDonationToPool(externalId, productBatch, poolNumber));
-    });
-
-}; */
-
 const initBloodPool = (poolId, changes) => dispatch => new Promise((resolve, reject) => {
     dispatch(
         getOrCreateTableRow("bloodPools", poolId, changes)
     ).then(tableRow => {
-        console.log("BloodPool: ", tableRow);
-        resolve(tableRow);
+        const {bloodDonations} = tableRow;
+        if (Array.isArray(bloodDonations) && bloodDonations.length > 0)
+            Promise.all(
+                bloodDonations.map(bloodDonationId => dispatch(getOrFetchTableRow("bloodDonations", bloodDonationId)))
+            ).then(() => {
+                resolve(tableRow);
+            },  error => {
+                reject(error);
+            });
+        else resolve(tableRow);
+
     }, error => reject(error));
 });
 
@@ -134,42 +125,99 @@ export const assignScannedDonationToPool = (donationId, productBatch, poolNumber
         const amount = bloodDonation && bloodDonation.amount;
         const externalId = bloodDonation && bloodDonation.externalId;
         dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_REQUEST, donationId : externalId, poolId});
+        const errorPrefix = `Невозможно назначить донацию '${externalId}' в пул '${poolId}': `;
+        let error = undefined;
         if (!amount || amount <= 0 || amount > totalAmountLimit || !donationId || /^\s*$/.test(donationId)
             || !productBatch || /^\s*$/.test(productBatch) || !poolNumber || poolNumber<=0) {
-            const error = `Невозможно назначить донацию '${externalId}' в пул '${poolId}': один из параметров имеет неверное значение: ID загрузки = ${productBatch}, номер пула = ${poolNumber} объем = ${amount}`;
-            dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE, donationId: externalId, poolId, error});
-            reject({donationId, poolId, error});
+            error = `${errorPrefix}один из параметров имеет неверное значение: ID загрузки = ${productBatch}, номер пула = ${poolNumber} объем = ${amount}`;
         } else {
-            dispatch(initBloodPool(poolId, {productBatch, poolNumber}));
-            /*
-            dispatch(
-                getOrCreateTableRow("bloodPools", poolId, {poolNumber, productBatch})
-            ).then(() => {
-                dispatch(
-                    tableRowChangeOnFeature("bloodDonations", bloodDonation.localId, {bloodPool: poolId})
-                ).then(
-                    () => dispatch({
-                        type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS,
-                        donationId: externalId,
-                        poolId
-                    })
-                );
-            }); */
+            dispatch(initBloodPool(poolId, {productBatch, poolNumber})).then(() => {
+                const bloodPool = getTableRowByLocalIdOrExternalId(getState().tableItems["bloodPools"], poolId);
+                if (!bloodPool) {
+                    error = `${errorPrefix}возникла непредвиденная ошибка при инициализации пула`;
+                } else {
+                    let {bloodDonations} = bloodPool;
+                    const totalPoolAmount = dispatch(calculateTotalAmount(bloodDonations));
+                    if (totalPoolAmount == null) {
+                        error = `${errorPrefix}невозможно вычислить текущий суммарный объём пула. Возможно не указан объем для одной из донаций пула.`;
+                    } else if (totalPoolAmount + amount > totalAmountLimit) {
+                        error = `${errorPrefix}пул переполнен: суммарный объём: ${totalPoolAmount + amount} ограничение: ${totalAmountLimit}`;
+                    } else if (bloodDonations && bloodDonations.find(id => id === externalId)) {
+                        resolve(bloodPool);
+                        dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS, donationId: externalId, poolId});
+                    } else {
+                        bloodDonations = [externalId, ...(bloodDonations || [])];
+                        dispatch(
+                            tableRowChangeOnFeature("bloodPools", bloodPool.localId, {bloodDonations, totalAmount: totalPoolAmount + amount})
+                        ).then(() => {
+                            resolve(bloodPool);
+                            dispatch(Object.assign({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS, donationId: externalId, poolId}, bloodPool));
+                        }, e => {
+                            error = `${errorPrefix}непредвиденная ошибка записи изменений в пул: ${e}`;
+                            dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE, donationId: externalId, poolId, error});
+                            reject({donationId:externalId, poolId, error});
+                        })
+                    }
+                }
+                if (error) {
+                    dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE, donationId: externalId, poolId, error});
+                    reject({donationId:externalId, poolId, error});
+                }
+            }, e => {
+                error = `${errorPrefix}непредвиденная ошибка при инициализации пула: ${e}`;
+                dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE, donationId: externalId, poolId, error});
+                reject({donationId:externalId, poolId, error});
+            });
+        }
+        if (error) {
+            dispatch({type: ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_FAILURE, donationId: externalId, poolId, error});
+            reject({donationId:externalId, poolId, error});
         }
     });
 };
 
-export const ACTION_REMOVE_DONATION_FROM_POOL = "ACTION_REMOVE_DONATION_FROM_POOL";
+const calculateTotalAmount = (bloodDonationIds) => (dispatch, getState) => {
+    if (!bloodDonationIds || bloodDonationIds.length === 0) return 0;
+    if (!Array.isArray(bloodDonationIds)) return null;
+    return bloodDonationIds.map(bloodDonationId =>
+         getTableRowByLocalIdOrExternalId(getState().tableItems["bloodDonations"], bloodDonationId)
+    ).map(bd => bd && bd.amount).reduce((acc, amount) => acc != null && amount != null ? acc + amount : null, 0);
+};
+
+export const ACTION_REMOVE_DONATION_FROM_POOL_REQUEST = "ACTION_REMOVE_DONATION_FROM_POOL_REQUEST";
+export const ACTION_REMOVE_DONATION_FROM_POOL_SUCCESS = "ACTION_REMOVE_DONATION_FROM_POOL_REQUEST";
+export const ACTION_REMOVE_DONATION_FROM_POOL_FAILURE = "ACTION_REMOVE_DONATION_FROM_POOL_FAILURE";
 
 export const removeDonationFromPool = (donationId, productBatch, poolNumber) => (dispatch, getState) => {
     const poolId = productBatch + "-" + poolNumber;
     const bloodDonation = getTableRowByLocalIdOrExternalId(getState().tableItems["bloodDonations"], donationId);
-    if (!bloodDonation) return;
-    dispatch({
-        type: ACTION_REMOVE_DONATION_FROM_POOL,
-        donationId : bloodDonation.externalId,
-        poolId
-    });
-    if (bloodDonation.bloodPool === poolId)
-        dispatch(tableRowChangeOnFeature("bloodDonations", bloodDonation.localId, {bloodPool:undefined}));
+    const bloodPool = productBatch && poolNumber ? getTableRowByLocalIdOrExternalId(getState().tableItems["bloodPools"], poolId) : undefined;
+    const dispatchAction = (type, data) => dispatch(
+        Object.assign({
+            type, donationId: bloodDonation ? bloodDonation.externalId : donationId, productBatch, poolNumber, poolId
+        }, data)
+    );
+    dispatchAction(ACTION_REMOVE_DONATION_FROM_POOL_REQUEST);
+    const error = `Невозможно удалить донацию ${donationId} из пула ${poolId}: `;
+    if (!bloodDonation || !bloodPool) {
+        dispatchAction(
+            ACTION_REMOVE_DONATION_FROM_POOL_FAILURE,
+            {error: `${error} ${!bloodDonation ? 'донация не найдена' : !bloodPool ? 'пул не найден' : ''}`}
+        );
+    }
+    dispatch(tableRowChangeOnFeature("bloodDonations", bloodDonation.localId, {bloodPool: undefined}))
+        .then(() => {
+            const bloodDonations = (bloodPool.bloodDonations || []).filter(id => id !== bloodDonation.externalId);
+            const totalAmount = dispatch(calculateTotalAmount(bloodDonations));
+            dispatch(tableRowChangeOnFeature("bloodPools", bloodPool.localId, {bloodDonations, totalAmount})).then(() => {
+                dispatchAction(ACTION_REMOVE_DONATION_FROM_POOL_SUCCESS, {bloodDonation});
+            }, error => {
+                dispatchAction(
+                    ACTION_REMOVE_DONATION_FROM_POOL_FAILURE,
+                    {error: `${error}непредвиденная ошибка: ${error}`}
+                );
+            });
+        }, error => {
+            dispatchAction(ACTION_REMOVE_DONATION_FROM_POOL_FAILURE, {error: `${error}непредвиденная ошибка: ${error}`});
+        });
 };
