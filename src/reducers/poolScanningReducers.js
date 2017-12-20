@@ -15,10 +15,25 @@ import {
     ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_REQUEST,
     ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS,
     ACTION_REMOVE_DONATION_FROM_POOL_SUCCESS,
-
-
+    ACTION_POOL_SCANNER_SAVE_CHANGES_REQUEST,
+    ACTION_POOL_SCANNER_SAVE_CHANGES_SUCCESS,
+    ACTION_POOL_SCANNER_SAVE_CHANGES_FAILURE
 } from '../actions/poolScanningActions'
 import {objectWith} from './util'
+
+export const poolScanner = (state = {noChanges: true}, action) => {
+    const {type, message, error} = action;
+    if (type === ACTION_POOL_SCANNER_SAVE_CHANGES_REQUEST) {
+        return objectWith(state, {isSaving: true, message, error:undefined})
+    } else if (type === ACTION_POOL_SCANNER_SAVE_CHANGES_SUCCESS) {
+        return objectWith(state, {noChanges: true, isSaving: false, message, error:undefined})
+    } else if (type === ACTION_POOL_SCANNER_SAVE_CHANGES_FAILURE) {
+        return objectWith(state, {error, isSaving: false})
+    } else if (type === ACTION_ADD_SCANNED_DONATION_SUCCESS || type === ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS) {
+        return objectWith(state, {noChanges: false, message: undefined, error: undefined})
+    }
+    return state;
+};
 
 const updateConfig = (state, newConfig, allowedFields) => {
     if (!newConfig) return state;

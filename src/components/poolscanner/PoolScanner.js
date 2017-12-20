@@ -13,71 +13,21 @@ import BloodDonation from './BloodDonation'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Card, CardTitle, CardText, CardActions} from 'material-ui/Card';
+import {Card, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
+import FontIcon from 'material-ui/FontIcon';
 
 class PoolScanner extends React.Component {
     constructor(props) {
         super(props);
-        this.onSubmit = this.onSubmit.bind(this);
         this.onNewBloodDonation = this.onNewBloodDonation.bind(this);
-        this.deleteFromPool = this.deleteFromPool.bind(this);
-        this.onCloseDialog = this.onCloseDialog.bind(this);
-        this.deleteBloodDonation = this.deleteBloodDonation.bind(this);
         this.onAddBloodDonationToPool = this.onAddBloodDonationToPool.bind(this);
-        this.state = {
-            bloodDonationIds: "",
-            bloodPools: {}
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.bloodDonations && nextProps.bloodDonations !== this.props.bloodDonations) {
-            const bloodDonationIds = this.state.bloodDonationIds.split(/\s+/).filter(v => /^\w+$/.test(v));
-            bloodDonationIds.forEach(externalId => {
-                const bloodDonation = nextProps.bloodDonations.find(bd => bd.externalId === externalId);
-                if (!bloodDonation) return;
-                this.addToBloodDonations(bloodDonation);
-            });
-        }
+        this.deleteFromPool = this.deleteFromPool.bind(this);
     }
 
     onNewBloodDonation(externalId, amount) {
         const {onNewDonationScanned} = this.props;
         onNewDonationScanned && onNewDonationScanned(externalId, {amount});
-    }
-
-    addToBloodDonations(bloodDonation) {
-        if (!bloodDonation || !bloodDonation.externalId) return;
-        const errors = {};
-        const hasErrors = !PoolScanner.setErrorMessages(this.state, errors);
-        if (hasErrors) return this.setState(errors);
-        const {addedBloodDonationIds, bloodInvoiceId, bloodDonationIds, bloodInvoiceSeriesId} = this.state;
-        let {addedBloodInvoices} = this.state;
-        if (!addedBloodDonationIds.find(id => id === bloodDonation.externalId))
-            addedBloodDonationIds.push(bloodDonation.externalId);
-        if (!addedBloodInvoices.find(bi => bi.bloodInvoiceId === bloodInvoiceId && bi.bloodInvoiceSeriesId === bloodInvoiceSeriesId)) {
-            addedBloodInvoices = addedBloodInvoices.filter(bi => bi.bloodInvoiceId !== bloodInvoiceId);
-            addedBloodInvoices.push({bloodInvoiceId, bloodInvoiceSeriesId});
-            this.props.requestBloodInvoice(
-                bloodInvoiceId,
-                bloodInvoiceSeriesId && /\s*[\w\d]+\s*/.test(bloodInvoiceSeriesId)
-                    ? {bloodInvoiceSeries: bloodInvoiceSeriesId} : undefined
-            );
-        }
-        this.setState({
-            addedBloodDonationIds,
-            addedBloodInvoices,
-            bloodDonationIds: bloodDonationIds.replace(new RegExp(bloodDonation.externalId + "\\s+\\d{2,4}\\s+", "g"), "\t").replace(/^\s+/, '')
-        });
-    }
-
-    deleteBloodDonation(localId, bloodDonation) {
-        const {resetBloodDonationChanges} = this.props;
-        const {addedBloodDonationIds} = this.state;
-        this.setState({addedBloodDonationIds : addedBloodDonationIds.filter(id => id !== bloodDonation.externalId)});
-
-        resetBloodDonationChanges && resetBloodDonationChanges(localId);
     }
 
     onAddBloodDonationToPool(localId) {
@@ -89,104 +39,6 @@ class PoolScanner extends React.Component {
     deleteFromPool(bloodDonationId, poolNumber, productBatchId) {
         const {onRemoveDonationFromPool} = this.props;
         if (onRemoveDonationFromPool) onRemoveDonationFromPool(bloodDonationId, productBatchId, poolNumber);
-    }
-
-    bloodPoolTotalAmount(bloodPool) {
-        return Object.keys(bloodPool.bloodDonations).map(localId => bloodPool.bloodDonations[localId])
-            .reduce((accumulator, bd) => accumulator + parseInt(bd.amount, 10), 0);
-    }
-
-    static setErrorMessages(state, changes) {
-        const errorMsg = "Требуется ввести значение";
-        const newState = Object.assign({}, state, changes);
-        let result = true;
-        if (newState.bloodInvoiceId === undefined) {
-            changes.bloodInvoiceIdError = errorMsg;
-            result = false;
-        }
-        if (newState.productBatchId === undefined) {
-            changes.productBatchIdError = errorMsg;
-            result = false;
-        }
-        return result;
-    }
-
-    static resetErrorMessages() {
-        return {
-            bloodInvoiceIdError: undefined,
-            productBatchIdError: undefined,
-        }
-    }
-
-    onSubmit() {
-        const {onSubmit, changeBloodDonation} = this.props;
-        const {productBatchId, bloodPools} = this.state;
-        if (!productBatchId || /^\s+$/.test(productBatchId)) {
-            this.setState({productBatchIdError: "Введите номер загрузки."});
-            return;
-        }
-        Object.keys(bloodPools).forEach(poolNumber => {
-            const externalId = productBatchId + "-" + poolNumber;
-            const {bloodDonations} = bloodPools[poolNumber];
-            Object.keys(bloodDonations).map(key => bloodDonations[key]).forEach(bd => changeBloodDonation && changeBloodDonation(bd.localId, {bloodPool: externalId}));
-        });
-        onSubmit && onSubmit();
-        this.setState({
-            bloodDonationIds: "",
-            bloodPools: {},
-            addedBloodDonationIds : [],
-            ...PoolScanner.resetErrorMessages()
-        });
-    }
-
-    onCloseDialog() {
-        const {onCancel} = this.props;
-        this.setState({
-            bloodDonationIds: "",
-            bloodPools: {},
-            addedBloodDonationIds : [],
-            ...PoolScanner.resetErrorMessages()
-        });
-        onCancel && onCancel();
-    }
-
-    renderBloodPools() {
-        const {bloodPools, poolScanning} = this.props;
-        const {managingPools, productBatch, totalAmountLimit} = poolScanning;
-        const managingPoolItems = Object.keys(managingPools)
-            .map(externalId => managingPools[externalId])
-            .sort((p1, p2) => p2.timestamp - p1.timestamp)
-            .map(pool => ({
-                ...pool,
-                ...this.totalAmountAndDonations(pool)
-            })).map(pool => {
-                const bloodPool = bloodPools.find(bp => bp.externalId === pool.externalId);
-                return {
-                    ...pool,
-                    poolNumber: bloodPool && bloodPool.poolNumber,
-                    totalAmount: pool.totalAmount + (bloodPool && bloodPool.totalAmount ? bloodPool.totalAmount : 0)
-                }
-            });
-        console.log("managingPools: ", managingPoolItems, managingPools);
-        return managingPoolItems.map(pool =>
-            <BloodPool key={pool.externalId}
-                       bloodPool={pool}
-                       productBatchId={productBatch}
-                       totalAmountLimit={totalAmountLimit}
-                       onDeleteBloodDonation={this.deleteFromPool}/>
-        )
-    }
-
-    totalAmountAndDonations(pool) {
-        const {bloodDonations} = this.props;
-        const {donations} = pool;
-        return donations.reduce((acc, id) => {
-            const donation = bloodDonations && bloodDonations.find(d => d.externalId === id);
-            return {
-                totalAmount: acc.totalAmount + (donation ? donation.amount | 0 : 0),
-                bloodDonations : Object.assign(acc.bloodDonations, donation ? {[id] : donation} : undefined)
-            };
-        }, {totalAmount : 0, bloodDonations : {}});
     }
 
     renderScannedDonations() {
@@ -213,19 +65,34 @@ class PoolScanner extends React.Component {
             ))
     }
 
+    renderApplyButton() {
+        const {onApplyChanges, poolScannerState} = this.props;
+        const {isSaving, noChanges} = poolScannerState;
+        return (
+            <FlatButton label={noChanges ? "Нет изменений" : isSaving ? "Сохранение изменений..." : "Сохранить изменения"}
+                        icon={isSaving ? <FontIcon className="material-icons">loop</FontIcon> : undefined}
+                        onClick={onApplyChanges}
+            />
+        )
+    }
+
     render() {
         const {
-            poolScannerConfig, poolScannerErrors, onScannerConfigChange, onDrawerChangeDrawerVisibilityRequest
+            poolScannerConfig, poolScannerErrors, onScannerConfigChange, onDrawerChangeDrawerVisibilityRequest, poolScannerState
         } = this.props;
+        const {error, message} = poolScannerState;
 
         return (
             <AppPage className="PoolScanner"
                      title="Сканирование пакетов с плазмой"
                      onDrawerChangeDrawerVisibilityRequest={onDrawerChangeDrawerVisibilityRequest}
-                     iconElementRight={<FlatButton label="Применить" onClick={this.onSubmit}/>}
+                     iconElementRight={this.renderApplyButton()}
             >
                 <Card>
                     <CardText>
+                        {
+                            (error || message) && <CardTitle subtitle={error || message} subtitleColor={error ? "#990000" : "#008800"}/>
+                        }
                         <PoolScannerConfigs config={poolScannerConfig}
                                             errors={poolScannerErrors}
                                             onChange={onScannerConfigChange}/>
@@ -267,6 +134,12 @@ export const poolScannerErrorType = PropTypes.shape({
 });
 PoolScanner.propTypes = {
     onDrawerChangeDrawerVisibilityRequest : PropTypes.func,
+    poolScannerState: PropTypes.shape({
+        isSaving: PropTypes.bool,
+        noChanges: PropTypes.bool,
+        error: PropTypes.string,
+        message: PropTypes.string
+    }),
     poolScannerConfig: poolScannerConfigType.isRequired,
     poolScannerErrors: poolScannerErrorType.isRequired,
     onScannerConfigChange: PropTypes.func,
@@ -275,6 +148,7 @@ PoolScanner.propTypes = {
     onChangeBloodDonation: PropTypes.func,
     onAssignDonationToPool: PropTypes.func,
     onRemoveDonationFromPool: PropTypes.func,
+    onApplyChanges: PropTypes.func,
     scannedDonations:PropTypes.arrayOf(bloodDonationType),
     scannedPools:PropTypes.arrayOf(PropTypes.shape({
         localId : PropTypes.string,
@@ -282,6 +156,6 @@ PoolScanner.propTypes = {
         totalAmount : PropTypes.number,
         timestamp : PropTypes.number,
         bloodDonations: PropTypes.arrayOf(bloodDonationType)
-    })),
+    }))
 };
 export default PoolScanner;

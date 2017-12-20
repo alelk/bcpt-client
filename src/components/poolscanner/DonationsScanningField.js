@@ -43,7 +43,7 @@ class DonationsScanningField extends React.Component {
                        rows={1}
                        rowsMax={4}
                        type="text"
-                       floatingLabelText={floatingLabelText || "[Штрих-код донации] пробел [Объем донации, мл.] пробел"}
+                       floatingLabelText={floatingLabelText || "[Штрих-код донации][пробел][Объем донации, мл.][пробел]"}
                        onChange={e => this.onChange(e.target.value)}/>
         )
     }

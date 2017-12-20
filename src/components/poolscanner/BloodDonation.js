@@ -40,7 +40,6 @@ class BloodDonation extends React.Component {
     render() {
         const {bloodDonation, onDeleteBloodDonation, poolNumber} = this.props;
         const {localId, amount, bloodInvoice, externalId} = bloodDonation;
-        console.log("Blood Donation: ", this.props);
         return (
             <Paper style={{padding: 6, display:'inline-block', margin: 10, flexGrow: 1}} zDepth={3}>
                 <div>
