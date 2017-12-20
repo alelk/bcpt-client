@@ -10,3 +10,5 @@ export const getTableRowByLocalIdOrExternalId = (tableItems, localId) => {
         existingLocalId = tableItems && Object.keys(tableItems).find(key => tableItems[key].externalId === localId);
     return existingLocalId && {...tableItems[existingLocalId], localId: existingLocalId};
 };
+
+export const getTableRowByExternalId = (tableItems, externalId) => tableItems ? tableItems[externalId] : undefined;

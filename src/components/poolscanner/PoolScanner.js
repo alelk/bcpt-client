@@ -87,8 +87,8 @@ class PoolScanner extends React.Component {
     }
 
     deleteFromPool(bloodDonationId, poolNumber, productBatchId) {
-        const {removeDonationFromPool} = this.props;
-        if (removeDonationFromPool) removeDonationFromPool(bloodDonationId, productBatchId, poolNumber);
+        const {onRemoveDonationFromPool} = this.props;
+        if (onRemoveDonationFromPool) onRemoveDonationFromPool(bloodDonationId, productBatchId, poolNumber);
     }
 
     bloodPoolTotalAmount(bloodPool) {
@@ -205,6 +205,14 @@ class PoolScanner extends React.Component {
             ) : undefined;
     }
 
+    renderScannedPools() {
+        const {scannedPools, poolScannerConfig} = this.props;
+        const {totalAmountLimit} = poolScannerConfig;
+        return scannedPools && scannedPools.map((pool, key) => (
+                <BloodPool key={key} bloodPool={pool} totalAmountLimit={totalAmountLimit} onDeleteBloodDonation={this.deleteFromPool}/>
+            ))
+    }
+
     render() {
         const {
             poolScannerConfig, poolScannerErrors, onScannerConfigChange, onDrawerChangeDrawerVisibilityRequest
@@ -226,6 +234,7 @@ class PoolScanner extends React.Component {
                         <div><label style={{color:'red'}}>{poolScannerErrors.scannedDonationError}</label></div>
                         }
                         {this.renderScannedDonations()}
+                        {this.renderScannedPools()}
                     </CardText>
                 </Card>
             </AppPage>
@@ -233,33 +242,13 @@ class PoolScanner extends React.Component {
     }
 }
 
-/*
- <div style={{display:'flex', flexWrap:'wrap'}}>
- {scannedDonationItems.map(bd =>
- <BloodDonation key={bd.localId}
- bloodDonation={bd}
- productBatchId={productBatch}
- onApply={this.onAddBloodDonationToPool}
- onDeleteBloodDonation={this.deleteBloodDonation}
- onChangeBloodDonation={changeBloodDonation}/>
- )}
- </div>
- {this.renderBloodPools()}
- */
-
 export const bloodDonationType = PropTypes.shape({
-    isChecked : PropTypes.bool,
     localId : PropTypes.string,
     externalId : PropTypes.string,
-    donor : PropTypes.string,
     bloodInvoice : PropTypes.string,
     bloodPool : PropTypes.string,
-    donationType : PropTypes.string,
     amount : PropTypes.number,
-    donationDate : PropTypes.string,
-    quarantineDate : PropTypes.string,
-    updateTimestamp : PropTypes.string,
-    errors : PropTypes.object | PropTypes.array
+    timestamp : PropTypes.number,
 });
 export const poolScannerConfigType = PropTypes.shape({
     productBatch: PropTypes.string,
@@ -285,33 +274,14 @@ PoolScanner.propTypes = {
     onRemoveScannedDonation: PropTypes.func,
     onChangeBloodDonation: PropTypes.func,
     onAssignDonationToPool: PropTypes.func,
-    scannedDonations:PropTypes.arrayOf(PropTypes.shape({
+    onRemoveDonationFromPool: PropTypes.func,
+    scannedDonations:PropTypes.arrayOf(bloodDonationType),
+    scannedPools:PropTypes.arrayOf(PropTypes.shape({
         localId : PropTypes.string,
         externalId : PropTypes.string,
-        bloodInvoice : PropTypes.string,
-        bloodPool : PropTypes.string,
-        amount : PropTypes.number,
+        totalAmount : PropTypes.number,
         timestamp : PropTypes.number,
+        bloodDonations: PropTypes.arrayOf(bloodDonationType)
     })),
-
-
-
-    bloodDonations : PropTypes.arrayOf(bloodDonationType),
-
-
-    open: PropTypes.bool,
-    poolScanning: PropTypes.object.isRequired,
-    requestBloodDonation: PropTypes.func,
-    resetBloodDonationChanges: PropTypes.func,
-    changeBloodDonation: PropTypes.func,
-    requestBloodInvoice: PropTypes.func,
-    changeScanningProps: PropTypes.func,
-    addScannedDonation: PropTypes.func,
-    removeDonationFromPool: PropTypes.func,
-
-
-
-    onCancel : PropTypes.func,
-    onSubmit : PropTypes.func
 };
 export default PoolScanner;

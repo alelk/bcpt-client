@@ -111,6 +111,12 @@ export const fetchTableRow = (tableName, localId, overrideChanges) => (dispatch)
     ));
 };
 
+export const getOrFetchTableRow = (tableName, localId, overrideChanges) => (dispatch, getState) => {
+    const existing = getTableRowByLocalIdOrExternalId(getState().tableItems[tableName], localId);
+    if (existing) return Promise.resolve(existing);
+    return dispatch(fetchTableRow(tableName, localId, overrideChanges));
+};
+
 export const ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST = "ACTION_TABLE_ROW_GET_OR_CREATE_REQUEST";
 export const ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS = "ACTION_TABLE_ROW_GET_OR_CREATE_SUCCESS";
 export const ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE = "ACTION_TABLE_ROW_GET_OR_CREATE_FAILURE";
