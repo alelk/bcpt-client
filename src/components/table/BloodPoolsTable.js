@@ -12,7 +12,6 @@ import TextFilter from './filter/TextFilter'
 import Table from './Table'
 import Button from '../Button'
 import CreatePoolsDialog from './dialog/CreatePoolsDialog'
-import PoolScanningDialog from './dialog/PoolScanningDialog'
 import SumCheckedFooter from './footer/SumCheckedFooter'
 import {bloodDonationType} from './BloodDonationsTable'
 
@@ -26,13 +25,9 @@ class BloodPoolsTable extends Table {
         this.onBloodDonationsClick=this.onBloodDonationsClick.bind(this);
         this.onCreatePoolsOpen = this.onCreatePoolsOpen.bind(this);
         this.onCreatePoolsClose = this.onCreatePoolsClose.bind(this);
-        this.onPoolScanningOpen = this.onPoolScanningOpen.bind(this);
-        this.onPoolScanningClose = this.onPoolScanningClose.bind(this);
         this.onCreatePoolsSubmit = this.onCreatePoolsSubmit.bind(this);
-        this.onPoolScanningSubmit = this.onPoolScanningSubmit.bind(this);
         this.state = {
             isCreatePoolsDialogOpened: false,
-            isPoolScanningDialogOpened: false,
             productBatchId : '',
             poolStartNumber : 1,
             poolsCount : 10
@@ -47,12 +42,6 @@ class BloodPoolsTable extends Table {
                                  title="Создать пулы"
                                  key="add_pulls"
                                  onClick={this.onCreatePoolsOpen}/>
-            }, {
-                control: <Button iconName="camera_alt"
-                                 className="change"
-                                 title="Создание пулов сканером штрих-кодов"
-                                 key="scan_pools"
-                                 onClick={this.onPoolScanningOpen}/>
             }
         ]
     }
@@ -77,22 +66,7 @@ class BloodPoolsTable extends Table {
         this.setState({productBatchId, poolStartNumber, poolsCount, isCreatePoolsDialogOpened:false})
     }
 
-    onPoolScanningOpen() {
-        this.setState({isPoolScanningDialogOpened:true})
-    }
-
-    onPoolScanningClose() {
-        this.setState({isPoolScanningDialogOpened:false})
-    }
-
-    onPoolScanningSubmit(bloodPools) {
-        const {onAddNewItem} = this.props;
-        bloodPools && onAddNewItem && bloodPools.forEach(bloodPool => onAddNewItem(bloodPool));
-        this.setState({isPoolScanningDialogOpened:false})
-    }
-
     extraContent() {
-        const {bloodDonations, onFetchBloodDonation} = this.props;
         return (
             <div>
                 <CreatePoolsDialog open={this.state.isCreatePoolsDialogOpened}
@@ -101,11 +75,6 @@ class BloodPoolsTable extends Table {
                                poolsCount={this.state.poolsCount}
                                onSubmit={this.onCreatePoolsSubmit}
                                onCancel={this.onCreatePoolsClose}/>
-                <PoolScanningDialog open={this.state.isPoolScanningDialogOpened}
-                                    bloodDonations={bloodDonations}
-                                    requestBloodDonation={onFetchBloodDonation}
-                                    onSubmit={this.onPoolScanningSubmit}
-                                    onCancel={this.onPoolScanningClose}/>
             </div>
         )
     }
