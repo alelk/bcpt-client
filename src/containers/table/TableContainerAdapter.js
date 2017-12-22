@@ -80,6 +80,8 @@ class TableContainerAdapter extends React.Component {
             data,
             checkedItems,
             pagesCount : page && page.pagesCount,
+            itemsCount : table && table.itemsCount,
+            itemsPerPage : table && table.itemsPerPage,
             isEditing : table && table.isEditing,
             isFetching : page && page.isFetching,
             onFetchData : this.onFetchData,

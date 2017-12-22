@@ -119,7 +119,8 @@ class BloodPoolsTable extends Table {
                 sortable: false,
                 isEditable: true,
                 filterable: false,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 180
             }, {
                 Header: "Суммарный объем, мл.",
                 accessor: "totalAmount",
@@ -142,7 +143,7 @@ class BloodPoolsTable extends Table {
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 160
             }
         ];
     }

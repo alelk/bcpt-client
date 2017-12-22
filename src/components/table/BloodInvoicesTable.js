@@ -95,7 +95,8 @@ class BloodInvoicesTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 140
             }, {
                 Header: "Контейнеры с плазмой",
                 accessor: "bloodDonations",
@@ -106,7 +107,8 @@ class BloodInvoicesTable extends Table {
                 sortable: false,
                 isEditable: true,
                 filterable: false,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 180
             }, {
                 Header: "Суммарный объем, мл.",
                 accessor: "totalAmount",
@@ -115,7 +117,7 @@ class BloodInvoicesTable extends Table {
                 Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 sortable: false,
                 filterable: false,
-                maxWidth: 190
+                minWidth: 160,
             }, {
                 Header: "Серия ПДФ",
                 accessor: "bloodInvoiceSeries",
@@ -123,7 +125,8 @@ class BloodInvoicesTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 110,
             }, {
                 Header: "Дата накладной",
                 isEditable: true,
@@ -131,13 +134,13 @@ class BloodInvoicesTable extends Table {
                 inputType: "date",
                 onChange: this.onValueChange,
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 150
             }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 150
             }
         ];
     }

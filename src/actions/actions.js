@@ -139,7 +139,7 @@ export const getOrCreateTableRow = (tableName, localId, changes) => (dispatch, g
             if (changes)
                 return dispatch(tableRowChangeOnFeature(tableName, localId, changes)).then(changedItem => resolve(changedItem));
             else resolve(tableItemFromResponse(action.response, tableName, localId));
-        }, action => {
+        }, () => {
             const item = Object.assign({externalId: localId}, changes);
             dispatch(tableRowCreate(tableName, item));
             resolve(item);

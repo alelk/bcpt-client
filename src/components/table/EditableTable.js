@@ -60,7 +60,7 @@ const EditableTable = ({
 EditableTable.propTypes = {
     onAppDrawerRequest : PropTypes.func,
     checkedItems : PropTypes.arrayOf(PropTypes.string),
-    tableName : PropTypes.string,
+    tableName : PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     isEditMode : PropTypes.bool,
     onAdd : PropTypes.func,
     onEdit : PropTypes.func,

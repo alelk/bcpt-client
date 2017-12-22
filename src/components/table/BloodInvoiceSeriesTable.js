@@ -33,7 +33,8 @@ class BloodInvoiceSeriesTable extends Table {
                 Cell: TextCell,
                 isEditable: true,
                 filterable: true,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 140
             }, {
                 Header: "Накладные",
                 accessor: "bloodInvoices",
@@ -43,7 +44,8 @@ class BloodInvoiceSeriesTable extends Table {
                 sortable: false,
                 isEditable: true,
                 filterable: false,
-                Filter: TextFilter
+                Filter: TextFilter,
+                minWidth: 160
             }, {
                 Header: "Суммарный объем, мл.",
                 accessor: "totalAmount",
@@ -52,7 +54,7 @@ class BloodInvoiceSeriesTable extends Table {
                 Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
                 sortable: false,
                 filterable: false,
-                maxWidth: 190
+                minWidth: 160
             }, {
                 Header: "Дата",
                 isEditable: true,
@@ -60,13 +62,13 @@ class BloodInvoiceSeriesTable extends Table {
                 inputType: "date",
                 onChange: this.onValueChange,
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 130
             }, {
                 Header: "Последнее изменение",
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 160
             }
         ];
     }
