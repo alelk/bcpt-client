@@ -16,11 +16,13 @@ import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 import { routerMiddleware } from 'react-router-redux'
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
 const configureStore = (history, preloadedState) => {
     return createStore(
         rootReducer,
         preloadedState,
-        compose(
+        composeEnhancers(
             applyMiddleware(
                 thunk,
                 bcptRestApiMiddleware,

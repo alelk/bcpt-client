@@ -26,7 +26,7 @@ const addScannedDonationWith = (type, externalId, config, changes) => {
 
 export const addScannedDonation = (externalId, changes) => (dispatch, getState) => {
     const {poolScanningConfigs} = getState();
-    const donationConfig = Object.assign(poolScanningConfigs, changes);
+    const donationConfig = Object.assign({}, poolScanningConfigs, changes);
     const {bloodInvoice, bloodInvoiceSeries} = donationConfig;
     dispatch(addScannedDonationWith(ACTION_ADD_SCANNED_DONATION_REQUEST, externalId, donationConfig));
     return new Promise((resolve, reject) => {
