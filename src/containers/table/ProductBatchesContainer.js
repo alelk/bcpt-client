@@ -16,13 +16,17 @@ const ProductBatchSubTable = (row) => {
     const bloodPoolsCount = Array.isArray(row.bloodPools) ? row.bloodPools.length : undefined;
     return (
         <div className="ProductBatchSubTable">
-            <label style={{margin: '20px', fontSize: '18px'}}>Пулы для загрузки № <b>{row.externalId}</b> (количество пулов: {bloodPoolsCount || 0})</label>
-            <BloodPoolsContainer
+            {bloodPoolsCount && bloodPoolsCount > 0 ?
+            <div>
+                <label style={{margin: '20px', fontSize: '18px'}}>Пулы для загрузки № <b>{row.externalId}</b> (количество пулов: {bloodPoolsCount || 0})</label>
+                <BloodPoolsContainer
                 isSimpleTable={true}
                 tableInstanceId={"productBatch-" + row.externalId}
                 filtered={[{key: "productBatch", value: row.externalId}]}
                 defaultPageSize={bloodPoolsCount}
-            />
+                />
+            </div> : undefined}
+
         </div>
     )
 };

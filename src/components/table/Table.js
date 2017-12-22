@@ -74,7 +74,7 @@ class Table extends React.Component {
     _columns() {
         if (this.columnsData == null) {
             this.columnsData = this.props.isSimpleTable
-                ? this.columns().map(c => Object.assign({}, c, {filterable:false, Filter:undefined}))
+                ? this.columns().map(c => Object.assign({}, c, {filterable: false, Filter: undefined}))
                 : [
                     {
                         accessor: "isChecked",
@@ -103,7 +103,7 @@ class Table extends React.Component {
 
     onUncheckRows() {
         const {checkedItems, onCheckRow} = this.props;
-        checkedItems && onCheckRow && checkedItems.forEach(ci => onCheckRow(ci.localId, {isChecked:false}))
+        checkedItems && onCheckRow && checkedItems.forEach(ci => onCheckRow(ci.localId, {isChecked: false}))
     }
 
     onCheckAllRows() {
@@ -132,23 +132,25 @@ class Table extends React.Component {
         this.props.onChange && this.props.onChange(row.localId, {[column.id]: value});
     }
 
-    controls() {}
+    controls() {
+    }
 
-    extraContent() {}
+    extraContent() {
+    }
 
     renderReactTable() {
-        const {data, pagesCount, isFetching, subComponent, filtered, isSimpleTable, defaultPageSize} = this.props;
+        const {data, pagesCount, isFetching, subComponent, filtered, isSimpleTable, defaultPageSize, itemsPerPage} = this.props;
         return (
             <ReactTable
-                style={isSimpleTable && {padding:'20px'}}
+                style={isSimpleTable && {padding: '20px'}}
                 data={data || []}
                 manual
                 onFetchData={this.onFetchData}
                 loading={isFetching}
                 columns={this._columns()}
                 pages={pagesCount}
-                defaultPageSize={defaultPageSize || 15}
-                pageSizeOptions={[defaultPageSize || 15, 20, 25, 30, 40, 50, 100, 500]}
+                defaultPageSize={defaultPageSize || itemsPerPage || 15}
+                pageSizeOptions={[defaultPageSize || itemsPerPage || 10, 15, 20, 25, 30, 40, 50, 100, 500, 1000]}
                 minRows={!isSimpleTable ? 15 : 0}
                 previousText="Предыдущая"
                 nextText='Следующая'
@@ -168,28 +170,29 @@ class Table extends React.Component {
 
     render() {
         const {
-            name, checkedItems, isEditing, onResetChanges,
+            name, checkedItems, isEditing, onResetChanges, itemsCount,
             onSaveChanges, onRefreshData, isSimpleTable, onAppDrawerRequest
         } = this.props;
         return (
             isSimpleTable ? this.renderReactTable() :
-            <EditableTable tableName={name}
-                           checkedItems={checkedItems && checkedItems.map(ci => ci.localId)}
-                           onUncheckItems={this.onUncheckRows}
-                           onCheckAllItems={this.onCheckAllRows}
-                           onRemove={this.onDeleteRows}
-                           onEdit={this.onEditRows}
-                           isEditMode={isEditing}
-                           onCancel={onResetChanges}
-                           onDone={onSaveChanges}
-                           onRefresh={onRefreshData}
-                           onAdd={this.onAddRow}
-                           controls={this.controls()}
-                           onAppDrawerRequest={onAppDrawerRequest}
-            >
-                {this.renderReactTable()}
-                {this.extraContent()}
-            </EditableTable>
+                <EditableTable tableName={<span>{name}{itemsCount &&
+                <span style={{fontWeight: 100}}> ({itemsCount})</span>}</span>}
+                               checkedItems={checkedItems && checkedItems.map(ci => ci.localId)}
+                               onUncheckItems={this.onUncheckRows}
+                               onCheckAllItems={this.onCheckAllRows}
+                               onRemove={this.onDeleteRows}
+                               onEdit={this.onEditRows}
+                               isEditMode={isEditing}
+                               onCancel={onResetChanges}
+                               onDone={onSaveChanges}
+                               onRefresh={onRefreshData}
+                               onAdd={this.onAddRow}
+                               controls={this.controls()}
+                               onAppDrawerRequest={onAppDrawerRequest}
+                >
+                    {this.renderReactTable()}
+                    {this.extraContent()}
+                </EditableTable>
         )
     }
 }
@@ -203,6 +206,8 @@ Table.propTypes = {
     data: PropTypes.arrayOf(dataItem),
     checkedItems : PropTypes.arrayOf(dataItem),
     pagesCount: PropTypes.number,
+    itemsCount: PropTypes.number,
+    itemsPerPage: PropTypes.number,
     isFetching : PropTypes.bool,
     isEditing : PropTypes.bool,
     onFetchData: PropTypes.func,

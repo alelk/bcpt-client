@@ -20,18 +20,18 @@ const PoolScannerContainer = ({
     scannedDonations, bloodDonations, tableRowChange, removeScannedDonation, assignScannedDonationToPool, bloodPools,
     scannedPools, removeDonationFromPool, saveScannedData, poolScannerState
 }) => {
-    const bloodDonationItems = bloodDonations ? Object.keys(bloodDonations)
-            .map(key => Object.assign({localId: key}, bloodDonations[key])) : [];
+    const bloodDonationsByExternalId = bloodDonations ? Object.keys(bloodDonations)
+            .map(key => Object.assign({localId: key}, bloodDonations[key]))
+            .reduce((acc, bd) => Object.assign(acc, {[bd.externalId] : bd}), {}) : [];
     const scnDonations = bloodDonations && Object.keys(scannedDonations).map(key => scannedDonations[key])
             .sort((sd1, sd2) => sd2.timestamp - sd1.timestamp)
             .map(scannedDonation =>
                 Object.assign(
                     {},
                     scannedDonation,
-                    bloodDonations[scannedDonation.localId] || bloodDonationItems.find(item => item.externalId === scannedDonation.externalId)
+                    bloodDonations[scannedDonation.localId] || bloodDonationsByExternalId[scannedDonation.externalId]
                 )
             );
-    console.info("Scanned donations", scnDonations, bloodDonationItems);
     const scnPools = bloodPools && Object.keys(scannedPools).map(key => scannedPools[key])
             .sort((sp1, sp2) => sp2.timestamp - sp1.timestamp)
             .map(scannedPool =>
@@ -39,7 +39,7 @@ const PoolScannerContainer = ({
             ).map(bloodPool => {
                 const _bloodDonations = (bloodPool.bloodDonations || []).map(donationId =>
                     bloodDonations[donationId] ? Object.assign({localId: donationId}, bloodDonations[donationId]) :
-                        bloodDonationItems.find(di => di.externalId === donationId)
+                        bloodDonationsByExternalId[donationId]
                 );
                 return Object.assign({}, bloodPool, {bloodDonations: _bloodDonations})
             });

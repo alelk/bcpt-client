@@ -63,7 +63,8 @@ const tables = (state = {
         const {pageNumber, response} = action;
         const page = pageFromResponse(pageNumber, response);
         const pagesCount = (page && page.pagesCount) || undefined;
-        return tableWith(state, tableName, {isFetched:true, isFetching:false}, pagesCount && {pagesCount});
+        const itemsCount = (page && page.itemsCount) || undefined;
+        return tableWith(state, tableName, {isFetched:true, isFetching:false, pagesCount, itemsCount});
     } else if (ACTION_TABLE_DATA_FAILURE === type) {
         return tableWith(state, tableName, {isFetched:false, isFetching:false, error});
     } else if (ACTION_TABLE_INVALIDATE_PAGES === type) {

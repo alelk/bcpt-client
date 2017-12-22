@@ -68,6 +68,7 @@ class BloodPoolAnalysisTable extends Table {
                 sortable: false,
                 isEditable: false,
                 filterable: false,
+                minWidth: 180
             }, {
                 Header: "ID загрузки",
                 accessor: "productBatch",
@@ -81,7 +82,7 @@ class BloodPoolAnalysisTable extends Table {
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 90
+                minWidth: 160
             }
         ];
     }

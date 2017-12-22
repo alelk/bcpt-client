@@ -121,6 +121,17 @@ class BloodDonationsTable extends Table {
                 Filter: TextFilter,
                 minWidth: 80
             }, {
+                Header: "Объем, мл.",
+                accessor: "amount",
+                onChange: this.onValueChange,
+                Cell: TextCell,
+                type: "number",
+                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
+                isEditable: true,
+                filterable: true,
+                Filter: TextFilter,
+                minWidth: 100
+            }, {
                 Header: "Тип донации",
                 accessor: "donationType",
                 onChange: this.onValueChange,
@@ -165,17 +176,6 @@ class BloodDonationsTable extends Table {
                 sortable: false,
                 Filter: DropDownFilter,
                 minWidth: 50
-            },{
-                Header: "Объем, мл.",
-                accessor: "amount",
-                onChange: this.onValueChange,
-                Cell: TextCell,
-                type: "number",
-                Footer: (props) => <SumCheckedFooter checkedItems={this.props.checkedItems} {...props}/>,
-                isEditable: true,
-                filterable: true,
-                Filter: TextFilter,
-                minWidth: 100
             }, {
                 Header: "Дата донации",
                 accessor: "donationDate",
@@ -195,7 +195,7 @@ class BloodDonationsTable extends Table {
                 accessor: "updateTimestamp",
                 inputType: "datetime-local",
                 Cell: DateTimeCell,
-                minWidth: 110
+                minWidth: 160
             }
         ];
     }

@@ -1,7 +1,7 @@
 .BloodPoolSubTable {
     background-color: #ede7f6;
 }
-.BloodPoolSubTable > label {
+.BloodPoolSubTable > div > label {
     margin-left: 20px;
     margin-top: 30px;
     font-size: 20px;
