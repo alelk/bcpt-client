@@ -108,10 +108,19 @@ export const scannedDonations = (state = {}, action) => {
     return state;
 };
 
+const RECENT_POOLS_COUNT = 10;
+
+const addScannedPool = (state, externalId, poolChanges) => {
+    const pool = Object.assign({}, state[externalId], poolChanges, {externalId, timestamp: Date.now()});
+    return [pool, ...Object.keys(state).filter(key => key !== externalId).map(key => state[key])]
+        .sort((p1, p2) => p2.timestamp - p1.timestamp).slice(0, RECENT_POOLS_COUNT)
+        .reduce((acc, pool) => Object.assign(acc, {[pool.externalId] : pool}), {});
+};
+
 export const scannedPools = (state = {}, action) => {
     const {type, externalId, localId, totalAmount} = action;
     if (type === ACTION_ASSIGN_SCANNED_DONATION_TO_POOL_SUCCESS) {
-        return objectWith(state, {[externalId] : {externalId, localId, totalAmount, timestamp: Date.now()}})
+        return addScannedPool(state, externalId, {localId, totalAmount});
     }
     return state;
 };

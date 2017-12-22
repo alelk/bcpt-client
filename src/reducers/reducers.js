@@ -239,7 +239,7 @@ const tableItems = (state = {}, action) => {
         return tableItemWith(state, tableName, localId, {isEditing:true, isDeleted:false});
     } else if (ACTION_TABLE_ROW_CHANGE === type && localId) {
         const newState = tableItemWith(state, tableName, localId, objectWith({isEdited:true, isEditing:true}, changes));
-        onComplete && onComplete(newState[tableName][localId]);
+        onComplete && onComplete(newState[tableName] && newState[tableName][localId]);
         return newState;
     } else if (ACTION_TABLE_RESET_CHANGES === type) {
         return objectWith(state, {[tableName]:{}})
@@ -252,7 +252,9 @@ const tableItems = (state = {}, action) => {
         const {errors, localId} = error;
         return tableItemWith(state, tableName, localId, {errors})
     } else if (ACTION_TABLE_ADD_NEW_ITEM === type) {
-        return tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true, creationTimestamp: Date.now()});
+        const newState = tableItemWith(state, tableName, localId, {isEditing:true, isCreated:true, creationTimestamp: Date.now()});
+        onComplete && onComplete(newState[tableName] && newState[tableName][localId]);
+        return newState;
     } else if (ACTION_TABLE_CLEAN_UP_SUBTABLE && isSubtable(tableName)) {
         const items = objectWith(state);
         delete items[tableName];

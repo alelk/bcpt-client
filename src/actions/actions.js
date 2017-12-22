@@ -208,16 +208,33 @@ export const savedChanges = (tableName, localId, response) => ({
 export const ACTION_TABLE_ADD_NEW_ITEM = 'ACTION_TABLE_ADD_NEW_ITEM';
 
 export const tableRowCreate = (tableName, initialData) => (dispatch, getState) => {
+    const externalId = initialData && initialData.externalId;
+    const existing = externalId && getTableRowByLocalIdOrExternalId(getState().tableItems[tableName], externalId);
+    return new Promise((resolve, reject) => {
+        if (existing)
+            dispatch(tableRowChangeOnFeature(tableName, externalId.localId, initialData)).then(tableRow => resolve(tableRow), error => reject(error));
+        else {
+            dispatch(tableRowCreateWithPromise(tableName)).then(tableRow => {
+                const {localId} = tableRow;
+                if (initialData)
+                    dispatch(tableRowChangeOnFeature(tableName, localId, initialData)).then(tableRow => resolve(tableRow), error => reject(error));
+                else resolve(tableRow);
+            });
+        }
+    });
+};
+
+const tableRowCreateWithPromise = (tableName) => (dispatch, getState) => new Promise((resolve) => {
     const table = getState().tables[tableName];
     const localId = Math.random().toString(36);
     dispatch({
         type: ACTION_TABLE_ADD_NEW_ITEM,
         tableName,
         pageNumber: (table && table.pageNumber) || 1,
-        localId
+        localId,
+        onComplete: (tableRow) => resolve(Object.assign({localId}, tableRow))
     });
-    initialData && dispatch(tableRowChange(tableName, localId, initialData));
-};
+});
 
 export const ACTION_TABLE_CLEAN_UP_SUBTABLE = 'ACTION_TABLE_CLEAN_UP_SUBTABLE';
 
