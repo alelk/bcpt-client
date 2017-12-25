@@ -8,6 +8,7 @@ import TextCell from './cell/TextCell'
 import ArrayCell from './cell/ArrayCell'
 import IconCell from './cell/IconCell'
 import DateTimeCell from './cell/DateTimeCell'
+import DropDownCell from './cell/DropDownCell'
 import TextFilter from './filter/TextFilter'
 import Table from './Table'
 import SumCheckedFooter from './footer/SumCheckedFooter'
@@ -118,6 +119,21 @@ class BloodInvoicesTable extends Table {
                 sortable: false,
                 filterable: false,
                 minWidth: 160,
+            }, {
+                Header: "Состояние",
+                accessor: "analysisConclusion",
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: true,
+                allowedValues: [
+                    {value: "", displayValue: ""},
+                    {value: "pass", displayValue: "PASS"},
+                    {value: "reject", displayValue: "БРАК"},
+                    {value: "conversion", displayValue: "Переработка"},
+                ],
+                filterable: false,
+                sortable: false,
+                minWidth: 70
             }, {
                 Header: "Серия ПДФ",
                 accessor: "bloodInvoiceSeries",

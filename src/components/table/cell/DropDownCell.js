@@ -16,6 +16,11 @@ const valueFor = (allowedValues, value) => {
     return v && v.value;
 };
 
+const displayValueFor = (allowedValues, value) => {
+    const v = allowedValues && allowedValues.find(av => av.value === value || av.displayValue === value);
+    return v && v.displayValue;
+};
+
 const DropDownCell = ({value, column, original, row}) => {
     return (
         <div key={original.localId} className={`Cell${(original.isDeleted && ' deleted') || ''}`}>
@@ -23,7 +28,7 @@ const DropDownCell = ({value, column, original, row}) => {
                 original.isEditing && column.isEditable
                     ? <DropDownInput value={valueFor(column.allowedValues, value)} allowedValues={column.allowedValues}
                              onChange={(value) => onCellChange(value, column, row)}/>
-                    : <label>{value}</label>
+                    : <label>{displayValueFor(column.allowedValues, value)}</label>
             }
         </div>
     )

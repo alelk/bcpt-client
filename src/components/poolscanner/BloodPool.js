@@ -23,11 +23,18 @@ const BloodPool = ({bloodPool, totalAmountLimit, onDeleteBloodDonation}) => {
             </div>
             <div style={{display: 'flex', flexWrap: 'wrap'}}>
                 {bloodDonations && Object.keys(bloodDonations).map(bloodDonationId => {
-                    const {amount, localId, externalId, bloodInvoice} = bloodDonations[bloodDonationId];
+                    const {amount, localId, externalId, bloodInvoice, analysisConclusion} = bloodDonations[bloodDonationId];
                     return (
                         <Chip key={bloodDonationId} style={{margin: 6}}
+                              backgroundColor={/pass/.test(analysisConclusion) ? "#b7fabf" :
+                                  /reject/.test(analysisConclusion) ? "#ffa8ab":undefined}
                               onRequestDelete={onDeleteBloodDonation && (() => onDeleteBloodDonation(localId, poolNumber, productBatch))}>
                             <b>{externalId}</b>  <span style={{color:'#00693d'}}>{amount} мл.</span> (накл. <span style={{color:'#333'}}>{bloodInvoice}</span>)
+                            {/reject|conversion/.test(analysisConclusion) &&
+                            <b><span style={/reject/.test(analysisConclusion) ? {color:"#c70039"} : {color:"#001389"}}>
+                                {/reject/.test(analysisConclusion) ? " БРАК" : " Переработка"}
+                            </span></b>
+                            }
                         </Chip>
                     )
                 })}

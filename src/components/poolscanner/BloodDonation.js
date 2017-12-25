@@ -39,12 +39,19 @@ class BloodDonation extends React.Component {
 
     render() {
         const {bloodDonation, onDeleteBloodDonation, poolNumber} = this.props;
-        const {localId, amount, bloodInvoice, externalId} = bloodDonation;
+        const {localId, amount, bloodInvoice, analysisConclusion, externalId} = bloodDonation;
         return (
             <Paper style={{padding: 6, display:'inline-block', margin: 10, flexGrow: 1}} zDepth={3}>
-                <div>
+                <div style={/pass/.test(analysisConclusion) ? {backgroundColor:'#86d6b5'} :
+                    /reject/.test(analysisConclusion) ? {backgroundColor:'#d68b8d'} :
+                        /conversion/.test(analysisConclusion) ? {backgroundColor:'#a1bdd6'} : undefined}>
                     <span>Донация</span>
                     <span style={{fontSize: '1.1em', padding: "0 20px", fontWeight: 800}}>{externalId}</span>
+                    { /reject|conversion/.test(analysisConclusion) &&
+                    <span style={{color: '#5a0009', padding: "0 20px", fontWeight: 800}}>
+                        {/reject/.test(analysisConclusion) ? "БРАК" : "Переработка"}
+                        </span>
+                    }
                     <TextField floatingLabelText="Объём (мл.)"
                                defaultValue={amount}
                                type="number"
