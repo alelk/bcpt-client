@@ -132,6 +132,21 @@ class BloodDonationsTable extends Table {
                 Filter: TextFilter,
                 minWidth: 100
             }, {
+                Header: "Состояние",
+                accessor: "analysisConclusion",
+                onChange: this.onValueChange,
+                Cell: DropDownCell,
+                isEditable: true,
+                allowedValues: [
+                    {value: "", displayValue: ""},
+                    {value: "pass", displayValue: "PASS"},
+                    {value: "reject", displayValue: "БРАК"},
+                    {value: "conversion", displayValue: "Переработка"},
+                ],
+                filterable: true,
+                Filter: DropDownFilter,
+                minWidth: 70
+            }, {
                 Header: "Тип донации",
                 accessor: "donationType",
                 onChange: this.onValueChange,
